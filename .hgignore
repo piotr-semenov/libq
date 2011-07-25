@@ -1,0 +1,23 @@
+syntax: glob
+*.ncb
+*.dep
+*.ilk
+*.exe
+*.user
+*.htm
+*.obj
+*.idb
+*.pdb
+*.lib
+*.dll
+*.suo
+*.manifest
+*.rest
+*.doc
+*.bin
+*.hu
+*.alist
+*.pdf
+*.mht
+*.zip
+*.ber
