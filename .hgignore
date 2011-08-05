@@ -12,7 +12,7 @@ syntax: glob
 *.dll
 *.suo
 *.manifest
-*.rest
+*.res
 *.doc
 *.bin
 *.hu
