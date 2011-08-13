@@ -113,6 +113,7 @@ namespace utils {
             static value_type internal_cast(T val);
         };
 
+        /// @brief default fixed-point number is zero
         explicit number()
             :    m_value(0){}
 
