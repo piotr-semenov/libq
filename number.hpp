@@ -1,4 +1,4 @@
-/// @brief provides fixed-point arithmetics
+/// @mainpage fixed-point stuff
 
 #ifndef INC_FIXED_POINT_NUMBER_HPP_
 #define INC_FIXED_POINT_NUMBER_HPP_
@@ -17,44 +17,101 @@
 #include <boost/integer.hpp>
 
 #include <boost/numeric/conversion/cast.hpp>
+#include <boost/numeric/conversion/bounds.hpp>
 #include <boost/cstdint.hpp>
 
 #include <boost/mpl/bool.hpp>
+#include <boost/mpl/eval_if.hpp>
+#include <boost/type_traits/make_signed.hpp>
+
+#include <boost/integer_traits.hpp>
+
 #include <boost/operators.hpp>
 
 #include <limits>
 #include <cmath>
 
-/// @brief fixed-point number and its arithmetics
+/// namespace utils
+/// @brief fixed-point numbers stuff
+/// @detailed this contains fixed-point number, product type inference by template techniques,
+///            CORDIC implementation of all wide-used elementary functions, utils for flexible
+///            substitution of floating-point with fixed-point and vice versa
 namespace utils {
     namespace {
         namespace mpl = boost::mpl;
     }
 
-    /// @brief class should be parameterized by integral type.
-    ///              no checks will be made for point position: it can be any non-negative
-    /// @param storage_type this integral type represents fixed-point number
-    /// @param total total bits count for fixed-point logic
-    /// @param fractionals count of fractional part bits for fixed-point logic
-    template<typename storage_type, size_t total, size_t fractionals>
+    /// @brief fixed-point number
+    /// @detailed class should be parameterized by integral type: no checks will be made for point position,
+    ///           it can be any non-negative integer
+    /// @param storage_type built-in integral type that represents fixed-point number
+    /// @param n total bits count for fixed-point logic (without sign bit if it need).
+    ///          So if storage_type is signed then total bits representing type is (n + 1).
+    ///          If storage_type is unsigned then total bits representing type is n exactly.
+    /// @param f count of fractional part bits for fixed-point logic
+    template<typename storage_type, size_t n, size_t f>
     class number
-        :    public boost::totally_ordered<number<storage_type, total, fractionals> >,      // >, <=, >=, != in terms of <, == and !
-             public boost::shiftable<number<storage_type, total, fractionals>, size_t>
+        :    public boost::totally_ordered<number<storage_type, n, f> >,   // >, <=, >=, != in terms of <, == and !
+             public boost::shiftable<number<storage_type, n, f>, size_t>
     {
         BOOST_CONCEPT_ASSERT((boost::IntegerConcept<storage_type>));
 
-        BOOST_STATIC_ASSERT((fractionals >= 0));
-        BOOST_STATIC_ASSERT(( (total > fractionals) ? total <= std::numeric_limits<storage_type>::digits : true));
+        BOOST_STATIC_ASSERT((f >= 0));
+        BOOST_STATIC_ASSERT((n <= std::numeric_limits<storage_type>::digits));
 
-        typedef number<storage_type, total, fractionals> this_class;
+        typedef number<storage_type, n, f> this_class;
 
     public:
         typedef this_class type;
 
         typedef storage_type value_type;                                        ///< integral type to model fixed-point logic
-        static size_t const fractionals = fractionals;                          ///< count of fractional part bits
-        static size_t const total = total;                                      ///< count of whole part bits
-        static boost::uintmax_t const scale = static_pow<2, fractionals>::value;  ///< scale to convert from float to fixed-point and contra versa
+        static size_t const fractionals = f;                                    ///< count of fractional part bits
+        static size_t const total = n;                                          ///< count of whole part bits
+        static boost::uintmax_t const scale = static_pow<2, fractionals>::value;  ///< scale to convert from float to fixed-point and vise versa
+
+        static size_t const sign_bit = (std::numeric_limits<value_type>::is_signed) ? 1u : 0; ///< fixed-point number sign bit
+
+        /// @brief integral bounds for fixed-point number values
+        /// @detailed fixed-point number is an modeled by an built-in integer.
+        ///           If fixed-point format does not fit an integer dynamic range,
+        ///           we have to check its user-defined intrinsic range.
+        class bounds
+        {
+        public:
+            /// @brief gets range highest value
+            // logics: we want to get from (2^n - 1) a value (2^m - 1), where n is digits count for extended type
+            //         and m is digits count for fixed-point format
+            //         we could do it in next way: (2^n - 1)/2^(n-m) = 2^m - 1/2^(n-m)
+            //         term -1/2^(n-m) will be truncated to just to -1 during right shift
+            static value_type const max = (boost::integer_traits<value_type>::const_max >> (boost::integer_traits<value_type>::digits - total));
+
+        private:
+            // in case of signed type
+            template<bool t>
+            struct min_bound_traits
+            {
+                static value_type const value = -max - 1;
+            };
+
+            // in case of unsigned types
+            template<>
+            struct min_bound_traits<false>
+            {
+                static value_type const value = value_type(0);
+            };
+
+        public:
+            /// @brief gets range lowest value
+            static value_type const min = min_bound_traits<sign_bit>::value;
+
+            /// @brief cast from any integer type T to internal integer type
+            /// @detailed cast is valid if value could be fit with dynamic range for current
+            ///           fixed-point format
+            /// @throw boost::numeric::positive_overflow or boost::numeric::negative_overflow
+            ///        if value is out of range
+            template<typename T>
+            static value_type internal_cast(T val);
+        };
 
         explicit number()
             :    m_value(0){}
@@ -125,10 +182,45 @@ namespace utils {
         {
             BOOST_CONCEPT_ASSERT((boost::IntegerConcept<storage_type1>));
 
-            static size_t const shifts = std::labs(fractionals - fractionals1);
-            static bool const is_gt = fractionals > fractionals1;
+            static size_t const shifts = (fractionals > fractionals1) ? (fractionals - fractionals1) : (fractionals1 - fractionals);
+            static size_t const max_bits = std::numeric_limits<boost::uintmax_t>::digits;
+            typedef boost::uintmax_t maxint_type;
 
-            value_type val = is_gt ? (boost::numeric_cast<value_type>(x) << shifts) : boost::numeric_cast<value_type>(x >> shifts);
+            //if (std::numeric_limits<value_type>::is_signed) {
+            //    max_bits = std::numeric_limits<boost::intmax_t>::digits;
+            //    typedef boost::intmax_t maxint_type;
+            //}
+            //else {
+            //    max_bits = std::numeric_limits<boost::uintmax_t>::digits;
+            //}
+
+            value_type val(0);
+            value_type const converted = boost::numeric_cast<value_type>(x);
+
+            using boost::mpl::eval_if_c;
+            if (fractionals > fractionals1) {
+                struct t1
+                {
+                    typedef boost::int_t<total + shifts>::least type;
+                };
+
+                struct t2
+                {
+                    typedef maxint_type type;
+                };
+
+                typedef eval_if_c<total + shifts < max_bits, t1, t2>::type extended_type;
+                extended_type t = static_cast<extended_type>(x);
+                t <<= shifts;
+
+                //bounds::check(t);
+                val = static_cast<value_type>(t);
+            }
+            else {
+//                bounds::check(x >> shifts);
+                val = static_cast<value_type>(x >> shifts);
+            }
+
             return val;
         }
 
@@ -148,6 +240,12 @@ namespace utils {
             return x;
         }
 
+        typedef typename boost::make_signed<value_type>::type signed_value_type;
+        static number<signed_value_type, total, fractionals> make_signed(this_class const& x)
+        {
+            return number<signed_value_type, total, fractionals>(x);
+        }
+
         ///////////////////////////// ORDERING OPERATORS /////////////////////////////////////
         /// @brief binary relations for fixed-point numbers
         bool operator <(this_class const& x) const{ return value() < x.value(); }
@@ -155,12 +253,12 @@ namespace utils {
         bool operator !() const{ return value() == 0; }
 
         //////////////////////////// +,-,*,/-OPERATORS ///////////////////////////////////////
-    private:
         typedef typename sum_info<this_class>::sum_type sum_type;
         typedef typename diff_info<this_class>::diff_type diff_type;
         typedef typename product_info<this_class>::product_type product_type;
         typedef typename quotient_info<this_class>::quotient_type quotient_type;
 
+    private:
         static boost::intmax_t const mod = static_pow<2, total - 1>::value;
 
         // if addition is non-closed operation: integral type to represent sum is existed
@@ -244,7 +342,10 @@ namespace utils {
         {
             typedef quotient_type::value_type quotient_value_type;
 
-            quotient_value_type const val = (boost::numeric_cast<quotient_value_type>(a.value()) << fractionals) / this_class(b).value();
+            quotient_value_type const shifted = (boost::numeric_cast<quotient_value_type>(a.value()) << fractionals);
+            quotient_value_type const converted = this_class(b).value();
+            quotient_value_type const val = shifted / converted;
+
             return quotient_type::create(val << fractionals);
         }
 
@@ -279,28 +380,32 @@ namespace utils {
         template<typename Other_type>
         sum_type operator +(Other_type const& x) const
         { 
-            return add(*this, x, mpl::bool_<!(sum_info<this_class>::closing_info::value)>::type());
+            sum_type const val = add(*this, x, mpl::bool_<!(sum_info<this_class>::closing_info::value)>::type());
+            return val;
         }
 
         /// @brief subtracts a number that will be converting to fixed-point form firstly
         template<typename Other_type>
         diff_type operator -(Other_type const& x) const
         {
-            return subtract(*this, x, mpl::bool_<!(diff_info<this_class>::closing_info::value)>::type());
+            diff_type const val = subtract(*this, x, mpl::bool_<!(diff_info<this_class>::closing_info::value)>::type());
+            return val;
         }
 
         /// @brief multiplies by a number that will be converting to fixed-point form firstly
         template<typename Other_type>
         product_type operator *(Other_type const& x) const
         {
-            return product(*this, x, mpl::bool_<!(product_info<this_class>::closing_info::value)>::type());
+            product_type const val = product(*this, x, mpl::bool_<!(product_info<this_class>::closing_info::value)>::type());
+            return val;
         }
 
         /// @brief divides by a number that will be converting to fixed-point form firstly
         template<typename Other_type>
         quotient_type operator /(Other_type const& x) const
         {
-            return divide(*this, x, mpl::bool_<!(quotient_info<this_class>::closing_info::value)>::type());
+            quotient_type const val = divide(*this, x, mpl::bool_<!(quotient_info<this_class>::closing_info::value)>::type());
+            return val;
         }
 
         //////////////////////////////////// OPERATIONS IN RING Z/Z_p ///////////////////////////////////
@@ -524,32 +629,34 @@ namespace std {
 
         static const int digits = total;
 
-        #define M_LOG10_2 M_LOG10E/M_LOG2E
-        static const int digits10 = static_cast<int>(digits * M_LOG10_2 + 0.5);
+        //#define M_LOG10_2 M_LOG10E/M_LOG2E
+        static const int digits10 = 0;//static_cast<int>(digits * M_LOG10_2 + 0.5);
 
-        static const int max_exponent = static_pow<2, total - fractionals>::value;
-        static const int max_exponent10 = static_cast<int>(max_exponent * M_LOG10_2);
-        static const int min_exponent = -static_cast<int>(static_pow<2, fractionals>::value);
-        static const int min_exponent10 = static_cast<int>(min_exponent * M_LOG10_2);
+        static const int max_exponent = 0;//static_pow<2, total - fractionals>::value;
+        static const int max_exponent10 = 0;//static_cast<int>(max_exponent * M_LOG10_2);
+        static const int min_exponent = 0;//-static_cast<int>(static_pow<2, fractionals>::value);
+        static const int min_exponent10 = 0;//static_cast<int>(min_exponent * M_LOG10_2);
         static const int radix = 0;
 
         /// @brief computes minimum value for current type
         static number_type min()
         {
-            if (std::numeric_limits<storage_type>::is_signed)
+            if (std::numeric_limits<storage_type>::is_signed) {
                 return -max();
+            }
+
             return number_type::create(0);
         }
 
         /// @brief computes maximum value for current type
         static number_type max()
         {
-            boost::uintmax_t const whole = (total < fractionals)? 0 : (static_pow<2, total - fractionals>::value - 1);
-            boost::uintmax_t const fractional = static_pow<2, fractionals>::value - 1;
+            boost::uintmax_t val = 0;
+            if (total >= fractionals) {
+                val = static_pow<2, total>::value - 1;
+            }
 
-            boost::uintmax_t const x = whole << fractionals;
-
-            return number_type::create(x + fractional);
+            return number_type::create(val);
         }
 
         /// @brief computes the smallest difference between two values-neighbors
@@ -564,5 +671,10 @@ namespace std {
         static number_type signaling_NaN(){ return number_type(0); }
     };
 }
+
+#define _tmpl_head_ template<typename storage_type, size_t n, size_t f>
+#define _cls_name_ number<storage_type, n, f>
+
+#include "./../Common/details/bounds.inl"
 
 #endif
