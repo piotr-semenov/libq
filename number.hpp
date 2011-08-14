@@ -178,6 +178,9 @@ namespace utils {
         }
 
         /// @brief normalizes specified fixed-point format integer to current format
+        /// @detailed this procedure performs fixed-point alignment
+        /// @param x integer fixed-point integral representation to align with current
+        ///        fixed-point format
         template<typename storage_type1, size_t fractionals1>
         static value_type normalize_of(storage_type1 const x);
 
@@ -188,7 +191,7 @@ namespace utils {
             return val;
         }
 
-        /// @brief combines specified integral value to fixed-point instance
+        /// @brief converts specified integral value to fixed-point instance
         static this_class create(value_type const val)
         {
             this_class x;
@@ -197,6 +200,7 @@ namespace utils {
             return x;
         }
 
+        /// @brief converts unsigned fixed-point to signed one by adding sign bit
         typedef typename boost::make_signed<value_type>::type signed_value_type;
         static number<signed_value_type, total, fractionals> make_signed(this_class const& x)
         {
@@ -204,10 +208,16 @@ namespace utils {
         }
 
         ///////////////////////////// ORDERING OPERATORS /////////////////////////////////////
-        /// @brief binary relations for fixed-point numbers
-        bool operator <(this_class const& x) const{ return value() < x.value(); }
-        bool operator ==(this_class const& x) const{ return value() == x.value(); }
-        bool operator !() const{ return value() == 0; }
+        /// @brief 'less' binary relation for fixed-point numbers
+        /// @param x instance to compare with
+        bool operator <(this_class const& x) const;
+
+        /// @brief 'equal-to' binary relation for fixed-point numbers
+        /// @param x instance to compare with
+        bool operator ==(this_class const& x) const;
+
+        /// @brief 'not equal to zero' binary relation for fixed-point numbers
+        bool operator !() const;
 
         //////////////////////////// +,-,*,/-OPERATORS ///////////////////////////////////////
         typedef typename sum_info<this_class>::sum_type sum_type;
@@ -634,5 +644,6 @@ namespace std {
 
 #include "./../Common/details/bounds.inl"
 #include "./../Common/details/normalization.inl"
+#include "./../Common/details/ordering.inl"
 
 #endif
