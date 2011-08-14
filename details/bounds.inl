@@ -7,16 +7,6 @@ namespace utils {
             BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
             BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T1>));
 
-            struct first
-            {
-                typedef T type;
-            };
-
-            struct second
-            {
-                typedef T1 type;
-            };
-
             static size_t const d1 = std::numeric_limits<T>::digits;
             static size_t const d2 = std::numeric_limits<T1>::digits;
 
