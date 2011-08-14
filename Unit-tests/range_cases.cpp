@@ -58,7 +58,7 @@ namespace utils { namespace unit_tests {
 
         typedef S_number<8, 13>::type type1;
         typedef U_number<53, 45>::type type2;
-        typedef U_number<17, 1>::type type3;
+        typedef U_number<13, 1>::type type3;
 
         type3 x(100);
 
@@ -89,6 +89,9 @@ namespace utils { namespace unit_tests {
         typedef S_number<35, 12>::type type2;
         typedef U_number<19, 3>::type type3;
 
+        typedef U_number<27, 3>::type type4;
+        typedef S_number<26, 3>::type type5;
+
         std::string const message("Wrong overflow detection if integer fits the fixed-point format range");
         try {
             type1::bounds::internal_cast(17592186044415L);
@@ -99,6 +102,12 @@ namespace utils { namespace unit_tests {
 
             type3::bounds::internal_cast(524287L);
             type3::bounds::internal_cast(0);
+
+            type4::bounds::internal_cast(134217727L);
+            type4::bounds::internal_cast(0);
+
+            type5::bounds::internal_cast(67108863L);
+            type5::bounds::internal_cast(-67108864L);
         }
         catch (std::exception e) {
             BOOST_FAIL(message);
