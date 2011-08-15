@@ -279,43 +279,18 @@ namespace utils {
         template<typename storage_type1, size_t total1, size_t fractionals1>
         this_class product(this_class const& a, number<storage_type1, total1, fractionals1> const& b, mpl::bool_<false>::type) const;
 
+        // 4. DIVISION
         // if division is non-closed operation
         template<typename Other_type>
-        quotient_type divide(this_class const& a, Other_type const &b, mpl::bool_<true>::type) const
-        {
-            typedef quotient_type::value_type quotient_value_type;
-
-            quotient_value_type const shifted = (boost::numeric_cast<quotient_value_type>(a.value()) << fractionals);
-            quotient_value_type const converted = this_class(b).value();
-            quotient_value_type const val = shifted / converted;
-
-            return quotient_type::create(val << fractionals);
-        }
+        quotient_type divide(this_class const& a, Other_type const &b, mpl::bool_<true>::type) const;
 
         // if division is closed operation: case of integral value
         template<typename Other_type>
-        this_class divide(this_class const& a, Other_type const &b, mpl::bool_<false>::type) const
-        {
-            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<Other_type>));
-
-            this_class x = a;
-            x *= b;
-
-            return x;
-        }
+        this_class divide(this_class const& a, Other_type const &b, mpl::bool_<false>::type) const;
 
         // if division is closed operation: case of another fixed-point
         template<typename storage_type1, size_t total1, size_t fractionals1>
-        this_class divide(this_class const& a, number<storage_type1, total1, fractionals1> const&b, mpl::bool_<false>::type) const
-        {
-            this_class x;
-
-            // we have no additional precision for quotient due to operation closeness
-            value_type const val = (static_cast<value_type>(1u) << fractionals1) / static_cast<value_type>(b.value());
-            x.value(a.value() * val);
-
-            return x;
-        }
+        this_class divide(this_class const& a, number<storage_type1, total1, fractionals1> const&b, mpl::bool_<false>::type) const;
 
     public:
         /// @brief addition with a number
@@ -341,7 +316,7 @@ namespace utils {
         diff_type operator -(Other_type const& x) const;
 
         /// @brief multiplies by a number
-        /// @detailed multiplied number will be converted to fixed-point firstly
+        /// @detailed multiplied number will be converted to fixed-point firstly.
         ///           Its format will be the same as the left operand has.
         ///           So expression (a * b) will be processed by the next algorithm:
         ///           1. b will be converted to value b' with fixed-point format of a
@@ -352,12 +327,15 @@ namespace utils {
         product_type operator *(Other_type const& x) const;
 
         /// @brief divides by a number that will be converting to fixed-point form firstly
+        /// @detailed divider will be converted to fixed-point firstly.
+        ///           Its format will be the same as the left operand has.
+        ///           So expression (a / b) will be processed by the next algorithm:
+        ///           1. b will be converted to value b' with fixed-point format of a
+        ///           2. (a / b') will be performed
+        ///           So, (a / b') will have the type type(a)::quotient_type.
+        ///           So we have, (signed * ...) -> signed, (unsigned * ...) -> unsigned.
         template<typename Other_type>
-        quotient_type operator /(Other_type const& x) const
-        {
-            quotient_type const val = divide(*this, x, mpl::bool_<!(quotient_info<this_class>::closing_info::value)>::type());
-            return val;
-        }
+        quotient_type operator /(Other_type const& x) const;
 
         //////////////////////////////////// OPERATIONS IN RING Z/Z_p ///////////////////////////////////
         /// @brief interprets fixed-point number as integer and adds to it an integer
