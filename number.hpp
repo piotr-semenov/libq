@@ -248,33 +248,23 @@ namespace utils {
 
         // FIXED-POINT ARITHMETICS AUX
         //////////////////////////////////////////////////////////////////////////
+        // 1. SUMMATION
         // if addition is non-closed operation: integral type to represent summand is existed
         template<typename Other_type>
-        sum_type add(this_class const& a, Other_type const& b, mpl::bool_<true>::type) const;
+        inline sum_type add(this_class const& a, Other_type const& b, mpl::bool_<true>::type) const;
 
         // if addition is closed operation: integral type to represent sum isn't existed
         template<typename Other_type>
-        this_class add(this_class const& a, Other_type const& b, mpl::bool_<false>::type) const;
+        inline this_class add(this_class const& a, Other_type const& b, mpl::bool_<false>::type) const;
 
+        // 2. SUBTRACTION
         // if subtraction is non-closed operation
         template<typename Other_type>
-        diff_type subtract(this_class const& a, Other_type const& b, mpl::bool_<true>::type) const
-        {
-            typedef diff_type::value_type diff_value_type;
-
-            diff_value_type const val = boost::numeric_cast<diff_value_type>(a.value()) - this_class(b).value();
-            return diff_type::create(val);
-        }
+        diff_type subtract(this_class const& a, Other_type const& b, mpl::bool_<true>::type) const;
 
         // if subtraction is closed operation
         template<typename Other_type>
-        this_class subtract(this_class const& a, Other_type const& b, mpl::bool_<false>::type) const
-        {
-            value_type const diff = a.value() - this_class(b).value();
-
-            value_type const val = static_cast<value_type>(diff % this_class::mod);
-            return this_class::create(val);
-        }
+        this_class subtract(this_class const& a, Other_type const& b, mpl::bool_<false>::type) const;
 
         // if product is non-closed operation
         template<typename Other_type>
@@ -350,7 +340,7 @@ namespace utils {
 
     public:
         /// @brief addition with a number
-        /// @detailed added number will be converting to fixed-point firstly.
+        /// @detailed added number will be converted to fixed-point firstly.
         ///           Its format will be the same as the left operand has.
         ///           So expression (a + b) will be processed by the next algorithm:
         ///           1. b will be converted to value b' with fixed-point format of a
@@ -360,13 +350,16 @@ namespace utils {
         template<typename Other_type>
         sum_type operator +(Other_type const& x) const;
 
-        /// @brief subtracts a number that will be converting to fixed-point form firstly
+        /// @brief subtracts within a number
+        /// @detailed subtracted number will be converted to fixed-point firstly.
+        ///           Its format will be the same as the left operand has.
+        ///           So expression (a - b) will be processed by the next algorithm:
+        ///           1. b will be converted to value b' with fixed-point format of a
+        ///           2. (a - b') will be performed
+        ///           So, (a - b) will have the type type(a)::diff_type.
+        ///           So we have, (signed - ...) -> signed, (unsigned - ...) -> unsigned.
         template<typename Other_type>
-        diff_type operator -(Other_type const& x) const
-        {
-            diff_type const val = subtract(*this, x, mpl::bool_<!(diff_info<this_class>::closing_info::value)>::type());
-            return val;
-        }
+        diff_type operator -(Other_type const& x) const;
 
         /// @brief multiplies by a number that will be converting to fixed-point form firstly
         template<typename Other_type>
