@@ -63,4 +63,49 @@ namespace utils {
         diff_type const val = subtract(*this, x, mpl::bool_<!(diff_info<this_class>::closing_info::value)>::type());
         return val;
     }
+
+    // MULTIPLICATION
+    //////////////////////////////////////////////////////////////////////////
+    // 1. if multiplication is non-closed operation
+    _tmpl_head_ template<typename Other_type>
+    typename _cls_name_::product_type _cls_name_::product(_cls_name_ const& a, Other_type const& b, bool_<true>::type) const
+    {
+        typedef product_type::value_type product_value_type;
+
+        product_value_type const val = boost::numeric_cast<product_value_type>(a.value()) * this_class(b).value();
+        return product_type::create(val);
+    }
+
+    // 2. if multiplication is closed operation
+    // 2.1 case of integral value
+    _tmpl_head_ template<typename Other_type>
+    _cls_name_ _cls_name_::product(_cls_name_ const& a, Other_type const& b, bool_<false>::type) const
+    {
+        BOOST_CONCEPT_ASSERT((boost::IntegerConcept<Other_type>));
+
+        this_class x = a;
+        x *= b;
+
+        return x;
+    }
+
+    // 2.2 case of fixed-point of another format
+    _tmpl_head_ template<typename storage_type1, size_t total1, size_t fractionals1>
+    _cls_name_ _cls_name_::product(_cls_name_ const& a, number<storage_type1, total1, fractionals1> const& b, bool_<false>::type) const
+    {
+        this_class x;
+
+        value_type const val = a.value() * static_cast<value_type>(b.value());
+        x.value(val >> fractionals1);
+
+        return x;
+    }
+
+    // 3. multiplication operator
+    _tmpl_head_ template<typename Other_type>
+    typename _cls_name_::product_type _cls_name_::operator *(Other_type const& x) const
+    {
+        product_type const val = product(*this, x, bool_<!(product_info<this_class>::closing_info::value)>::type());
+        return val;
+    }
 }
