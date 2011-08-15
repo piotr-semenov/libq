@@ -108,4 +108,53 @@ namespace utils {
         product_type const val = product(*this, x, bool_<!(product_info<this_class>::closing_info::value)>::type());
         return val;
     }
+
+    // DIVISION
+    //////////////////////////////////////////////////////////////////////////
+    // 1. if division is non-closed operation
+    _tmpl_head_ template<typename Other_type>
+    typename _cls_name_::quotient_type _cls_name_::divide(_cls_name_ const& a, Other_type const &b, bool_<true>::type) const
+    {
+        typedef quotient_type::value_type quotient_value_type;
+
+        quotient_value_type const shifted = (boost::numeric_cast<quotient_value_type>(a.value()) << fractionals);
+        quotient_value_type const converted = this_class(b).value();
+        quotient_value_type const val = shifted / converted;
+
+        return quotient_type::create(val << fractionals);
+    }
+
+    // 2. if division is closed operation
+    // 2.1 case of integral value
+    _tmpl_head_ template<typename Other_type>
+    _cls_name_ _cls_name_::divide(_cls_name_ const& a, Other_type const &b, bool_<false>::type) const
+    {
+        BOOST_CONCEPT_ASSERT((boost::IntegerConcept<Other_type>));
+
+        this_class x = a;
+        x *= b;
+
+        return x;
+    }
+
+    // 2.2 case of another fixed-point
+    _tmpl_head_ template<typename storage_type1, size_t total1, size_t fractionals1>
+    _cls_name_ _cls_name_::divide(_cls_name_ const& a, number<storage_type1, total1, fractionals1> const&b, bool_<false>::type) const
+    {
+        this_class x;
+
+        // we have no additional precision for quotient due to operation closeness
+        value_type const val = (static_cast<value_type>(1u) << fractionals1) / static_cast<value_type>(b.value());
+        x.value(a.value() * val);
+
+        return x;
+    }
+
+    // 3. division operator
+    _tmpl_head_ template<typename Other_type>
+    typename _cls_name_::quotient_type _cls_name_::operator /(Other_type const& x) const
+    {
+        quotient_type const val = divide(*this, x, mpl::bool_<!(quotient_info<this_class>::closing_info::value)>::type());
+        return val;
+    }
 }
