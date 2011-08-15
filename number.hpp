@@ -266,39 +266,18 @@ namespace utils {
         template<typename Other_type>
         this_class subtract(this_class const& a, Other_type const& b, mpl::bool_<false>::type) const;
 
+        // 3. MULTIPLICATION
         // if product is non-closed operation
         template<typename Other_type>
-        product_type product(this_class const& a, Other_type const& b, mpl::bool_<true>::type) const
-        {
-            typedef product_type::value_type product_value_type;
-
-            product_value_type const val = boost::numeric_cast<product_value_type>(a.value()) * this_class(b).value();
-            return product_type::create(val);
-        }
+        product_type product(this_class const& a, Other_type const& b, mpl::bool_<true>::type) const;
 
         // if product is closed operation: case of integral value
         template<typename Other_type>
-        this_class product(this_class const& a, Other_type const& b, mpl::bool_<false>::type) const
-        {
-            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<Other_type>));
-
-            this_class x = a;
-            x *= b;
-
-            return x;
-        }
+        this_class product(this_class const& a, Other_type const& b, mpl::bool_<false>::type) const;
 
         // if product is closed operation: case of another fixed-point
         template<typename storage_type1, size_t total1, size_t fractionals1>
-        this_class product(this_class const& a, number<storage_type1, total1, fractionals1> const& b, mpl::bool_<false>::type) const
-        {
-            this_class x;
-
-            value_type const val = a.value() * static_cast<value_type>(b.value());
-            x.value(val >> fractionals1);
-
-            return x;
-        }
+        this_class product(this_class const& a, number<storage_type1, total1, fractionals1> const& b, mpl::bool_<false>::type) const;
 
         // if division is non-closed operation
         template<typename Other_type>
@@ -361,13 +340,16 @@ namespace utils {
         template<typename Other_type>
         diff_type operator -(Other_type const& x) const;
 
-        /// @brief multiplies by a number that will be converting to fixed-point form firstly
+        /// @brief multiplies by a number
+        /// @detailed multiplied number will be converted to fixed-point firstly
+        ///           Its format will be the same as the left operand has.
+        ///           So expression (a * b) will be processed by the next algorithm:
+        ///           1. b will be converted to value b' with fixed-point format of a
+        ///           2. (a * b') will be performed
+        ///           So, (a * b') will have the type type(a)::product_type.
+        ///           So we have, (signed * ...) -> signed, (unsigned * ...) -> unsigned.
         template<typename Other_type>
-        product_type operator *(Other_type const& x) const
-        {
-            product_type const val = product(*this, x, mpl::bool_<!(product_info<this_class>::closing_info::value)>::type());
-            return val;
-        }
+        product_type operator *(Other_type const& x) const;
 
         /// @brief divides by a number that will be converting to fixed-point form firstly
         template<typename Other_type>
