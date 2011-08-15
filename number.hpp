@@ -23,6 +23,7 @@
 #include <boost/mpl/bool.hpp>
 #include <boost/mpl/eval_if.hpp>
 #include <boost/type_traits/make_signed.hpp>
+#include <boost/type_traits/make_unsigned.hpp>
 
 #include <boost/integer_traits.hpp>
 
@@ -195,19 +196,13 @@ namespace utils {
         static this_class create(value_type const val)
         {
             this_class x;
-            x.m_value = val;
 
+            x.m_value = bounds::internal_cast(val);
             return x;
         }
 
-        /// @brief converts unsigned fixed-point to signed one by adding sign bit
-        typedef typename boost::make_signed<value_type>::type signed_value_type;
-        static number<signed_value_type, total, fractionals> make_signed(this_class const& x)
-        {
-            return number<signed_value_type, total, fractionals>(x);
-        }
-
-        ///////////////////////////// ORDERING OPERATORS /////////////////////////////////////
+        // ORDERING OPERATORS
+        //////////////////////////////////////////////////////////////////////////
         /// @brief 'less' binary relation for fixed-point numbers
         /// @param x instance to compare with
         bool operator <(this_class const& x) const;
@@ -219,34 +214,47 @@ namespace utils {
         /// @brief 'not equal to zero' binary relation for fixed-point numbers
         bool operator !() const;
 
-        //////////////////////////// +,-,*,/-OPERATORS ///////////////////////////////////////
+        // FIXED-POINT ARITHMETICS
+        //////////////////////////////////////////////////////////////////////////
+        /// @brief current type of fixed-point number extended by sign or current type if it
+        ///        is already signed
+        typedef number<typename boost::make_signed<value_type>::type, total, fractionals> to_signed_type;
+
+        /// @brief current type of fixed-point number truncated by sign removing or current type
+        ///        if it is already unsigned
+        typedef number<typename boost::make_unsigned<value_type>::type, total, fractionals> to_unsigned_type;
+
+        /// @brief type of summand in case of addition with instance of current type
+        /// @detailed so this type differs from real-world applicable one just by
+        ///           sign that was propagated from current type.
+        ///           Sum_type could be used with to_signed_type.
+        /// @see to_signed_type
         typedef typename sum_info<this_class>::sum_type sum_type;
+
+        /// @brief type of minuend in case of subtraction with instance of current type
+        /// @see sum_type
         typedef typename diff_info<this_class>::diff_type diff_type;
+
+        /// @brief type of product in case of multiplication with instance of current type
+        /// @see sum_type
         typedef typename product_info<this_class>::product_type product_type;
+
+        /// @brief type of dividend in case of division with instance of current type
+        /// @see sum_type
         typedef typename quotient_info<this_class>::quotient_type quotient_type;
 
     private:
-        static boost::intmax_t const mod = static_pow<2, total - 1>::value;
+        static boost::uintmax_t const mod = static_pow<2, total - 1>::value;
 
-        // if addition is non-closed operation: integral type to represent sum is existed
+        // FIXED-POINT ARITHMETICS AUX
+        //////////////////////////////////////////////////////////////////////////
+        // if addition is non-closed operation: integral type to represent summand is existed
         template<typename Other_type>
-        sum_type add(this_class const& a, Other_type const& b, mpl::bool_<true>::type) const
-        {
-            typedef sum_type::value_type sum_value_type;
-
-            sum_value_type const val = boost::numeric_cast<sum_value_type>(a.value()) + this_class(b).value();
-            return sum_type::create(val);
-        }
+        sum_type add(this_class const& a, Other_type const& b, mpl::bool_<true>::type) const;
 
         // if addition is closed operation: integral type to represent sum isn't existed
         template<typename Other_type>
-        this_class add(this_class const& a, Other_type const& b, mpl::bool_<false>::type) const
-        {
-            value_type const sum = a.value() + this_class(b).value();
-
-            value_type const val = static_cast<value_type>(sum % this_class::mod);
-            return this_class::create(val);
-        }
+        this_class add(this_class const& a, Other_type const& b, mpl::bool_<false>::type) const;
 
         // if subtraction is non-closed operation
         template<typename Other_type>
@@ -290,7 +298,6 @@ namespace utils {
             return x;
         }
 
-        /// !!!! here is a bottleneck in fixed-point implementation performance
         // if product is closed operation: case of another fixed-point
         template<typename storage_type1, size_t total1, size_t fractionals1>
         this_class product(this_class const& a, number<storage_type1, total1, fractionals1> const& b, mpl::bool_<false>::type) const
@@ -342,14 +349,16 @@ namespace utils {
         }
 
     public:
-
-        /// @brief adds a number that will be converting to fixed-point form firstly
+        /// @brief addition with a number
+        /// @detailed added number will be converting to fixed-point firstly.
+        ///           Its format will be the same as the left operand has.
+        ///           So expression (a + b) will be processed by the next algorithm:
+        ///           1. b will be converted to value b' with fixed-point format of a
+        ///           2. (a + b') will be performed
+        ///           So, (a + b) will have the type type(a)::sum_type.
+        ///           So we have, (signed + ...) -> signed, (unsigned + ...) -> unsigned.
         template<typename Other_type>
-        sum_type operator +(Other_type const& x) const
-        { 
-            sum_type const val = add(*this, x, mpl::bool_<!(sum_info<this_class>::closing_info::value)>::type());
-            return val;
-        }
+        sum_type operator +(Other_type const& x) const;
 
         /// @brief subtracts a number that will be converting to fixed-point form firstly
         template<typename Other_type>
@@ -644,6 +653,9 @@ namespace std {
 
 #include "./../Common/details/bounds.inl"
 #include "./../Common/details/normalization.inl"
+
 #include "./../Common/details/ordering.inl"
+
+#include "./../Common/details/arithmetics.inl"
 
 #endif
