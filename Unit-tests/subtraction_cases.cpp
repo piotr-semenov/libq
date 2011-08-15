@@ -63,7 +63,7 @@ namespace utils { namespace unit_tests {
         std::string const message("fixed-point arithmetics does not satisfy law of negatives");
         BOOST_CHECK_MESSAGE(a - a == type::diff_type(unit), message);
         BOOST_CHECK_MESSAGE(b - b == type::diff_type(unit), message);
-        BOOST_CHECK_MESSAGE(a - c == type::diff_type(unit), message);
+        BOOST_CHECK_MESSAGE(c - c == type::diff_type(unit), message);
     }
 
     // check for unit and commutativity is considered in sum_cases.cpp
