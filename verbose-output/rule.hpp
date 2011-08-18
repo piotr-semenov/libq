@@ -3,7 +3,7 @@
 #include "./../../Common/functor_info.hpp"
 
 namespace utils { namespace verbose_output {
-    /// @brief rule interface that tracks variable state changes
+    /// @brief interface for rules tracking variable state changes
     class rule
         :    public utils::functor_info<bool(void) const>
     {
