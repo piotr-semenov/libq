@@ -1,6 +1,6 @@
 #include "./../../../Common/verbose-output/rule.hpp"
 
-#include <boost/concept_check.hpp>
+#include <boost/static_assert.hpp>
 
 namespace utils { namespace verbose_output {
     /// @brief rule for events from integrals state changing
@@ -11,7 +11,7 @@ namespace utils { namespace verbose_output {
     class integrals_rule
         :    public rule
     {
-        BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
+        BOOST_STATIC_ASSERT((boost::is_arithmetic<T>::value));
 
         typedef integrals_rule<T> this_class;
         typedef rule base_class;
@@ -20,12 +20,12 @@ namespace utils { namespace verbose_output {
         /// @brief default constructor
         /// @param state observable
         /// @param stride stride we want to log observable through
-        rule(T state, T stride)
+        integrals_rule(T state, T stride)
             :    m_state(state), m_stride(stride){ };
 
         /// @brief inherited from rule interface
         /// @see rule
-        result_type operator(args<0>::type) const;
+        result_type operator()(args<0>::type);
 
     private:
         // logics: we could not adaptively change rule behavior.
@@ -40,10 +40,9 @@ namespace utils { namespace verbose_output {
         T m_state;
         T m_stride;
     };
+}}
 
 #define _tmpl_head_T_ template<typename T>
 #define _cls_name_ integrals_rule<T>
 
 #include "./../../../Common/verbose-output/rules/details/integrals_rule.inl"
-
-}}
