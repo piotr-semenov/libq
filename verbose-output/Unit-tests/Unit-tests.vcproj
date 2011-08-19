@@ -21,6 +21,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			InheritedPropertySheets="..\..\..\Boost.vsprops"
 			CharacterSet="1"
 			>
 			<Tool
@@ -85,6 +86,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Running unit tests..."
+				CommandLine="&quot;$(TargetPath)&quot;"
 			/>
 		</Configuration>
 		<Configuration
@@ -92,6 +95,7 @@
 			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
 			IntermediateDirectory="$(ConfigurationName)"
 			ConfigurationType="1"
+			InheritedPropertySheets="..\..\..\Boost.vsprops"
 			CharacterSet="1"
 			WholeProgramOptimization="1"
 			>
@@ -159,6 +163,8 @@
 			/>
 			<Tool
 				Name="VCPostBuildEventTool"
+				Description="Running unit test..."
+				CommandLine="$(TargetPath)"
 			/>
 		</Configuration>
 	</Configurations>
@@ -170,12 +176,10 @@
 			Filter="cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx"
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
-		</Filter>
-		<Filter
-			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
+			<File
+				RelativePath=".\integrals_rule_test.cpp"
+				>
+			</File>
 		</Filter>
 	</Files>
 	<Globals>
