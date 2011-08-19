@@ -4,11 +4,11 @@
 #include <boost/test/unit_test.hpp>
 #include <string>
 
-#include "./../rules/integrals_rule.hpp"
+#include "./../rules/numerals_rule.hpp"
 
 namespace utils { namespace verbose_output { namespace unit_tests {
     namespace {
-        using utils::verbose_output::integrals_rule;
+        using utils::verbose_output::numerals_rule;
     }
 
     BOOST_AUTO_TEST_SUITE(IntegralsRule)
@@ -21,7 +21,7 @@ namespace utils { namespace verbose_output { namespace unit_tests {
     {
         size_t const ob = 0;
 
-        integrals_rule<size_t> rule(ob, 50);
+        numerals_rule<size_t> rule(ob, 50);
         BOOST_CHECK_MESSAGE(rule(ob + 49) == false, "event was misoperated");
         BOOST_CHECK_MESSAGE(rule(ob + 56) == true, "event was failed");
     }
@@ -30,7 +30,7 @@ namespace utils { namespace verbose_output { namespace unit_tests {
     {
         double const ob = -10.23;
 
-        integrals_rule<double> rule(ob, -0.01);
+        numerals_rule<double> rule(ob, -0.01);
         BOOST_CHECK_MESSAGE(rule(ob - 0.001) == false, "event was misoperated");
         BOOST_CHECK_MESSAGE(rule(ob - 0.02) == true, "event was failed");
     }
@@ -39,7 +39,7 @@ namespace utils { namespace verbose_output { namespace unit_tests {
     {
         int const ob = -203;
 
-        integrals_rule<int> rule(ob, -20);
+        numerals_rule<int> rule(ob, -20);
         BOOST_CHECK_MESSAGE(rule(ob + 19) == false, "event was misoperated");
         BOOST_CHECK_MESSAGE(rule(ob - 100) == true, "event was failed");
     }
