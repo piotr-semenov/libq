@@ -31,10 +31,9 @@ namespace utils { namespace verbose_output {
             unsigned_type_map<T> >::type type;
         type const value = *boost::any_cast<T>(&x);
 
-        type const state = this->state();
-        type const stride = this->stride();
-        if (std::abs(state + stride) <= std::abs(value)) {
-            this->state(static_cast<T>(state + stride));
+        type const pt = this->state() + this->stride();
+        if (std::abs(pt) <= std::abs(value)) {
+            this->state(static_cast<T>(pt));
 
             return true;
         }
