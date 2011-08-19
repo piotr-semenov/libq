@@ -177,6 +177,14 @@
 			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
 			>
 			<File
+				RelativePath=".\formats_verifying.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\formatted_output_test.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\numerals_rule_test.cpp"
 				>
 			</File>
