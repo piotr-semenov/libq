@@ -48,6 +48,6 @@ namespace utils { namespace verbose_output {
 #define _tmpl_head_T_ template<typename T>
 #define _cls_name_ numerals_rule<T>
 
-#include "./../../../Common/verbose-output/rules/details/integrals_rule.inl"
+#include "./../../../Common/verbose-output/rules/details/numerals_rule.inl"
 
 #endif
