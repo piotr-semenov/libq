@@ -9,21 +9,21 @@ namespace utils { namespace verbose_output {
     /// @brief rule for events from integrals state changing
     /// @detailed 1. let x be monotonous increasing integral under observation
     ///           2. let we want to track x every time if it goes through 100
-    ///           3. so integrals_rule will raise event if we observe x + y, where y >= 100
+    ///           3. so numerals_rule will raise event if we observe x + y, where y >= 100
     template<typename T>
-    class integrals_rule
+    class numerals_rule
         :    public rule
     {
         BOOST_STATIC_ASSERT((boost::is_arithmetic<T>::value));
 
-        typedef integrals_rule<T> this_class;
+        typedef numerals_rule<T> this_class;
         typedef rule base_class;
 
     public:
         /// @brief default constructor
         /// @param state observable
         /// @param stride stride we want to log observable through
-        integrals_rule(T state, T stride)
+        numerals_rule(T state, T stride)
             :    m_state(state), m_stride(stride){ };
 
         /// @brief inherited from rule interface
@@ -46,7 +46,7 @@ namespace utils { namespace verbose_output {
 }}
 
 #define _tmpl_head_T_ template<typename T>
-#define _cls_name_ integrals_rule<T>
+#define _cls_name_ numerals_rule<T>
 
 #include "./../../../Common/verbose-output/rules/details/integrals_rule.inl"
 
