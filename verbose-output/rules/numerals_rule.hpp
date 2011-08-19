@@ -1,3 +1,6 @@
+#ifndef INC_NUMERALS_RULE_HPP_
+#define INC_NUMERALS_RULE_HPP_
+
 #include "./../../../Common/verbose-output/rule.hpp"
 
 #include <boost/static_assert.hpp>
@@ -46,3 +49,5 @@ namespace utils { namespace verbose_output {
 #define _cls_name_ integrals_rule<T>
 
 #include "./../../../Common/verbose-output/rules/details/integrals_rule.inl"
+
+#endif
