@@ -5,7 +5,7 @@
 namespace utils { namespace verbose_output {
     /// @brief interface for rules tracking variable state changes
     class rule
-        :    public utils::functor_info<bool(void) const>
+        :    public utils::functor_info<bool(boost::any) const>
     {
     public:
         virtual ~rule(){}
