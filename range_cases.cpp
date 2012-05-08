@@ -4,7 +4,7 @@
 
 #include <string>
 
-#include "./../../Common/number.hpp"
+#include "./../fixed_point/lib/number.hpp"
 
 namespace utils { namespace unit_tests {
     namespace {
