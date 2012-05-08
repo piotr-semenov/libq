@@ -3,7 +3,7 @@
 #ifndef INC_DIFFERENCE_INFO_HPP_
 #define INC_DIFFERENCE_INFO_HPP_
 
-#include "./../Common/sum_info.hpp"
+#include "./sum_info.hpp"
 
 namespace utils {
     /// @brief meta-class to inference computation primitive subtraction type

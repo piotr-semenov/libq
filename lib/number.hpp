@@ -3,13 +3,13 @@
 #ifndef INC_FIXED_POINT_NUMBER_HPP_
 #define INC_FIXED_POINT_NUMBER_HPP_
 
-#include "./../Common/quotient_info.hpp"
-#include "./../Common/product_info.hpp"
+#include "./quotient_info.hpp"
+#include "./product_info.hpp"
 
-#include "./../Common/diff_info.hpp"
-#include "./../Common/sum_info.hpp"
+#include "./diff_info.hpp"
+#include "./sum_info.hpp"
 
-#include "./../Common/static_pow.hpp"
+#include "static_pow.hpp"
 
 #include <boost/static_assert.hpp>
 #include <boost/concept_check.hpp>
@@ -604,11 +604,11 @@ namespace std {
 #define _tmpl_head_ template<typename storage_type, size_t n, size_t f>
 #define _cls_name_ number<storage_type, n, f>
 
-#include "./../Common/details/bounds.inl"
-#include "./../Common/details/normalization.inl"
+#include "./details/bounds.inl"
+#include "./details/normalization.inl"
 
-#include "./../Common/details/ordering.inl"
+#include "./details/ordering.inl"
 
-#include "./../Common/details/arithmetics.inl"
+#include "./details/arithmetics.inl"
 
 #endif

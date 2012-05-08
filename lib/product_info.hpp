@@ -3,7 +3,7 @@
 #ifndef INC_PRODUCT_INFO_HPP_
 #define INC_PRODUCT_INFO_HPP_
 
-#include "./../Common/number.hpp"
+#include "./number.hpp"
 
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
