@@ -193,7 +193,8 @@ namespace utils {
         }
 
         /// @brief converts specified integral value to fixed-point instance
-        static this_class create(value_type const val)
+        template<typename other_type>
+        static this_class create(other_type const val)
         {
             this_class x;
 
