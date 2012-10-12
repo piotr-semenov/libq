@@ -10,6 +10,16 @@
       <Platform>Win32</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\division_cases.cpp" />
+    <ClCompile Include="..\normalization_cases.cpp" />
+    <ClCompile Include="..\ordering_cases.cpp" />
+    <ClCompile Include="..\product_cases.cpp" />
+    <ClCompile Include="..\range_cases.cpp" />
+    <ClCompile Include="..\sign_cases.cpp" />
+    <ClCompile Include="..\subtraction_cases.cpp" />
+    <ClCompile Include="..\sum_cases.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectName>Unit-tests</ProjectName>
     <ProjectGuid>{66D57F85-F10F-4EAF-873F-18F05ABE1B0E}</ProjectGuid>
@@ -101,16 +111,6 @@
       <Command>$(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="division_cases.cpp" />
-    <ClCompile Include="normalization_cases.cpp" />
-    <ClCompile Include="ordering_cases.cpp" />
-    <ClCompile Include="product_cases.cpp" />
-    <ClCompile Include="range_cases.cpp" />
-    <ClCompile Include="sign_cases.cpp" />
-    <ClCompile Include="subtraction_cases.cpp" />
-    <ClCompile Include="sum_cases.cpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

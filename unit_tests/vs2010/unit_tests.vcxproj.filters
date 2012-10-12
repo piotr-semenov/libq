@@ -11,28 +11,28 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="division_cases.cpp">
+    <ClCompile Include="..\division_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="normalization_cases.cpp">
+    <ClCompile Include="..\normalization_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ordering_cases.cpp">
+    <ClCompile Include="..\ordering_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="product_cases.cpp">
+    <ClCompile Include="..\product_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="range_cases.cpp">
+    <ClCompile Include="..\range_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sign_cases.cpp">
+    <ClCompile Include="..\sign_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="subtraction_cases.cpp">
+    <ClCompile Include="..\subtraction_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="sum_cases.cpp">
+    <ClCompile Include="..\sum_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
