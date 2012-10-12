@@ -82,8 +82,8 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Message>Fixed-point unit-tests</Message>
-      <Command>"$(TargetPath)"</Command>
+      <Message>Run of fixed_point_lib unit tests</Message>
+      <Command>$(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -107,7 +107,7 @@
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
     <PostBuildEvent>
-      <Message>Running unit test...</Message>
+      <Message>Running the unit tests:</Message>
       <Command>$(TargetPath)</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
