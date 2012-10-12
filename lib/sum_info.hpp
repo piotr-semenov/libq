@@ -47,6 +47,19 @@ namespace utils {
         {
             enum { value = true };
         };
+
+        struct value_type_info
+        {
+            struct op
+            {
+                typedef value_type type;
+            };
+
+            struct cl
+            {
+                typedef value_type type;
+            };
+        };
     };
 
     /// @brief in case of fixed-point type
