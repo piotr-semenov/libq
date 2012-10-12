@@ -6,8 +6,8 @@
 #include <limits>
 #include <string>
 
-#include "./../../Common/number.hpp"
-#include "./../../Common/sign_info.hpp"
+#include "./../../fixed_point_lib/src/number.hpp"
+#include "./../../fixed_point_lib/src/sign_info.hpp"
 
 namespace utils { namespace unit_tests {
     namespace {

@@ -7,7 +7,7 @@
 #include <limits>
 #include <string>
 
-#include "./../../Common/number.hpp"
+#include "./../../fixed_point_lib/src/number.hpp"
 
 namespace utils { namespace unit_tests {
     namespace {
