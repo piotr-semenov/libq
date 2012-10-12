@@ -6,6 +6,9 @@
 #include "./sum_info.hpp"
 
 namespace utils {
+    template<typename value_type>
+    class sum_info;
+
     /// @brief meta-class to inference computation primitive subtraction type
     template<typename value_type>
     class diff_info
