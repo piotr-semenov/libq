@@ -1,23 +1,6 @@
+syntax: regexp
+^Debug/
 syntax: glob
-*.ncb
-*.dep
-*.ilk
-*.exe
-*.user
-*.htm
-*.obj
-*.idb
-*.pdb
-*.lib
-*.dll
-*.suo
-*.manifest
-*.res
-*.doc
-*.bin
-*.hu
-*.alist
-*.pdf
-*.mht
-*.zip
-*.ber
+fixed_point.ncb
+fixed_point.suo
+unit_tests.vcproj.CCR.psemenov.user
