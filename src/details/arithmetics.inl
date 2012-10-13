@@ -12,7 +12,7 @@ namespace utils {
         typedef sum_type::value_type sum_value_type;
 
         sum_value_type const val = boost::numeric_cast<sum_value_type>(a.value()) + this_class(b).value();
-        return sum_type::create(val);
+        return sum_type::wrap(val);
     }
 
     // 2. if summation is closed operation
@@ -21,15 +21,15 @@ namespace utils {
     {
         value_type const sum = a.value() + this_class(b).value();
 
-        value_type const val = static_cast<value_type>(bounds::internal_cast(sum) % this_class::mod);
-        return this_class::create(val);
+        value_type const val = static_cast<value_type>(bounds::reduce(sum) % this_class::mod);
+        return this_class::wrap(val);
     }
 
     // 3. summation operator
     _tmpl_head_ template<typename Other_type>
     typename _cls_name_::sum_type _cls_name_::operator +(Other_type const& x) const
     { 
-        sum_type const val = add(*this, x, bool_<!(sum_info<this_class>::closing_info::value)>::type());
+        sum_type const val = add(*this, x, bool_<!(sum_info<this_class>::is_closed::value)>::type());
 
         return val;
     }
@@ -43,7 +43,7 @@ namespace utils {
         typedef diff_type::value_type diff_value_type;
 
         diff_value_type const val = boost::numeric_cast<diff_value_type>(a.value()) - this_class(b).value();
-        return diff_type::create(val);
+        return diff_type::wrap(val);
     }
 
     // 2. if subtraction is closed operation
@@ -53,14 +53,14 @@ namespace utils {
         value_type const diff = a.value() - this_class(b).value();
 
         value_type const val = static_cast<value_type>(diff % this_class::mod);
-        return this_class::create(val);
+        return this_class::wrap(val);
     }
 
     // 3. subtraction operator
     _tmpl_head_ template<typename Other_type>
     typename _cls_name_::diff_type _cls_name_::operator -(Other_type const& x) const
     {
-        diff_type const val = subtract(*this, x, mpl::bool_<!(diff_info<this_class>::closing_info::value)>::type());
+        diff_type const val = subtract(*this, x, mpl::bool_<!(diff_info<this_class>::is_closed::value)>::type());
         return val;
     }
 
@@ -73,7 +73,7 @@ namespace utils {
         typedef product_type::value_type product_value_type;
 
         product_value_type const val = boost::numeric_cast<product_value_type>(a.value()) * this_class(b).value();
-        return product_type::create(val);
+        return product_type::wrap(val);
     }
 
     // 2. if multiplication is closed operation
@@ -105,7 +105,7 @@ namespace utils {
     _tmpl_head_ template<typename Other_type>
     typename _cls_name_::product_type _cls_name_::operator *(Other_type const& x) const
     {
-        product_type const val = product(*this, x, bool_<!(product_info<this_class>::closing_info::value)>::type());
+        product_type const val = product(*this, x, bool_<!(product_info<this_class>::is_closed::value)>::type());
         return val;
     }
 
@@ -121,7 +121,7 @@ namespace utils {
         quotient_value_type const converted = this_class(b).value();
         quotient_value_type const val = shifted / converted;
 
-        return quotient_type::create(val << fractionals);
+        return quotient_type::wrap(val << fractionals);
     }
 
     // 2. if division is closed operation
@@ -154,7 +154,7 @@ namespace utils {
     _tmpl_head_ template<typename Other_type>
     typename _cls_name_::quotient_type _cls_name_::operator /(Other_type const& x) const
     {
-        quotient_type const val = divide(*this, x, mpl::bool_<!(quotient_info<this_class>::closing_info::value)>::type());
+        quotient_type const val = divide(*this, x, mpl::bool_<!(quotient_info<this_class>::is_closed::value)>::type());
         return val;
     }
 }
