@@ -15,7 +15,7 @@ namespace utils {
     }
 
     _tmpl_head_ template<typename storage_type1, size_t fractionals1>
-    typename _cls_name_::value_type _cls_name_::normalize_of(storage_type1 const x)
+    typename _cls_name_::value_type _cls_name_::normalize(storage_type1 const x)
     {
         BOOST_CONCEPT_ASSERT((boost::IntegerConcept<storage_type1>));
 

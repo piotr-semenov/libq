@@ -31,10 +31,10 @@ namespace utils { namespace unit_tests {
         #define test(x, y) (x == y) || (x + 1 == y) || (x - 1 == y)
 
         std::string const message("normalization is failed");
-        type2::value_type converted = type2::normalize_of<type1::value_type, type1::fractionals>(a.value());
+        type2::value_type converted = type2::normalize<type1::value_type, type1::fractionals>(a.value());
         BOOST_CHECK_MESSAGE(test(b.value(), converted), message);
 
-        converted = type2::normalize_of<type1::value_type, type1::fractionals>(a1.value());
+        converted = type2::normalize<type1::value_type, type1::fractionals>(a1.value());
         BOOST_CHECK_MESSAGE(test(b1.value(), converted), message);
     }
 
