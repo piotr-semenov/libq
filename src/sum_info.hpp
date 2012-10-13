@@ -73,7 +73,7 @@ namespace utils {
                 max_type;
 
             // total bits and std::numeric_limits do not count sign bit
-            enum { value = !(n + 1u <= std::numeric_limits<max_type>::digits) };
+            enum { value = !(n + 1u + is_signed::value <= std::numeric_limits<max_type>::digits) };
         };
 
         // brief: 1. if one do not have integral type of enough bits count then
@@ -85,6 +85,7 @@ namespace utils {
             ///< in case if summ type is not closed under arithmetic operations
             struct op
             {
+                // Bits includes sign bit in boost::int_t<Bits> template
                 typedef typename if_<is_signed, typename boost::int_t<n + 2u>::least,
                     typename boost::uint_t<n + 1u>::least>::type type;
             };
