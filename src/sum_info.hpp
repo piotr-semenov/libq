@@ -75,7 +75,7 @@ namespace utils {
                 max_type;
 
             // total bits and std::numeric_limits do not count sign bit
-            enum { value = !(n + 1 <= std::numeric_limits<max_type>::digits) };
+            enum { value = !(n + 1u <= std::numeric_limits<max_type>::digits) };
         };
 
         // brief: 1. if one do not have integral type of enough bits count then
@@ -103,7 +103,7 @@ namespace utils {
             typename value_type_info::op>::type sum_value_type;
 
         ///< fixed-point type for summ result
-        typedef typename if_<is_closed, operand_type, number<sum_value_type, n + 1, f> >::type
+        typedef typename if_<is_closed, operand_type, number<sum_value_type, n + 1u, f> >::type
             sum_type;
     };
 }
