@@ -66,7 +66,7 @@ namespace utils { namespace unit_tests {
         try {
             unsigned int const a = 300;
 
-            type1::bounds::internal_cast(a);
+            type1::bounds::reduce(a);
             BOOST_FAIL(message);
         }
         catch (positive_overflow e){}
@@ -74,7 +74,7 @@ namespace utils { namespace unit_tests {
         try {
             unsigned int const a = 10000;
 
-            type3::bounds::internal_cast(a);
+            type3::bounds::reduce(a);
             BOOST_FAIL(message);
         }
         catch (positive_overflow e){}
@@ -94,20 +94,20 @@ namespace utils { namespace unit_tests {
 
         std::string const message("Wrong overflow detection if integer fits the fixed-point format range");
         try {
-            type1::bounds::internal_cast(17592186044415L);
-            type1::bounds::internal_cast(-17592186044416L);
+            type1::bounds::reduce(17592186044415L);
+            type1::bounds::reduce(-17592186044416L);
 
-            type2::bounds::internal_cast(34359738367L);
-            type2::bounds::internal_cast(-34359738368L);
+            type2::bounds::reduce(34359738367L);
+            type2::bounds::reduce(-34359738368L);
 
-            type3::bounds::internal_cast(524287L);
-            type3::bounds::internal_cast(0);
+            type3::bounds::reduce(524287L);
+            type3::bounds::reduce(0);
 
-            type4::bounds::internal_cast(134217727L);
-            type4::bounds::internal_cast(0);
+            type4::bounds::reduce(134217727L);
+            type4::bounds::reduce(0);
 
-            type5::bounds::internal_cast(67108863L);
-            type5::bounds::internal_cast(-67108864L);
+            type5::bounds::reduce(67108863L);
+            type5::bounds::reduce(-67108864L);
         }
         catch (std::exception e) {
             BOOST_FAIL(message);

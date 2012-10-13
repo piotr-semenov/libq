@@ -16,7 +16,7 @@ namespace utils {
     }
 
     _tmpl_head_ template<typename T>
-    inline typename _cls_name_::value_type _cls_name_::bounds::internal_cast(T x)
+    inline typename _cls_name_::value_type _cls_name_::bounds::reduce(T x)
     {
         BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
         typedef get_super_type<value_type, T>::type super_type;

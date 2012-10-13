@@ -27,10 +27,10 @@ namespace utils {
             max_type t(x);
             t <<= shifts;
 
-            val = bounds::internal_cast(t);
+            val = bounds::reduce(t);
         }
         else {
-            val = bounds::internal_cast(x >> shifts);
+            val = bounds::reduce(x >> shifts);
         }
 
         return val;
