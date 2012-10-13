@@ -4,8 +4,6 @@
 #define INC_PRODUCT_INFO_HPP_
 
 #include <boost/integer.hpp>
-#include <boost/static_assert.hpp>
-#include <boost/concept_check.hpp>
 
 #include <boost/mpl/if.hpp>
 #include <boost/mpl/eval_if.hpp>

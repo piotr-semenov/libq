@@ -4,8 +4,6 @@
 #define INC_SIGN_INFO_HPP_
 
 #include <boost/integer.hpp>
-#include <boost/static_assert.hpp>
-#include <boost/concept_check.hpp>
 
 #include <limits>
 
