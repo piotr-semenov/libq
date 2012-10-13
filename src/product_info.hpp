@@ -47,23 +47,23 @@ namespace utils {
         typedef number<T, n, f> operand_type;
 
     public:
-        ///< is the type of summ a signed type?
+        ///< is the type of product a signed type?
         struct is_signed
         {
             enum { value = std::numeric_limits<T>::is_signed };
         };
 
-        ///< is type of the summ closed under arithmetic operations?
+        ///< is type of the product closed under arithmetic operations?
         struct is_closed
         {
             typedef typename if_<is_signed, boost::intmax_t, boost::uintmax_t>::type max_type;
 
             // total bits and std::numeric_limits do not count sign bit
-            enum { value = !(2u * n + 1u <= std::numeric_limits<max_type>::digits) };
+            enum { value = !(2u * n + is_signed::value <= std::numeric_limits<max_type>::digits) };
         };
 
         // brief: 1. if one do not have integral type of enough bits count then
-        //           it has to interpret summation as a closed operation;
+        //           it has to interpret multiplication as a closed operation;
         //        2. boost::int_t template parameter takes into account a sign bit.
         ///< integral value type below fixed-point number as a product result type
         struct value_type_info
@@ -82,7 +82,8 @@ namespace utils {
             };
         };
 
-        ///< integral value type that is below of fixed-point result type of the summ
+        ///< integral value type that is below of fixed-point result type of the
+        /// multiplication
         typedef typename eval_if<is_closed, typename value_type_info::cl,
             typename value_type_info::op>::type product_value_type;
 
