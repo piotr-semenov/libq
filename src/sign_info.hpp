@@ -13,7 +13,7 @@ namespace utils {
     template<typename storage_type, size_t total, size_t fractionals>
     class number;
 
-    /// @brief tool for sign inference of the resilt in case of arithmetical
+    /// @brief tool for sign inference of the result in case of arithmetical
     /// operations with fixed-point and floating-point numbers
     template<typename T, typename U>
     class sign_info
