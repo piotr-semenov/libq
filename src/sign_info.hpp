@@ -1,4 +1,4 @@
-/// @brief provides info abount sign of result in fixed-point arithmetical operations
+/// @brief provides info class about sign of arithmetic operations result type
 
 #ifndef INC_SIGN_INFO_HPP_
 #define INC_SIGN_INFO_HPP_

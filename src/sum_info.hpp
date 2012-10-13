@@ -1,4 +1,4 @@
-/// @brief provides fixed-point sum info
+/// @brief provides info class about summ result type
 
 #ifndef INC_SUM_INFO_HPP_
 #define INC_SUM_INFO_HPP_

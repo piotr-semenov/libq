@@ -1,4 +1,4 @@
-/// @brief provides fixed-point difference info
+/// @brief provides info class about subtraction result type
 
 #ifndef INC_DIFFERENCE_INFO_HPP_
 #define INC_DIFFERENCE_INFO_HPP_
