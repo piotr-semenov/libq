@@ -87,7 +87,7 @@ namespace utils {
             ///< in case if summ type is not closed under arithmetic operations
             struct op
             {
-                typedef typename if_<is_signed, typename boost::int_t<is_signed::value + n + 1u>::least,
+                typedef typename if_<is_signed, typename boost::int_t<n + 2u>::least,
                     typename boost::uint_t<n + 1u>::least>::type type;
             };
 
