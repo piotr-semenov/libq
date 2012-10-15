@@ -35,5 +35,8 @@
     <ClCompile Include="..\sum_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\as_native_cases.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

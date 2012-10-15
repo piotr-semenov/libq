@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\as_native_cases.cpp" />
     <ClCompile Include="..\division_cases.cpp" />
     <ClCompile Include="..\normalization_cases.cpp" />
     <ClCompile Include="..\ordering_cases.cpp" />
@@ -99,7 +100,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>libboost_unit_test_framework-vc90-mt-1_44.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>libboost_unit_test_framework-vc100-mt-1_49.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Console</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>

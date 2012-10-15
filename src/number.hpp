@@ -184,7 +184,21 @@ namespace utils {
 
         /// @brief normalizes any fixed-point format to current one
         template<typename T, size_t f1>
-        static value_type normalize(T const x);
+        static value_type normalize(T const x)
+        {
+            static size_t const shifts = (fractionals > f1) ? (fractionals - f1) :
+                (f1 - fractionals);
+
+            if (fractionals > f1) {
+                boost::mpl::if_c<is_signed, boost::intmax_t, boost::uintmax_t>::type
+                    val(x);
+                val <<= shifts;
+
+                return bounds::check(val);
+            }
+
+            return bounds::check(x >> shifts);
+        }
 
         /// @brief converts fixed-point to float
         double to_float() const
@@ -596,8 +610,6 @@ namespace std {
 
 #define _tmpl_head_ template<typename storage_type, size_t n, size_t f>
 #define _cls_name_ number<storage_type, n, f>
-
-#include "./details/normalization.inl"
 
 #include "./details/ordering.inl"
 
