@@ -1,12 +1,10 @@
 namespace utils {
     namespace {
-        // logics: get type from T and T1 that range is subset for another one
+        // get_super_type::type is type X from T and T1 that range(T), range(T1)
+        // are subsets of range(X)
         template<typename T, typename T1>
         class get_super_type
         {
-            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
-            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T1>));
-
             static size_t const d1 = std::numeric_limits<T>::digits;
             static size_t const d2 = std::numeric_limits<T1>::digits;
 
@@ -15,8 +13,9 @@ namespace utils {
         };
     }
 
+    // 
     _tmpl_head_ template<typename T>
-    inline typename _cls_name_::value_type _cls_name_::bounds::reduce(T x)
+    inline typename _cls_name_::value_type _cls_name_::bounds::check(T x)
     {
         BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
         typedef get_super_type<value_type, T>::type super_type;

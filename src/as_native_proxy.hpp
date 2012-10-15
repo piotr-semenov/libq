@@ -35,13 +35,13 @@ namespace utils {
         /// from n bits of length
         this_class& operator +=(this_class const& x)
         {
-            fixed_point_class::bounds::reduce(this->value() += x.value());
+            fixed_point_class::bounds::check(this->value() += x.value());
 
             return *this;
         }
         this_class& operator +=(T x)
         {
-            fixed_point_class::bounds::reduce(this->value() += x);
+            fixed_point_class::bounds::check(this->value() += x);
 
             return *this;
         }
@@ -50,13 +50,13 @@ namespace utils {
         /// from n bits of length (signed/unsigned).
         this_class& operator -=(this_class const& x)
         {
-            fixed_point_class::bounds::reduce(this->value() -= x.value());
+            fixed_point_class::bounds::check(this->value() -= x.value());
 
             return *this;
         }
         this_class& operator -=(T x)
         {
-            fixed_point_class::bounds::reduce(this->value() -= x);
+            fixed_point_class::bounds::check(this->value() -= x);
 
             return *this;
         }
@@ -65,13 +65,13 @@ namespace utils {
         /// drawn from n bits of length.
         this_class& operator *=(this_class const& x)
         {
-            fixed_point_class::bounds::reduce(this->value() *= x.value());
+            fixed_point_class::bounds::check(this->value() *= x.value());
 
             return *this;
         }
         this_class& operator *=(T x)
         {
-            fixed_point_class::bounds::reduce(this->value() *= x);
+            fixed_point_class::bounds::check(this->value() *= x);
 
             return *this;
         }
@@ -80,13 +80,13 @@ namespace utils {
         /// from n bits of length.
         this_class& operator /=(this_class const& x)
         {
-            fixed_point_class::bounds::reduce(this->value() /= x.value());
+            fixed_point_class::bounds::check(this->value() /= x.value());
 
             return *this;
         }
         this_class& operator /=(T x)
         {
-            fixed_point_class::bounds::reduce(this->value() /= x);
+            fixed_point_class::bounds::check(this->value() /= x);
 
             return *this;
         }
@@ -103,13 +103,13 @@ namespace utils {
         /// n bits of length
         this_class& operator ^=(this_class const& x)
         {
-            fixed_point_class::bounds::reduce(this->value() ^= x.value());
+            fixed_point_class::bounds::check(this->value() ^= x.value());
 
             return *this;
         }
         this_class& operator ^=(T x)
         {
-            fixed_point_class::bounds::reduce(this->value() ^= x);
+            fixed_point_class::bounds::check(this->value() ^= x);
 
             return *this;
         }
@@ -127,13 +127,13 @@ namespace utils {
         /// n bits of length
         this_class& operator |=(this_class const& x)
         {
-            fixed_point_class::bounds::reduce(this->value() |= x.value());
+            fixed_point_class::bounds::check(this->value() |= x.value());
 
             return *this;
         }
         this_class& operator !=(T x)
         {
-            fixed_point_class::bounds::reduce(this->value() |= x);
+            fixed_point_class::bounds::check(this->value() |= x);
 
             return *this;
         }
@@ -142,7 +142,7 @@ namespace utils {
         /// from n bits of length.
         this_class& operator ++()
         {
-            fixed_point_class::bounds::reduce(this->value()++);
+            fixed_point_class::bounds::check(this->value()++);
 
             return *this;
         }
@@ -151,7 +151,7 @@ namespace utils {
         /// from n bits of length.
         this_class& operator --()
         {
-            fixed_point_class::bounds::reduce(this->value()--);
+            fixed_point_class::bounds::check(this->value()--);
 
             return *this;
         }
@@ -160,13 +160,13 @@ namespace utils {
         /// from n bits of length.
         this_class& operator <<=(this_class const& x)
         {
-            fixed_point_class::bounds::reduce(this_value() >>= x.value());
+            fixed_point_class::bounds::check(this_value() >>= x.value());
 
             return *this;
         }
         this_class& operator <<=(T x)
         {
-            fixed_point_class::bounds::reduce(this_value() >>= x);
+            fixed_point_class::bounds::check(this_value() >>= x);
 
             return *this;
         }

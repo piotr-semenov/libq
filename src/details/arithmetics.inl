@@ -21,7 +21,7 @@ namespace utils {
     {
         value_type const sum = a.value() + this_class(b).value();
 
-        value_type const val = static_cast<value_type>(bounds::reduce(sum) % this_class::mod);
+        value_type const val = static_cast<value_type>(bounds::check(sum) % this_class::mod);
         return this_class::wrap(val);
     }
 
