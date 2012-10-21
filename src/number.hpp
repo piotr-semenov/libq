@@ -28,8 +28,6 @@
 
 #include <boost/integer_traits.hpp>
 
-#include <boost/operators.hpp>
-
 #include <limits>
 #include <cmath>
 
@@ -63,8 +61,6 @@ namespace utils {
     /// @param f count of bits for fractional part: f can be greater than n
     template<typename storage_type, size_t n, size_t f>
     class number
-        :    public boost::totally_ordered<number<storage_type, n, f> >, // >, <=, >=, != in terms of <, == and !
-             public boost::shiftable<number<storage_type, n, f>, size_t> // <<, >> in terms of =<< and >>=
     {
         BOOST_CONCEPT_ASSERT((boost::IntegerConcept<storage_type>));
 
@@ -137,7 +133,10 @@ namespace utils {
 
         template<typename T>
         explicit number(T value)
-            :    m_value(convert_from(value)){}
+            :    m_value(convert_from(value))
+        {
+            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
+        }
 
         explicit number(this_class const& x)
             :    m_value(x.value()){}
@@ -186,6 +185,8 @@ namespace utils {
         template<typename T, size_t f1>
         static value_type normalize(T const x)
         {
+            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
+
             static size_t const shifts = (fractionals > f1) ? (fractionals - f1) :
                 (f1 - fractionals);
 
@@ -217,173 +218,184 @@ namespace utils {
             return x;
         }
 
-    // ORDERING OPERATORS
-        /// @brief 'less' binary relation for fixed-point numbers
-        /// @param x instance to compare with
-        bool operator <(this_class const& x) const;
+    // ORDERING OPERATORS:
+        /// @brief 'less' binary relation in case if one of operands is a fixed-point
+        /// number.
+        /// @detailed number to compare with has to be converted to a fixed-point number
+        /// of current format firstly.
+        template<typename T>
+        bool operator <(T const& x) const{ return this->value() < this_class(x).value(); }
 
-        /// @brief 'equal-to' binary relation for fixed-point numbers
-        /// @param x instance to compare with
-        bool operator ==(this_class const& x) const;
+        /// @brief 'less-equal' binary relation in case if one of operands is a fixed-point
+        /// number
+        template<typename T>
+        bool operator <=(T const& x) const{ return this->value() <= this_class(x).value(); }
+
+        /// @brief 'greater' binary relation in case if one of operands is a fixed-point
+        /// number
+        template<typename T>
+        bool operator >(T const& x) const{ return this->value() > this_class(x).value(); }
+
+        /// @brief 'greater-equal' binary relation in case if one of operands is a fixed-point
+        /// number
+        template<typename T>
+        bool operator >=(T const& x) const{ return this->value() >= this_class(x).value(); }
+
+        /// @brief 'equal-to' binary relation in case if one of operands is a fixed-point
+        /// number
+        template<typename T>
+        bool operator ==(T const& x) const{ return this->value() == this_class(x).value(); }
+
+        /// @brief 'not-equal-to' binary relation in case if one of operands is a fixed-point
+        /// number
+        template<typename T>
+        bool operator !=(T const& x) const{ return this->value() != this_class(x).value(); }
 
         /// @brief 'not equal to zero' binary relation for fixed-point numbers
-        bool operator !() const;
+        bool operator !() const{ return this->value() != value_type(0); }
 
-    // FIXED-POINT ARITHMETICS
+
+    // FIXED-POINT ARITHMETICS:
         /// @brief extends current type to signed one (adds signed bit if needed)
         typedef number<typename boost::make_signed<value_type>::type, total, fractionals>
             to_signed_type;
 
-        /// @brief reduces current type of unsigned one (remove signed bit if needed)
+        /// @brief reduces current type to unsigned one (remove signed bit if needed)
         typedef number<typename boost::make_unsigned<value_type>::type, total, fractionals>
             to_unsigned_type;
 
-        /// @brief summation result type
+        /// @brief result type for summation operation
         typedef typename sum_info<this_class>::sum_type sum_type;
 
-        /// @brief subtraction result type
+        /// @brief result type for summation operation
         typedef typename diff_info<this_class>::diff_type diff_type;
 
-        /// @brief product result type
+        /// @brief result type for multiplication operation
         typedef typename product_info<this_class>::product_type product_type;
 
-        /// @brief division result type
+        /// @brief result type for division operation
         typedef typename quotient_info<this_class>::quotient_type quotient_type;
 
     private:
         static boost::uintmax_t const mod = static_pow<2, total - 1>::value;
 
         // FIXED-POINT ARITHMETICS AUX:
-        // 1. summation in cases if it is not a closed operation and if it is
+        // 1. addition operation in the following cases:
+        // 1.1 if it is not a closed operation;
+        // 1.2 if it is a closed operation.
+
+        // 1.1
         template<typename T>
-        inline sum_type add(this_class const& a, T const& b, mpl::bool_<true>::type) const;
+        inline sum_type plus(this_class const&, T const&, mpl::bool_<true>::type) const;
 
+        // 1.2
         template<typename T>
-        inline this_class add(this_class const& a, T const& b, mpl::bool_<false>::type) const;
+        inline this_class plus(this_class const&, T const&, mpl::bool_<false>::type) const;
 
-        // 2. subtraction in cases if it is not a closed operation and if it is
+        // 2. subtraction operation in the following cases:
+        // 2.1 if it is not a closed operation;
+        // 2.2 if it is a closed operation.
+
+        // 2.1
         template<typename T>
-        diff_type subtract(this_class const& a, T const& b, mpl::bool_<true>::type) const;
+        inline diff_type minus(this_class const&, T const&, mpl::bool_<true>::type) const;
 
+        // 2.2
         template<typename T>
-        this_class subtract(this_class const& a, T const& b, mpl::bool_<false>::type) const;
+        inline this_class minus(this_class const&, T const&, mpl::bool_<false>::type) const;
 
-        // 3. multiplication in cases if it is not a closed operation and if it is
+        // 3. multiplication operation in the following cases:
+        // 3.1 if it is not a closed operation;
+        // 3.2 if it is a closed operation:
+            // 3.2.1 if other type is fixed point number of another format.
+
+        // 3.1
         template<typename T>
-        product_type product(this_class const& a, T const& b, mpl::bool_<true>::type) const;
+        inline product_type product(this_class const&, T const&, mpl::bool_<true>::type) const;
 
+        // 3.2
         template<typename T>
-        this_class product(this_class const& a, T const& b, mpl::bool_<false>::type) const;
+        inline this_class product(this_class const&, T const&, mpl::bool_<false>::type) const;
 
-        // if product is closed operation: case of another fixed-point
-        template<typename storage_type1, size_t total1, size_t fractionals1>
-        this_class product(this_class const& a, number<storage_type1, total1, fractionals1> const& b, mpl::bool_<false>::type) const;
+        // 3.2.1
+        template<typename T1, size_t n1, size_t f1>
+        inline this_class product(this_class const&, number<T1, n1, f1> const&, mpl::bool_<false>::type) const;
 
-        // 4. division in cases if it is not a closed operation and if it is
+        // 4. division operation in the following cases:
+        // 4.1 if it is not a closed operation;
+        // 4.2 if it is a closed operation:
+            // 4.2.1 if other type is fixed poing number of another format.
+
+        // 4.1
         template<typename T>
-        quotient_type divide(this_class const& a, T const &b, mpl::bool_<true>::type) const;
+        quotient_type quotient(this_class const&, T const&, mpl::bool_<true>::type) const;
 
+        // 4.2
         template<typename T>
-        this_class divide(this_class const& a, T const &b, mpl::bool_<false>::type) const;
+        this_class quotient(this_class const&, T const&, mpl::bool_<false>::type) const;
 
-        template<typename storage_type1, size_t total1, size_t fractionals1>
-        this_class divide(this_class const& a, number<storage_type1, total1, fractionals1> const&b, mpl::bool_<false>::type) const;
+        // 4.3
+        template<typename T1, size_t n1, size_t f1>
+        this_class quotient(this_class const&, number<T1, n1, f1> const&b, mpl::bool_<false>::type) const;
 
     public:
-        /// @brief addition with a number
-        /// @detailed added number will be converted to fixed-point firstly.
-        ///           Its format will be the same as the left operand has.
-        ///           So expression (a + b) will be processed by the next algorithm:
-        ///           1. b will be converted to value b' with fixed-point format of a
-        ///           2. (a + b') will be performed
-        ///           So, (a + b) will have the type type(a)::sum_type.
-        ///           So we have, (signed + ...) -> signed, (unsigned + ...) -> unsigned.
-        template<typename Other_type>
-        sum_type operator +(Other_type const& x) const;
-
-        /// @brief subtracts within a number
-        /// @detailed subtracted number will be converted to fixed-point firstly.
-        ///           Its format will be the same as the left operand has.
-        ///           So expression (a - b) will be processed by the next algorithm:
-        ///           1. b will be converted to value b' with fixed-point format of a
-        ///           2. (a - b') will be performed
-        ///           So, (a - b) will have the type type(a)::diff_type.
-        ///           So we have, (signed - ...) -> signed, (unsigned - ...) -> unsigned.
-        template<typename Other_type>
-        diff_type operator -(Other_type const& x) const;
-
-        /// @brief multiplies by a number
-        /// @detailed multiplied number will be converted to fixed-point firstly.
-        ///           Its format will be the same as the left operand has.
-        ///           So expression (a * b) will be processed by the next algorithm:
-        ///           1. b will be converted to value b' with fixed-point format of a
-        ///           2. (a * b') will be performed
-        ///           So, (a * b') will have the type type(a)::product_type.
-        ///           So we have, (signed * ...) -> signed, (unsigned * ...) -> unsigned.
-        template<typename Other_type>
-        product_type operator *(Other_type const& x) const;
-
-        /// @brief divides by a number that will be converting to fixed-point form firstly
-        /// @detailed divider will be converted to fixed-point firstly.
-        ///           Its format will be the same as the left operand has.
-        ///           So expression (a / b) will be processed by the next algorithm:
-        ///           1. b will be converted to value b' with fixed-point format of a
-        ///           2. (a / b') will be performed
-        ///           So, (a / b') will have the type type(a)::quotient_type.
-        ///           So we have, (signed * ...) -> signed, (unsigned * ...) -> unsigned.
-        template<typename Other_type>
-        quotient_type operator /(Other_type const& x) const;
-
-        //////////////////////////////////// OPERATIONS IN RING Z/Z_p ///////////////////////////////////
-        /// @brief interprets fixed-point number as integer and adds to it an integer
+        /// @brief addition operation
+        /// @detailed number to add has to be converted to a fixed-point number
+        /// of current format firstly. Result will be of type(a)::sum_type.
         template<typename T>
-        void operator +=(T x)
-        {
-            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
+        inline sum_type operator +(T const&) const;
 
-            this->value(this->value() + x);
-        }
-
-        /// @brief interprets fixed-point number as integer and subtracts an integer from it
         template<typename T>
-        void operator -=(T x)
+        inline this_type& operator +=(T const& x)
         {
-            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
+            sum_type const val(*this + this_class(x));
 
-            this->value(this->value() - x);
+            return this->value(bounds::check(val.value()));
         }
 
-        /// @brief interprets fixed-point number as integer and multiplies it by an integer
+        /// @brief subtraction operation
+        /// @detailed number to subtract has to be converted to a fixed-point number
+        /// of current format firstly. Result will be of type(a)::diff_type.
         template<typename T>
-        void operator *=(T x)
-        {
-            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
+        inline diff_type operator -(T const&) const;
 
-            this->value(this->value() * x);
-        }
-
-        /// @brief interprets fixed-point number as integer and multiplies it by an integer
-        ///        as fixed-point
-        template<typename storage_type1, size_t total1, size_t fractionals1>
-        void operator *=(number<storage_type1, total1, fractionals1> const x)
-        {
-            this->value(this->value() * x.value());
-        }
-
-        /// @brief interprets fixed-point number as integer and divides it by an integer
         template<typename T>
-        void operator /=(T x)
+        inline this_type& operator -=(T const& x)
         {
-            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
+            diff_type const val(*this - this_class(x));
 
-            this->value(this->value() / x);
+            return this->value(bounds::check(val.value()));
         }
 
-        ///////////////////////////// SHIFTING WITH TRUNCATION OPERATORS /////////////////
-        this_class& operator >>=(size_t shifts){ this->value(this->value() >> shifts); return *this; }
-        this_class& operator <<=(size_t shifts){ this->value(this->value() << shifts); return *this; }
+        /// @brief multiplication operation
+        /// @detailed number to multiply has to be converted to a fixed-point number
+        /// of current format firstly. Result will be of type(a)::product_type.
+        template<typename T>
+        inline product_type operator *(T const&) const;
 
-        ///////////////////////////// UNARY OPERATORS ////////////////////////////////////
+        template<typename T>
+        inline this_type& operator *=(T const& x)
+        {
+            product_type const val(*this * this_class(x));
+
+            return this->value(bounds::check(val.value()));
+        }
+
+        /// @brief division operation
+        /// @detailed number to divide by has to be converted to a fixed-point number
+        /// of current format firstly. Result will be of type(a)::quotient_type.
+        template<typename T>
+        inline quotient_type operator /(T const&) const;
+
+        template<typename T>
+        inline this_type& operator /=(T const& x)
+        {
+            quotient_type const val(*this / this_class(x));
+
+            return this->value(bounds::check(val.value()));
+        }
+
+    // UNARY OPERATORS:
         this_class operator -() const{ return this_class::wrap(-value()); }
 
         value_type const& value() const{ return this->m_value; }
@@ -400,18 +412,20 @@ namespace utils {
         friend class as_native_proxy<storage_type, n, f>;
     };
 
-    /// @brief just for convenience
-    template<size_t total, size_t fractionals>
+    /// @brief type class in case of signed integral storages
+    template<size_t n, size_t f>
     struct S_number
     {
-        // boost::int_t takes into account sign bit
-        typedef number<typename boost::int_t<1 + total>::least, total, fractionals> type;
+        // boost::int_t takes into account a sign bit
+        typedef number<typename boost::int_t<1u + n>::least, n, f> type;
     };
 
-    template<size_t total, size_t fractionals>
+    /// @brief type class in case of unsigned integral storages
+    template<size_t n, size_t f>
     struct U_number
     {
-        typedef number<typename boost::uint_t<total>::least, total, fractionals> type;
+        // boost::uint_t does not take into account a sign bit
+        typedef number<typename boost::uint_t<n>::least, n, f> type;
     };
 }
 
@@ -608,11 +622,14 @@ namespace std {
     };
 }
 
-#define _tmpl_head_ template<typename storage_type, size_t n, size_t f>
-#define _cls_name_ number<storage_type, n, f>
+#define _tmpl_head_ template<typename T, size_t n, size_t f>
+#define _cls_name_ number<T, n, f>
 
-#include "./details/ordering.inl"
+#include "./../../fixed_point_lib/src/details/arithmetics.inl"
+#include "./../../fixed_point_lib/src/details/number_limits.inl"
+#include "./../../fixed_point_lib/src/details/el_functions.inl"
 
-#include "./details/arithmetics.inl"
+#undef _tmpl_head_
+#undef _cls_name_
 
 #endif
