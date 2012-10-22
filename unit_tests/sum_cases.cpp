@@ -22,7 +22,7 @@ namespace utils { namespace unit_tests {
     // FIXED-POINT SUMMATION PRECISION TESTS
     //////////////////////////////////////////////////////////////////////////
     /// idea of tests 'commonCheck1' and 'commonCheck2':
-    ///     common checks if sign inference is accurate
+    ///     common checks for fixed-point accuracy and result sign inference
     BOOST_AUTO_TEST_CASE(commonCheck1)
     {
         typedef S_number<28, 13>::type type1;
@@ -34,7 +34,7 @@ namespace utils { namespace unit_tests {
         type1::sum_type const result = a + b;
 
         std::string const message("summation was made with illegal rounding error");
-        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) + 189.99) < 1E-2, message);
+        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) + 189.999) < 1E-3, message);
     }
 
     BOOST_AUTO_TEST_CASE(commonCheck2)
@@ -48,13 +48,13 @@ namespace utils { namespace unit_tests {
         type1::sum_type const result = a + b;
 
         std::string const message("summation was made with illegal rounding error");
-        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) - 13.54963) < 1E-6, message);
+        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) - 13.54963) < 1E-5, message);
     }
 
-    // FIXED-POINT SUMMATION IS ABELIAN GROUP IN CASE OF OPERANDS HAVING SAME TYPES
+    // SAME TYPE FIXED-POINT NUMBERS BUILDS AN ADDITIVE ABELIAN GROUP
     //////////////////////////////////////////////////////////////////////////
     // idea of tests 'unitCheck' and 'commutativityCheck'
-    //      checks if it satisfies laws of abelian additive group
+    //      checks if the additive abelian group laws are satisifed
     BOOST_AUTO_TEST_CASE(unitCheck)
     {
         typedef S_number<43, 23>::type type;
@@ -76,8 +76,6 @@ namespace utils { namespace unit_tests {
         BOOST_CHECK_MESSAGE(b + c == c + b, message);
         BOOST_CHECK_MESSAGE(a + c == c + a, message);
     }
-
-    // check for negatives is considered in subtraction_cases.cpp
 
     BOOST_AUTO_TEST_SUITE_END()
 }}
