@@ -1,4 +1,5 @@
 #define BOOST_TEST_STATIC_LINK
+#define BOOST_TEST_MODULE SUBTRACTION_CASES
 
 #include <boost/test/unit_test.hpp>
 #include <boost/integer.hpp>
@@ -22,19 +23,20 @@ namespace utils { namespace unit_tests {
         // FIXED-POINT SUBTRACTION PRECISION TESTS
         //////////////////////////////////////////////////////////////////////////
         /// idea of tests 'commonCheck1' and 'commonCheck2':
-        ///     common checks if sign inference is accurate
+        ///     common checks if fixed-point subtraction is accurate and sign inference
+        ///     is performed accurately
         BOOST_AUTO_TEST_CASE(commonCheck1)
     {
         typedef S_number<59, 48>::type type1;
         typedef U_number<37, 48>::type type2;
 
         type1 const a(-123.12321);
-        type2 const b(50.23129);
+        type2 const b(50.23128);
 
         type1::sum_type const result = a - b;
 
         std::string const message("subtraction was made with illegal rounding error");
-        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) + 173.3545) < 1E-5, message);
+        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) + 173.35449) < 1E-5, message);
     }
 
     BOOST_AUTO_TEST_CASE(commonCheck2)
@@ -48,13 +50,13 @@ namespace utils { namespace unit_tests {
         type1::sum_type const result = a - b;
 
         std::string const message("subtraction was made with illegal rounding error");
-        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) - 15.0) < 1E-4, message);
+        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) - 15.0) < 1E-3, message);
     }
 
-    // FIXED-POINT SUMMATION IS ABELIAN GROUP IN CASE OF OPERANDS HAVING SAME TYPES
+    // SAME-TYPE FIXED-POINT NUMBERS ARE FROM THE ADDITIVE ABELIAN GROUP
     //////////////////////////////////////////////////////////////////////////
     // idea of test 'negativesCheck'
-    //      checks if it satisfies laws of abelian additive group
+    //      checks if the abelian additive group laws are satisfied
     BOOST_AUTO_TEST_CASE(negativesCheck)
     {
         typedef S_number<54, 45>::type type;
@@ -64,9 +66,13 @@ namespace utils { namespace unit_tests {
         BOOST_CHECK_MESSAGE(a - a == type::diff_type(unit), message);
         BOOST_CHECK_MESSAGE(b - b == type::diff_type(unit), message);
         BOOST_CHECK_MESSAGE(c - c == type::diff_type(unit), message);
-    }
 
-    // check for unit and commutativity is considered in sum_cases.cpp
+        typedef U_number<0, 67>::type type1;
+        type const d(0.023143), e(0.000201), f(0.000001);
+        BOOST_CHECK_MESSAGE(d - d == type::diff_type(unit), message);
+        BOOST_CHECK_MESSAGE(e - e == type::diff_type(unit), message);
+        BOOST_CHECK_MESSAGE(f - f == type::diff_type(unit), message);
+    }
 
     BOOST_AUTO_TEST_SUITE_END()
 }}
