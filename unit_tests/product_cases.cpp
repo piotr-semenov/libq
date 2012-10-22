@@ -22,7 +22,8 @@ namespace utils { namespace unit_tests {
     // FIXED-POINT MULTIPLICATION PRECISION TESTS
     //////////////////////////////////////////////////////////////////////////
     /// idea of tests 'commonCheck1' and 'commonCheck2':
-    ///     common checks if multiplication is accurate
+    ///     common checks if multiplication is accurate and if sign is
+    ///     inferenced accurately
     BOOST_AUTO_TEST_CASE(commonCheck1)
     {
         typedef S_number<56, 13>::type type1;
@@ -32,9 +33,10 @@ namespace utils { namespace unit_tests {
         type2 const b(1231.321);
 
         type1::product_type const result = a * b;
+        double const aq(result);
 
         std::string const message("multiplication was made with illegal rounding error");
-        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) + 4.21634E+7) < 1E+2, message);
+        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) + 4.21634E+7) < 1E+3, message);
     }
 
     BOOST_AUTO_TEST_CASE(commonCheck2)
@@ -48,13 +50,13 @@ namespace utils { namespace unit_tests {
         type1::sum_type const result = a * b;
 
         std::string const message("multiplication was made with illegal rounding error");
-        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) - 233.92) < 1E-2, message);
+        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) - 233.92) < 1E-3, message);
     }
 
-    // FIXED-POINT MULTIPLICATION IS ABELIAN GROUP IN CASE OF OPERANDS HAVING SAME TYPES
+    // SAME-TYPE FIXED-POINT NUMBERS ARE FROM THE MULTIPLICATIVE ABELIAN GROUP
     //////////////////////////////////////////////////////////////////////////
     // idea of tests 'unitCheck' and 'commutativityCheck'
-    //      checks if it satisfies laws of abelian multiplicative group
+    //      checks if the abelian multiplicative group laws are satisfied
     BOOST_AUTO_TEST_CASE(unitCheck)
     {
         typedef S_number<15, 9>::type type;
@@ -69,15 +71,13 @@ namespace utils { namespace unit_tests {
     BOOST_AUTO_TEST_CASE(commutativityCheck)
     {
         typedef S_number<30, 31>::type type;
-        type const a(0.0097), b(0.0465), c(0.0992);
+        type const a(0.0097), b(0.0465), c(-0.0992);
 
         std::string const message("multiplication does not satisfy commutativity law");
         BOOST_CHECK_MESSAGE(a * b == b * a, message);
         BOOST_CHECK_MESSAGE(b * c == c * b, message);
         BOOST_CHECK_MESSAGE(a * c == c * a, message);
     }
-
-    // check for inverses is considered in division_cases.cpp
 
     BOOST_AUTO_TEST_SUITE_END()
 }}
