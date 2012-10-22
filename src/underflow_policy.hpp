@@ -12,14 +12,9 @@
 
 namespace utils {
     /// @brief underflow policy for fixed-point arithmetics
-    template<typename fixed_point_type>
     class underflow_policy
     {
-        typedef underflow_policy<fixed_point_type> this_class;
-
     public:
-        typedef typename fixed_point_type::value_type value_type;
-
         /// @brief policy to throw an exception in case the underflow has occured
         class exception
         {
@@ -29,21 +24,16 @@ namespace utils {
             /// will throw underflow exceptions.
             /// @throw boost::numeric::positive_overflow
             /// @throw boost::numeric::negative_overflow
-            template<typename T>
-            static inline value_type underflow_check(T val)
+            template<typename fixed_point, typename T>
+            static inline typename fixed_point::value_type checked_convert(T val)
             {
-                static std::string const m0("negative value is less than lower bound of range");
-                static std::string const m1("the value is too small to be captured with fixed-point type");
+                static std::string const m("the value is too small to be captured with fixed-point type");
 
-                if (fixed_point_type::is_signed && boost::intmax_t(val) < bounds::min) {
-                    throw std::underflow_error(m0);
+                if (val != T(0) && as_native(fixed_point(val)) == 0) {
+                    throw std::underflow_error(m);
                 }
 
-                if (val != T(0) && as_native(fixed_point_type(val)) == 0) {
-                    throw std::underflow_error(m1);
-                }
-
-                return static_cast<value_type>(val);
+                return static_cast<typename fixed_point::value_type>(val);
             }
         };
 
@@ -53,10 +43,11 @@ namespace utils {
         public:
             /// @brief converts integer to fixed point value type. If it is does not
             /// fit fixed point value type range than it performs by modulus computing.
-            template<typename T>
-            static inline value_type underflow_check(T val)
+            template<typename fixed_point, typename T>
+            static inline typename fixed_point::value_type checked_convert(T val)
             {
-                return static_cast<value_type>(val % bounds::max);
+                return static_cast<typename fixed_point::value_type>(val %
+                    fixed_point::bounds::max);
             }
         };
     };
