@@ -46,8 +46,7 @@ namespace utils {
             template<typename fixed_point, typename T>
             static inline typename fixed_point::value_type checked_convert(T val)
             {
-                return static_cast<typename fixed_point::value_type>(val %
-                    fixed_point::bounds::max);
+                return static_cast<typename fixed_point::value_type>(val);
             }
         };
     };
