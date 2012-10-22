@@ -17,7 +17,7 @@ namespace utils {
         using boost::mpl::eval_if;
     }
 
-    template<typename storage_type, size_t total, size_t fractionals>
+    template<typename storage_type, size_t total, size_t fractionals, class OP, class UP>
     class number;
 
     /// @brief tool for type inference of the summ result with fixed-point and
@@ -54,10 +54,10 @@ namespace utils {
     };
 
     /// @brief in case of fixed-point numbers
-    template<typename T, size_t n, size_t f>
-    class sum_info<number<T, n, f> >
+    template<typename T, size_t n, size_t f, class OP, class UP>
+    class sum_info<number<T, n, f, OP, UP> >
     {
-        typedef number<T, n, f> operand_type;
+        typedef number<T, n, f, OP, UP> operand_type;
 
     public:
         ///< is the type of summ a signed type?
@@ -102,8 +102,8 @@ namespace utils {
             typename value_type_info::op>::type sum_value_type;
 
         ///< fixed-point type for summ result
-        typedef typename if_<is_closed, operand_type, number<sum_value_type, n + 1u, f> >::type
-            sum_type;
+        typedef typename if_<is_closed, operand_type, number<sum_value_type, n + 1u,
+            f, OP, UP> >::type sum_type;
     };
 }
 
