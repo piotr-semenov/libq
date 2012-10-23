@@ -17,7 +17,8 @@ namespace utils {
         using boost::mpl::eval_if;
     }
 
-    template<typename storage_type, size_t total, size_t fractionals, class OP, class UP>
+    template<typename storage_type, size_t total, size_t fractionals, class op,
+    class up>
     class number;
 
     /// @brief tool for type inference of the product result with fixed-point and
@@ -41,10 +42,10 @@ namespace utils {
     };
 
     /// @brief in case of fixed-point numbers
-    template<typename T, size_t n, size_t f, class OP, class UP>
-    class product_info<number<T, n, f, OP, UP> >
+    template<typename T, size_t n, size_t f, class op, class up>
+    class product_info<number<T, n, f, op, up> >
     {
-        typedef number<T, n, f, OP, UP> operand_type;
+        typedef number<T, n, f, op, up> operand_type;
 
     public:
         ///< is the type of product a signed type?
@@ -89,7 +90,7 @@ namespace utils {
 
         ///< fixed-point type for product result
         typedef typename if_<is_closed, operand_type,
-            number<product_value_type, 2u * n, 2u * f, OP, UP> >::type product_type;
+            number<product_value_type, 2u * n, 2u * f, op, up> >::type product_type;
     };
 }
 
