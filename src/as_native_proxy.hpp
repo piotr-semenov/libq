@@ -3,23 +3,25 @@
 #include <boost/operators.hpp>
 
 namespace utils {
-    template<typename storage_type, size_t total, size_t fractionals>
+    template<typename storage_type, size_t total, size_t fractionals, class op,
+    class up>
     class number;
 
     /// @brief proxy class for dealing with fixed-point numbers as with integers
-    template<typename T, size_t n, size_t f>
+    template<typename T, size_t n, size_t f, class op, class up>
     class as_native_proxy
-        :    boost::operators<as_native_proxy<T, n, f> >,
-             boost::operators2<as_native_proxy<T, n, f>, T>,
-             boost::shiftable<as_native_proxy<T, n, f> >,
-             boost::shiftable2<as_native_proxy<T, n, f>, T>
+        :    boost::operators<as_native_proxy<T, n, f, op, up> >,
+             boost::operators2<as_native_proxy<T, n, f, op, up>, T>,
+             boost::shiftable<as_native_proxy<T, n, f, op, up> >,
+             boost::shiftable2<as_native_proxy<T, n, f, op, up>, T>
     {
-        typedef as_native_proxy<T, n, f> this_class;
-        typedef number<T, n, f> fixed_point_class;
+        typedef as_native_proxy<T, n, f, op, up> this_class;
+        typedef number<T, n, f, op, up> fixed_point_class;
 
     public:
-        explicit as_native_proxy(fixed_point_class& x)
-            :    m_value(x.m_value){};
+        /// @brief copy operator
+        template<typename T>
+        void operator =(T val){ this->m_value = val; }
 
         /// @brief less operator. It is the same as one for native integral types
         /// is
@@ -184,5 +186,11 @@ namespace utils {
     private:
         T& m_value;
         T& value(){ return this->m_value; }
+
+        as_native_proxy(fixed_point_class& x)
+            :    m_value(x.m_value){};
+
+        template<>
+        friend this_class as_native(fixed_point_class&);
     };
 }
