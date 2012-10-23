@@ -25,15 +25,10 @@ namespace utils {
             /// @throw boost::numeric::positive_overflow
             /// @throw boost::numeric::negative_overflow
             template<typename fixed_point, typename T>
-            static inline typename fixed_point::value_type checked_convert(T val)
+            static inline void check(T val)
             {
                 static std::string const m("the value is too small to be captured with fixed-point type");
-
-                if (val != T(0) && as_native(fixed_point(val)) == 0) {
-                    throw std::underflow_error(m);
-                }
-
-                return static_cast<typename fixed_point::value_type>(val);
+                throw std::underflow_error(m);
             }
         };
 
@@ -44,10 +39,7 @@ namespace utils {
             /// @brief converts integer to fixed point value type. If it is does not
             /// fit fixed point value type range than it performs by modulus computing.
             template<typename fixed_point, typename T>
-            static inline typename fixed_point::value_type checked_convert(T val)
-            {
-                return static_cast<typename fixed_point::value_type>(val);
-            }
+            static inline void checked_convert(T val){}
         };
     };
 }
