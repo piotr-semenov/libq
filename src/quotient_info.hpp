@@ -17,7 +17,8 @@ namespace utils {
         using boost::mpl::eval_if;
     }
 
-    template<typename storage_type, size_t total, size_t fractionals>
+    template<typename storage_type, size_t total, size_t fractionals,
+    class OP = overflow_policy::just_do, class UP = underflow_policy::just_do>
     class number;
 
     /// @brief tool for type inference of the division result with fixed-point and
@@ -41,10 +42,10 @@ namespace utils {
     };
 
     /// @brief in case of fixed-point numbers
-    template<typename T, size_t n, size_t f>
-    class quotient_info<number<T, n, f> >
+    template<typename T, size_t n, size_t f, class OP, class UP>
+    class quotient_info<number<T, n, f, OP, UP> >
     {
-        typedef number<T, n, f> operand_type;
+        typedef number<T, n, f, OP, UP> operand_type;
 
     public:
         ///< is the type of division a signed type?
@@ -89,7 +90,7 @@ namespace utils {
 
         ///< fixed-point type for division result
         typedef typename if_<is_closed, operand_type,
-            number<quotient_value_type, n + f, 2u * f> >::type quotient_type;
+            number<quotient_value_type, n + f, 2u * f, OP, UP> >::type quotient_type;
     };
 }
 
