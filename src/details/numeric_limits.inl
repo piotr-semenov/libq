@@ -1,6 +1,10 @@
 /// @brief provides stuff for std::numeric_limits
 
+#include <math.h>
+
 namespace std {
+    #define M_LOG10E 0.434294481903251827651
+    #define M_LOG2E 1.44269504088896340736
     #define M_LOG10_2 M_LOG10E/M_LOG2E
 
     /// @brief numeric limits specialization for fixed-point
@@ -49,10 +53,10 @@ namespace std {
         static bool const is_specialized = true;
 
         /// @brief checks if underflow occurring before rounding
-        static bool const tinyless_before = tinyless_before<up>::value;
+        static bool const tinyless_before = has_exceptions<up>::value;
 
         /// @brief checks if type has exceptions for arithmetics troubles
-        static bool const traps = has_exception<up>::value;
+        static bool const traps = has_exceptions<up>::value;
 
         /// @brief type rounds the values by rejecting bits
         static float_round_style const round_style = round_toward_zero;
@@ -67,10 +71,20 @@ namespace std {
         static int const radix = 2;
 
         /// @brief minimum value that can be achieved by fixed-point type
-        static type min(){ return type::wrap(type::bounds::min); }
+        static type min()
+        {
+            typedef typename type::value_type word_type;
+
+            return type::wrap(static_cast<word_type>(type::bounds::min));
+        }
 
         /// @brief maximum value that can be achieved by fixed-point type
-        static type max(){ return type::wrap(type::bounds::max); }
+        static type max()
+        {
+            typedef typename type::value_type word_type;
+
+            return type::wrap(static_cast<word_type>(type::bounds::max));
+        }
 
         /// @brief returns the machine epsilon, that is, the difference between
         /// 1.0 and the next value representable by the fixed-point type
@@ -86,5 +100,4 @@ namespace std {
     };
 
     #undef M_LOG10_2
-
 }
