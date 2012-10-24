@@ -26,8 +26,6 @@
 #include <boost/integer_traits.hpp>
 
 #include <limits>
-#include <cmath>
-
 #include <stdexcept>
 
 /// @brief fixed-point arithmetics stuff
@@ -165,7 +163,7 @@ namespace utils {
             template<bool t>
             struct min_bound_traits
             {
-                static boost::intmax_t const value = -static_cast<boost::intmax_t>(max) - 1u;
+                static boost::intmax_t const value = -static_cast<boost::intmax_t>(max);
             };
 
             // case of unsigned logics
@@ -185,7 +183,13 @@ namespace utils {
 
         template<typename T>
         explicit number(T value)
-            :    m_value(convert_from(value))
+            :    m_value(
+                    handle_underflow(
+                        value,
+                        handle_overflow(convert_from(value), op()),
+                        up()
+                    )
+                 )
         {
             BOOST_STATIC_ASSERT((boost::is_arithmetic<T>::value));
         }
@@ -556,9 +560,9 @@ namespace utils {
 #define _tmpl_head_ template<typename T, size_t n, size_t f, class op, class up>
 #define _cls_name_ number<T, n, f, op, up>
 
-//#include "./../../fixed_point_lib/src/details/arithmetics.inl"
-//#include "./../../fixed_point_lib/src/details/number_limits.inl"
-//#include "./../../fixed_point_lib/src/details/el_functions.inl"
+#include "./../../fixed_point_lib/src/details/arithmetics.inl"
+#include "./../../fixed_point_lib/src/details/numeric_limits.inl"
+#include "./../../fixed_point_lib/src/details/el_functions.inl"
 
 #undef _tmpl_head_
 #undef _cls_name_
