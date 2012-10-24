@@ -1,78 +1,109 @@
 #define BOOST_TEST_STATIC_LINK
-#define BOOST_TEST_MODULE SUBTRACTION_CASES
 
 #include <boost/test/unit_test.hpp>
-#include <boost/integer.hpp>
+#include <boost/foreach.hpp>
+#include <boost/range/irange.hpp>
 
 #include <limits>
+
 #include <string>
+#include <sstream>
+#include <iomanip>
+#include <stdexcept>
 
 #include "./../../fixed_point_lib/src/number.hpp"
-#include "./../../fixed_point_lib/src/sign_info.hpp"
 
 namespace utils { namespace unit_tests {
-    namespace {
-        using utils::S_number;
-        using utils::U_number;
+    #define iterations 100000
 
-        using utils::sign_info;
+    namespace {
+        using utils::SOU_number;
+        using utils::UOU_number;
+
+        double r(double low, double high)
+        {
+            return low + std::rand() / (double(RAND_MAX) / (high - low));
+        }
     }
+
+    #define fmin(type) double(std::numeric_limits<type>::min())
+    #define fmax(type) double(std::numeric_limits<type>::max())
 
     BOOST_AUTO_TEST_SUITE(Subtraction)
 
         // FIXED-POINT SUBTRACTION PRECISION TESTS
         //////////////////////////////////////////////////////////////////////////
         /// idea of tests 'commonCheck1' and 'commonCheck2':
-        ///     common checks if fixed-point subtraction is accurate and sign inference
-        ///     is performed accurately
-        BOOST_AUTO_TEST_CASE(commonCheck1)
+        ///     1. common checks for fixed-point accuracy
+        ///     2. number of accurate decimal numbers in fractional part is determined
+        ///     as floor(log(10, 2^(f + 1) - 1)) - 1. Last number is errored by left
+        ///     non-captured digits. But make sure that fixed-point positions are
+        ///     the same.
+    BOOST_AUTO_TEST_CASE(commonCheck1)
     {
-        typedef S_number<59, 48>::type type1;
-        typedef U_number<37, 48>::type type2;
+        typedef SOU_number<59, 48>::type type1;
+        typedef UOU_number<37, 48>::type type2;
 
-        type1 const a(-123.12321);
-        type2 const b(50.23128);
+        std::srand(static_cast<unsigned int>(std::time(0)));
 
-        type1::sum_type const result = a - b;
+        BOOST_FOREACH(size_t it, boost::irange<size_t>(0, iterations, 1)) {
+            // shortening range not to take care about rounding errors at the
+            // bounds
+            double u1 = r(fmin(type1) + 1, fmax(type1) - 1);
+            double u2 = r(fmin(type2), fmax(type2));
 
-        std::string const message("subtraction was made with illegal rounding error");
-        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) + 173.35449) < 1E-5, message);
+            type1 const a(u1);
+            type2 const b(u2);
+            type1::diff_type const result = a - b;
+
+            std::stringstream message_stream;
+            message_stream
+                << std::setprecision(15)
+                << u1
+                << " - "
+                << u2
+                << ": subtraction was made with unexpected rounding error";
+
+            BOOST_CHECK_MESSAGE(std::fabs(double(result) - (u1 - u2)) < 1E-12,
+                message_stream.str());
+        }
     }
 
     BOOST_AUTO_TEST_CASE(commonCheck2)
     {
-        typedef U_number<32, 12>::type type1;
-        typedef S_number<56, 23>::type type2;
+        typedef SOU_number<32, 13>::type type1;
+        typedef UOU_number<42, 23>::type type2;
 
-        type1 const a(15.001);
-        type2 const b(0.001);
+        std::srand(static_cast<unsigned int>(std::time(0)));
 
-        type1::sum_type const result = a - b;
+        BOOST_FOREACH(size_t it, boost::irange<size_t>(0, iterations, 1)) {
+            // shortening range not to take care about rounding errors at the
+            // bounds
+            double u1 = r(fmin(type1) + 1, fmax(type1) - 1);
+            double u2 = r(std::max(fmin(type1) + 1 - u1, fmin(type2) + 1u),
+                std::min(fmax(type1) - 1 - u1, fmax(type2) - 1u));
 
-        std::string const message("subtraction was made with illegal rounding error");
-        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) - 15.0) < 1E-3, message);
-    }
+            type1 const a(u1);
+            type2 const b(u2);
+            type1::sum_type const result = a - b;
+            //double x = double(result);
 
-    // SAME-TYPE FIXED-POINT NUMBERS ARE FROM THE ADDITIVE ABELIAN GROUP
-    //////////////////////////////////////////////////////////////////////////
-    // idea of test 'negativesCheck'
-    //      checks if the abelian additive group laws are satisfied
-    BOOST_AUTO_TEST_CASE(negativesCheck)
-    {
-        typedef S_number<54, 45>::type type;
-        type const a(234.234), b(-34.5432), c(109.12358), unit(0);
+            std::stringstream message_stream;
+            message_stream
+                << std::setprecision(5)
+                << u1
+                << " - "
+                << u2
+                << ": subtraction was made with unexpected rounding error";
 
-        std::string const message("fixed-point arithmetics does not satisfy law of negatives");
-        BOOST_CHECK_MESSAGE(a - a == type::diff_type(unit), message);
-        BOOST_CHECK_MESSAGE(b - b == type::diff_type(unit), message);
-        BOOST_CHECK_MESSAGE(c - c == type::diff_type(unit), message);
-
-        typedef U_number<0, 67>::type type1;
-        type const d(0.023143), e(0.000201), f(0.000001);
-        BOOST_CHECK_MESSAGE(d - d == type::diff_type(unit), message);
-        BOOST_CHECK_MESSAGE(e - e == type::diff_type(unit), message);
-        BOOST_CHECK_MESSAGE(f - f == type::diff_type(unit), message);
+            BOOST_CHECK_MESSAGE(std::fabs(double(result) - (u1 - u2)) < 1E-3,
+                message_stream.str());
+        }
     }
 
     BOOST_AUTO_TEST_SUITE_END()
+
+    #undef iterations
+    #undef fmin
+    #undef fmax
 }}
