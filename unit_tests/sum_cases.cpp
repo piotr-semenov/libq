@@ -15,17 +15,15 @@
 #include "./../../fixed_point_lib/src/number.hpp"
 
 namespace utils { namespace unit_tests {
-    namespace {
-        using utils::S_number;
-        using utils::U_number;
+    #define iterations 100000
 
+    namespace {
         using utils::SOU_number;
         using utils::UOU_number;
     }
 
     #define fmin(type) double(std::numeric_limits<type>::min())
     #define fmax(type) double(std::numeric_limits<type>::max())
-    #define iterations 10000
 
     double r(double low, double high)
     {
@@ -43,14 +41,17 @@ namespace utils { namespace unit_tests {
     ///     non-captured digits.
     BOOST_AUTO_TEST_CASE(commonCheck1)
     {
-        typedef U_number<28, 13>::type type1;
-        typedef U_number<37, 15>::type type2;
+        typedef UOU_number<28, 13>::type type1;
+        typedef UOU_number<37, 15>::type type2;
 
         std::srand(static_cast<unsigned int>(std::time(0)));
 
         BOOST_FOREACH(size_t it, boost::irange<size_t>(0, iterations, 1)) {
-            double const u1 = r(fmin(type1), fmax(type1));
-            double const u2 = r(fmin(type2), fmax(type1) - u1);
+            // shortening range not to take care about rounding errors at the
+            // bounds
+            double u1 = r(fmin(type1) + 1u, fmax(type1) - 1u);
+            double u2 = r(std::max(fmin(type1) + 1u - u1, fmin(type2) + 1u),
+                std::min(fmax(type1) - 1u - u1, fmax(type2) - 1u));
 
             type1 const a(u1);
             type2 const b(u2);
@@ -71,16 +72,33 @@ namespace utils { namespace unit_tests {
 
     BOOST_AUTO_TEST_CASE(commonCheck2)
     {
-        typedef U_number<56, 34>::type type1;
-        typedef S_number<56, 57>::type type2;
+        typedef SOU_number<56, 34>::type type1;
+        typedef SOU_number<56, 47>::type type2;
 
-        type1 const a(13.5462);
-        type2 const b(0.00343);
+        std::srand(static_cast<unsigned int>(std::time(0)));
 
-        type1::sum_type const result = a + b;
+        BOOST_FOREACH(size_t it, boost::irange<size_t>(0, iterations, 1)) {
+            // shortening range not to take care about rounding errors at the
+            // bounds
+            double u1 = r(fmin(type1) + 1, fmax(type1) - 1);
+            double u2 = r(std::max(fmin(type1) + 1 - u1, fmin(type2) + 1u),
+                std::min(fmax(type1) - 1 - u1, fmax(type2) - 1u));
 
-        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) - 13.54963) < 1E-5,
-            "summation was made with illegal rounding error");
+            type1 const a(u1);
+            type2 const b(u2);
+            type1::sum_type const result = a + b;
+
+            std::stringstream message_stream;
+            message_stream
+                << std::setprecision(11)
+                << u1
+                << " + "
+                << u2
+                << ": summation was made with unexpected rounding error";
+
+            BOOST_CHECK_MESSAGE(std::fabs(double(result) - (u1 + u2)) < 1E-9,
+                message_stream.str());
+        }
     }
 
     // POSITIVE/NEGATIVE OVERFLOW EVENTS HANDLING
@@ -94,13 +112,23 @@ namespace utils { namespace unit_tests {
         try {
             type const c(a + b);
 
-            BOOST_FAIL("Overflow event was not captured");
+            BOOST_FAIL("Positive overflow event was not captured");
         }
         catch (std::overflow_error e){};
     }
 
     BOOST_AUTO_TEST_CASE(negativeOverflow)
     {
+        typedef SOU_number<8, 3>::type type;
+
+        type const a(-31.9);
+        type const b(-0.2);
+        try {
+            type const c(a + b);
+
+            BOOST_FAIL("Negative overflow event was not captured");
+        }
+        catch (std::overflow_error e){};
     }
 
     // SAME TYPE FIXED-POINT NUMBERS BUILDS AN ADDITIVE ABELIAN GROUP
