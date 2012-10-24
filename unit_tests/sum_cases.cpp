@@ -122,7 +122,7 @@ namespace utils { namespace unit_tests {
         typedef SOU_number<8, 3>::type type;
 
         type const a(-31.9);
-        type const b(-0.2);
+        type const b(-1.1);
         try {
             type const c(a + b);
 
