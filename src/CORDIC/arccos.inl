@@ -1,13 +1,14 @@
 /// @brief provides CORDIC for cos function
+/// @ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 
-#include "./../../../Common/cordic/cordic.hpp"
-
-namespace utils { namespace cordic {
-    template<typename T>
-    T cordic_cos(T value)
+namespace std {
+    template<typename T, size_t n, size_t f, class op, class up>
+    utils::number<T, n, f, op, up> cos(utils::number<T, n, f, op, up> const& x)
     {
-        static cordic<60> const f;
+        #define iterations 20
 
+        static double lut[64] = {
 
+        }
     }
-}}
+}
