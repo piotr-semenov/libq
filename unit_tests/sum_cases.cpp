@@ -131,31 +131,5 @@ namespace utils { namespace unit_tests {
         catch (std::overflow_error e){};
     }
 
-    // SAME TYPE FIXED-POINT NUMBERS BUILDS AN ADDITIVE ABELIAN GROUP
-    //////////////////////////////////////////////////////////////////////////
-    // idea of tests 'unitCheck' and 'commutativityCheck'
-    //      checks if the additive abelian group laws are satisifed
-    BOOST_AUTO_TEST_CASE(unitCheck)
-    {
-        typedef S_number<43, 23>::type type;
-        type const unit(0.0), a(32.435), b(-23.123), c(0.034);
-
-        std::string const message("summation does not have unit");
-        BOOST_CHECK_MESSAGE((type(a + unit) == type(unit + a)) && (type(unit + a) == type(a)), message);
-        BOOST_CHECK_MESSAGE((type(b + unit) == type(unit + b)) && (type(unit + b) == type(b)), message);
-        BOOST_CHECK_MESSAGE((type(c + unit) == type(unit + c)) && (type(unit + c) == type(c)), message);
-    }
-
-    BOOST_AUTO_TEST_CASE(commutativityCheck)
-    {
-        typedef S_number<27, 27>::type type;
-        type const a(0.0023), b(0.095), c(0.9998);
-
-        std::string const message("summation does not satisfy commutativity law");
-        BOOST_CHECK_MESSAGE(a + b == b + a, message);
-        BOOST_CHECK_MESSAGE(b + c == c + b, message);
-        BOOST_CHECK_MESSAGE(a + c == c + a, message);
-    }
-
     BOOST_AUTO_TEST_SUITE_END()
 }}
