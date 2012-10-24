@@ -20,15 +20,15 @@ namespace utils { namespace unit_tests {
     namespace {
         using utils::SOU_number;
         using utils::UOU_number;
+
+        double r(double low, double high)
+        {
+            return low + std::rand() / (double(RAND_MAX) / (high - low));
+        }
     }
 
     #define fmin(type) double(std::numeric_limits<type>::min())
     #define fmax(type) double(std::numeric_limits<type>::max())
-
-    double r(double low, double high)
-    {
-        return low + std::rand() / (double(RAND_MAX) / (high - low));
-    }
 
     BOOST_AUTO_TEST_SUITE(Summation)
 
@@ -132,4 +132,8 @@ namespace utils { namespace unit_tests {
     }
 
     BOOST_AUTO_TEST_SUITE_END()
+
+    #undef iterations
+    #undef fmin
+    #undef fmax
 }}
