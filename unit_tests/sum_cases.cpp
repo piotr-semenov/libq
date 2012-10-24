@@ -2,8 +2,8 @@
 #define BOOST_TEST_MODULE FIXED_POINT_LIB_COMMON_USE_CASES
 
 #include <boost/test/unit_test.hpp>
-
-#include <boost/random.hpp>
+#include <boost/foreach.hpp>
+#include <boost/range/irange.hpp>
 
 #include <limits>
 
@@ -21,11 +21,15 @@ namespace utils { namespace unit_tests {
 
         using utils::SOU_number;
         using utils::UOU_number;
+    }
 
-        boost::mt19937 rng;
-        typedef boost::variate_generator<boost::mt19937&, boost::uniform_real<double> >
-            generator;
-        typedef boost::uniform_real<double> var;
+    #define fmin(type) double(std::numeric_limits<type>::min())
+    #define fmax(type) double(std::numeric_limits<type>::max())
+    #define iterations 10000
+
+    double r(double low, double high)
+    {
+        return low + std::rand() / (double(RAND_MAX) / (high - low));
     }
 
     BOOST_AUTO_TEST_SUITE(Summation)
@@ -33,39 +37,36 @@ namespace utils { namespace unit_tests {
     // FIXED-POINT SUMMATION PRECISION TESTS
     //////////////////////////////////////////////////////////////////////////
     /// idea of tests 'commonCheck1' and 'commonCheck2':
-    ///     1. common checks for fixed-point accuracy and result sign inference
+    ///     1. common checks for fixed-point accuracy
     ///     2. number of accurate decimal numbers in fractional part is determined
     ///     as floor(log(10, 2^(f + 1) - 1)) - 1. Last number is errored by left
     ///     non-captured digits.
     BOOST_AUTO_TEST_CASE(commonCheck1)
     {
-        typedef S_number<28, 13>::type type1;
+        typedef U_number<28, 13>::type type1;
         typedef U_number<37, 15>::type type2;
 
-        var v0(static_cast<double>(std::numeric_limits<type1>::min()),
-            static_cast<double>(std::numeric_limits<type1>::max()));
-        double const u0 = generator(rng, v0)();
+        std::srand(static_cast<unsigned int>(std::time(0)));
 
-        var v1(static_cast<double>(std::numeric_limits<type2>::min()),
-            static_cast<double>(std::numeric_limits<type1>::max()) - u0);
-        double const u1 = generator(rng, v1)();
+        BOOST_FOREACH(size_t it, boost::irange<size_t>(0, iterations, 1)) {
+            double const u1 = r(fmin(type1), fmax(type1));
+            double const u2 = r(fmin(type2), fmax(type1) - u1);
 
-        type1 const a(u0);
-        type1 const b(u1);
+            type1 const a(u1);
+            type2 const b(u2);
+            type1::sum_type const result = a + b;
 
-        type1::sum_type const result = a + b;
+            std::stringstream message_stream;
+            message_stream
+                << std::setprecision(5)
+                << u1
+                << " + "
+                << u2
+                << ": summation was made with unexpected rounding error";
 
-        std::stringstream message_stream;
-        message_stream
-            << std::setprecision(5)
-            << u0
-            << " + "
-            << u1
-            << ": summation was made with unexpected rounding error";
-
-        double const error = static_cast<double>(result) - (u0 + u1);
-        BOOST_CHECK_MESSAGE(std::fabs(static_cast<double>(result) - (u0 + u1)) < 1E-3,
-            message_stream.str());
+            BOOST_CHECK_MESSAGE(std::fabs(double(result) - (u1 + u2)) < 1E-3,
+                message_stream.str());
+        }
     }
 
     BOOST_AUTO_TEST_CASE(commonCheck2)
