@@ -11,8 +11,8 @@
 
 namespace utils { namespace unit_tests {
     namespace {
-        using utils::S_number;
-        using utils::U_number;
+        using utils::SOU_number;
+        using utils::UOU_number;
 
         using utils::sign_info;
     }
@@ -23,9 +23,9 @@ namespace utils { namespace unit_tests {
     ///     common checks if sign inference is accurate
     BOOST_AUTO_TEST_CASE(commonCheck)
     {
-        typedef S_number<28, 13>::type type1;
-        typedef U_number<37, 15>::type type2;
-        typedef U_number<12, 0>::type type3;
+        typedef SOU_number<28, 13>::type type1;
+        typedef UOU_number<37, 15>::type type2;
+        typedef UOU_number<12, 0>::type type3;
 
         std::string const message("sign inference is wrong");
         #define COMMON_CHECK_IMPL(i, j, s) BOOST_CHECK_MESSAGE(s##(sign_info<type##i, type##j>::sign), message)
@@ -41,9 +41,9 @@ namespace utils { namespace unit_tests {
     ///     inference of product type sign must be reflexive
     BOOST_AUTO_TEST_CASE(reflexivityCheck)
     {
-        typedef S_number<12, 9>::type type1;
-        typedef S_number<3, 0>::type type2;
-        typedef U_number<25, 26>::type type3;
+        typedef SOU_number<12, 9>::type type1;
+        typedef SOU_number<3, 0>::type type2;
+        typedef UOU_number<25, 26>::type type3;
 
         std::string const message("inference of product type sign does not satisfy reflexivity law");
         #define REFLEXIVITY_CHECK(i) BOOST_CHECK_MESSAGE((std::numeric_limits<type##i>::is_signed ==  \
@@ -58,9 +58,9 @@ namespace utils { namespace unit_tests {
     ///    inference of product type sign must be symmetric
     BOOST_AUTO_TEST_CASE(symmetryCheck)
     {
-        typedef S_number<28, 13>::type type1;
-        typedef U_number<37, 15>::type type2;
-        typedef U_number<12, 0>::type type3;
+        typedef SOU_number<28, 13>::type type1;
+        typedef UOU_number<37, 15>::type type2;
+        typedef UOU_number<12, 0>::type type3;
 
         std::string const message("inference of product type sign does not satisfy symmetry law");
         #define SYMMETRY_CHECK(i, j) BOOST_CHECK_MESSAGE((sign_info<type##i, type##j>::sign ==  \
