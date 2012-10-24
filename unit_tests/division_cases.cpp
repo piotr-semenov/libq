@@ -1,17 +1,19 @@
 #define BOOST_TEST_STATIC_LINK
-#define BOOST_TEST_MODULE DIVISION_CASES
 
 #include <boost/test/unit_test.hpp>
 #include <boost/integer.hpp>
 
 #include <limits>
 #include <string>
+#include <stdexcept>
 
 #include "./../../fixed_point_lib/src/number.hpp"
 
 namespace utils { namespace unit_tests {
     namespace {
         using utils::S_number;
+        using utils::SOU_number;
+
         using utils::U_number;
     }
 
@@ -25,23 +27,28 @@ namespace utils { namespace unit_tests {
     /// so, fixed-point alignment has to be failed during fixed-point numbers division
     BOOST_AUTO_TEST_CASE(positiveOverflowCheck)
     {
-        using boost::numeric::positive_overflow;
-
-        S_number<28, 20>::type const a(-2.302);
-        S_number<28, 2>::type const b(1000123);
-        S_number<38, 4>::type const c(10123);
-
-        try {
-            double const quotient(a / b);
-            BOOST_FAIL("Positive overflow was not detected");
-        }
-        catch (positive_overflow e) {}
+        SOU_number<28, 20>::type const a(-230.2);
+        SOU_number<28, 20>::type const b(0.0001);
+        SOU_number<38, 4>::type const c(100123);
+        SOU_number<38, 4>::type const d(255);
 
         try {
-            a / c;
+            a / b;
+            BOOST_FAIL("Negative overflow was not detected");
+        }
+        catch (std::overflow_error e){}
+
+        try {
+            b / c;
             BOOST_FAIL("Positive overflow was not detected");
         }
-        catch (positive_overflow e){}
+        catch (std::overflow_error e){}
+
+        try {
+            b / d;
+            BOOST_FAIL("Underflow was not detected");
+        }
+        catch (std::underflow_error e){}
     }
 
     /// idea of test:

@@ -14,9 +14,6 @@
     <ClCompile Include="..\division_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\normalization_cases.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\ordering_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -26,9 +23,6 @@
     <ClCompile Include="..\range_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\sign_cases.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\subtraction_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -36,6 +30,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\as_native_cases.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\std_ext_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

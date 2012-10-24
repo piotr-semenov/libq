@@ -11,13 +11,24 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\as_native_cases.cpp" />
-    <ClCompile Include="..\division_cases.cpp" />
-    <ClCompile Include="..\normalization_cases.cpp" />
-    <ClCompile Include="..\ordering_cases.cpp" />
+    <ClCompile Include="..\as_native_cases.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\division_cases.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\ordering_cases.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\product_cases.cpp" />
     <ClCompile Include="..\range_cases.cpp" />
-    <ClCompile Include="..\sign_cases.cpp" />
+    <ClCompile Include="..\std_ext_cases.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="..\subtraction_cases.cpp" />
     <ClCompile Include="..\sum_cases.cpp" />
   </ItemGroup>
@@ -84,7 +95,8 @@
     </Link>
     <PostBuildEvent>
       <Message>Run of fixed_point_lib unit tests</Message>
-      <Command>$(TargetPath)</Command>
+      <Command>
+      </Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
