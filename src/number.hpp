@@ -163,7 +163,7 @@ namespace utils {
             template<bool t>
             struct min_bound_traits
             {
-                static boost::intmax_t const value = -static_cast<boost::intmax_t>(max);
+                static boost::intmax_t const value = -static_cast<boost::intmax_t>(max) - 1;
             };
 
             // case of unsigned logics
