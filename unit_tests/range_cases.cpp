@@ -3,29 +3,31 @@
 #include <boost/test/unit_test.hpp>
 
 #include <string>
+#include <limits>
+#include <stdexcept>
 
 #include "./../../fixed_point_lib/src/number.hpp"
 
 namespace utils { namespace unit_tests {
     namespace {
-        using utils::S_number;
-        using utils::U_number;
-
-        namespace num = boost::numeric;
+        using utils::SOU_number;
+        using utils::UOU_number;
     }
 
     BOOST_AUTO_TEST_SUITE(Range)
 
-    // idea of test:
-    //     for common 8-bit, 16-bit, 32-bit formats fixed-point must have the same
-    //     range as built-in types have
+    // FIXED-POINT RANGE TESTS
+    //////////////////////////////////////////////////////////////////////////
+    /// idea of test 'rangeFitBuiltinCheck':
+    ///     checks if range of fixed-point of word length 8,16,32,64 is the same
+    ///     as for built-in integers
     BOOST_AUTO_TEST_CASE(rangeFitBultinCheck)
     {
-        typedef S_number<7, 6>::type type1;
-        typedef U_number<16, 23>::type type2;
-        typedef U_number<32, 12>::type type3;
-        typedef U_number<64, 54>::type type4;
-        typedef S_number<15, 12>::type type5;
+        typedef SOU_number<7, 6>::type type1;
+        typedef UOU_number<16, 23>::type type2;
+        typedef UOU_number<32, 12>::type type3;
+        typedef UOU_number<64, 54>::type type4;
+        typedef SOU_number<15, 12>::type type5;
 
         std::string const message("fixed-point has wrong range");
         typedef boost::int_t<8>::exact bit8_stype;
@@ -49,70 +51,29 @@ namespace utils { namespace unit_tests {
         BOOST_CHECK_MESSAGE(std::numeric_limits<bit16_stype>::min() == type5::bounds::min, message);
     }
 
-    // idea of test:
-    //     common checks if integer value (interpreted as fixed-point) is out of range
+    /// idea of test 'outOfRangeCheck':
+    ///     common checks if integer value (interpreted as fixed-point) is out
+    ///     of range
     BOOST_AUTO_TEST_CASE(outOfRangeCheck)
     {
-        using num::positive_overflow;
-        using num::negative_overflow;
-
-        typedef S_number<8, 13>::type type1;
-        typedef U_number<53, 45>::type type2;
-        typedef U_number<13, 1>::type type3;
-
-        type3 x(100);
+        typedef SOU_number<8, 13>::type type1;
+        typedef UOU_number<13, 1>::type type2;
 
         std::string const message("Positive overflow was not detected");
         try {
-            unsigned int const a = 300;
+            type1(300u);
 
-            type1::bounds::check(a);
             BOOST_FAIL(message);
         }
-        catch (positive_overflow e){}
+        catch (std::overflow_error e){}
 
         try {
-            unsigned int const a = 10000;
+            type2(10000u);
 
-            type3::bounds::check(a);
             BOOST_FAIL(message);
         }
-        catch (positive_overflow e){}
+        catch (std::overflow_error e){}
 
     }
-
-    // idea of test:
-    //     common checks if integers (interpreted as fixed-point values) fits the fixed-point format
-    BOOST_AUTO_TEST_CASE(rangeFitCheck)
-    {
-        typedef S_number<44, 23>::type type1;
-        typedef S_number<35, 12>::type type2;
-        typedef U_number<19, 3>::type type3;
-
-        typedef U_number<27, 3>::type type4;
-        typedef S_number<26, 3>::type type5;
-
-        std::string const message("Wrong overflow detection if integer fits the fixed-point format range");
-        try {
-            type1::bounds::check(17592186044415L);
-            type1::bounds::check(-17592186044416L);
-
-            type2::bounds::check(34359738367L);
-            type2::bounds::check(-34359738368L);
-
-            type3::bounds::check(524287L);
-            type3::bounds::check(0);
-
-            type4::bounds::check(134217727L);
-            type4::bounds::check(0);
-
-            type5::bounds::check(67108863L);
-            type5::bounds::check(-67108864L);
-        }
-        catch (std::exception e) {
-            BOOST_FAIL(message);
-        }
-    }
-
     BOOST_AUTO_TEST_SUITE_END()
 }}
