@@ -570,6 +570,6 @@ namespace utils {
 #undef _cls_name_
 
 // CORDIC-based fixed-point implementation of elementary functions
-#include "./../../fixed_point_lib/src/CORDIC/arccos.inl"
+#include "./../../fixed_point_lib/src/CORDIC/cos.inl"
 
 #endif
