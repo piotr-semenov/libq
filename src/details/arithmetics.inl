@@ -62,7 +62,7 @@ namespace std {
         fixed_point const fractional = fixed_point::wrap(
             fixed_point(a / b).value() & mask
         );
-        return fractional;
+        return fixed_point(fractional * b);
     }
 
     /// @brief computes square root for fixed-point by long-algorithm
