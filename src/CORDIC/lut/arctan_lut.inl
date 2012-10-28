@@ -11,7 +11,7 @@
 namespace utils { namespace cordic {
     /// @ref page 5, equation 7, m = 1 (circular coordinate system)
     template<size_t n, typename fixed_point>
-    typename arctan_lut<n, fixed_point>::base_class arctan_lut<n, fixed_point>::build()
+    typename lut<n, fixed_point> lut<n, fixed_point>::build_arctan_lut()
     {
         base_class table;
 
@@ -22,6 +22,6 @@ namespace utils { namespace cordic {
             table[i] = fixed_point(std::atan(1.0 / std::pow(2.0, double(i))));
         }
 
-        return table;
+        return this_class(table);
     }
 }}
