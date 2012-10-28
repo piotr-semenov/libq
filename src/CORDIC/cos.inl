@@ -20,9 +20,10 @@ namespace std {
         fixed_point arg(0);
         int sign(-1);
         {
-            fixed_point const p(pi);
+            // put argument to [-pi, pi] interval (with change of sign for
+            // cos)
             fixed_point const x = pi - std::fmod(val, pi2);
-            if (x < -pi_half) {
+            if (x < -pi_half) {     // convert to interval [-pi/2, pi/2]
                 arg = x + pi;
 
                 sign = 1;
