@@ -12,6 +12,8 @@
 
 #include "./../../fixed_point_lib/src/static_pow.hpp"
 
+#include "./../../fixed_point_lib/src/as_native_proxy.hpp"
+
 #include <boost/static_assert.hpp>
 #include <boost/concept_check.hpp>
 
@@ -276,7 +278,7 @@ namespace utils {
             BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
             this_class x;
 
-            x.value(val);
+            x.value(value_type(val));
             return x;
         }
 
@@ -566,5 +568,8 @@ namespace utils {
 
 #undef _tmpl_head_
 #undef _cls_name_
+
+// CORDIC-based fixed-point implementation of elementary functions
+#include "./../../fixed_point_lib/src/CORDIC/arccos.inl"
 
 #endif
