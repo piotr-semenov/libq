@@ -7,6 +7,8 @@ namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
     utils::number<T, n, f, op, up> sin(utils::number<T, n, f, op, up> const& val)
     {
+        BOOST_STATIC_ASSERT(n - f >= 3);
+
         #define pi fixed_point(3.141592653589793)
         #define pi2 fixed_point(6.283185307179586)
         #define pi_half fixed_point(1.5707963267948965)
