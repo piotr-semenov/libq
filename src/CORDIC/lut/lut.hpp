@@ -19,6 +19,9 @@ namespace utils { namespace cordic {
         typedef fixed_point fixed_point_type;
 
         static this_class build_arctan_lut();
+        static this_class build_log2_lut();
+        static this_class build_inv_2roots_lut();
+
         static double compute_circular_scale(size_t n);
 
     private:
@@ -28,6 +31,9 @@ namespace utils { namespace cordic {
 }}
 
 #include "./../../../fixed_point_lib/src/CORDIC/lut/arctan_lut.inl"
+#include "./../../../fixed_point_lib/src/CORDIC/lut/log2_lut.inl"
+#include "./../../../fixed_point_lib/src/CORDIC/lut/inv2roots_lut.inl"
+
 #include "./../../../fixed_point_lib/src/CORDIC/lut/circular_scales.inl"
 
 #endif
