@@ -420,7 +420,7 @@ namespace utils {
         {
             product_type const val(*this * this_class(x));
 
-            return this->value(val.value());
+            return this->value(value_type(val.value()));
         }
 
         /// @brief division operation
@@ -571,5 +571,9 @@ namespace utils {
 
 // CORDIC-based fixed-point implementation of elementary functions
 #include "./../../fixed_point_lib/src/CORDIC/cos.inl"
+#include "./../../fixed_point_lib/src/CORDIC/sin.inl"
+#include "./../../fixed_point_lib/src/CORDIC/tan.inl"
+#include "./../../fixed_point_lib/src/CORDIC/log.inl"
+#include "./../../fixed_point_lib/src/CORDIC/exp.inl"
 
 #endif
