@@ -10,6 +10,9 @@ namespace std {
         typedef utils::number<T, n, f, op, up> fixed_point;
         using utils::cordic::lut;
 
+        #define pi_half fixed_point(1.5707963267948965)
+        #define pi fixed_point(3.141592653589793)
+
         bool const is_negative = (val < fixed_point(0));
         assert(("argument has to be from interval [-1.0, 1.0]",
             std::fabs(val) <= fixed_point(1.0)));
@@ -52,6 +55,15 @@ namespace std {
             val = fixed_point(val * scales[i]);
         }
 
+        if (z > pi_half) {
+            z = fixed_point(pi - z);
+        }
+        else if (z < -pi_half) {
+            z = fixed_point(-pi - z);
+        }
+
         return z;
+
+        #undef pi_half
     }
 }
