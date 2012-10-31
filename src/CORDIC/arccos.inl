@@ -9,9 +9,14 @@ namespace std {
     {
         typedef utils::number<T, n, f, op, up> fixed_point;
         using utils::cordic::lut;
+
+        // one need integer part bits to represent pi number
+        #define pi fixed_point(3.141592653589793)
         assert(("fixed-point format is illegal", n - f >= 2));
-        assert(("argument has to be from interval [-1.0, 1.0]",
-            std::fabs(val) <= fixed_point(1.0)));
+
+        bool const is_negative = (val < fixed_point(0));
+        val = std::fabs(val);   // make the value positive
+        assert(("argument has to be from interval [0.0, 1.0]", val <= fixed_point(1.0)));
 
         typedef lut<f, fixed_point> lut_type;
         static lut_type const angles = lut_type::build_arctan_lut();
@@ -38,25 +43,20 @@ namespace std {
                 sign = -s;
             }
 
-            // make two same rotations to do square of scale parameter
-            // K(n)
-            for (size_t j(0); j != 2; ++j) {
-                fixed_point const x_scaled = fixed_point::wrap(sign * (x.value() >> i));
-                fixed_point const y_scaled = fixed_point::wrap(sign * (y.value() >> i));
+            fixed_point const x_scaled = fixed_point::wrap(sign * (x.value() >> i));
+            fixed_point const y_scaled = fixed_point::wrap(sign * (y.value() >> i));
 
-                x1 = fixed_point(x - y_scaled);
-                y1 = fixed_point(y + x_scaled);
+            x1 = fixed_point(x - y_scaled);
+            y1 = fixed_point(y + x_scaled);
 
-                x = x1; y = y1;
-            }
-            fixed_point total_angle(angles[i] * 2);
-            z = z + ((sign > 0) ? total_angle : -total_angle);
+            x = x1; y = y1;
+            z = z + ((sign > 0) ? angles[i] : -angles[i]);
 
             // multiply by square of scale parameter K(n)
-            val = fixed_point(val + val * fixed_point::wrap(T(1u) << (f - 2*i)));
+            val = fixed_point(val * scales[i]);
         }
 
-        return z;
+        return (is_negative) ? fixed_point(pi - std::fabs(z)) : std::fabs(z);
 
         #undef pi
     }
