@@ -14,8 +14,6 @@ namespace std {
         typedef utils::number<T, n, f, op, up> fixed_point;
         typedef utils::cordic::lut<f, fixed_point> lut_type;
 
-        assert(("log2: argument has to be positive", val > fixed_point(0)));
-
         // reduces argument to interval [1.0, 2.0]
         int power(0);
         fixed_point arg(val);
@@ -39,7 +37,7 @@ namespace std {
             }
         }
 
-        result = result * fixed_point(T(1u) << power);
+        result = result * (fixed_point::wrap(T(1u) << (f + power)));
         return result;
     }
 }
