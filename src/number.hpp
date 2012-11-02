@@ -187,14 +187,11 @@ namespace utils {
         explicit number(T value)
             :    m_value(
                     handle_underflow(
-                        value,
+                        convert_from(value),
                         handle_overflow(convert_from(value), op()),
                         up()
                     )
-                 )
-        {
-            BOOST_STATIC_ASSERT((boost::is_arithmetic<T>::value));
-        }
+                 ){}
 
         explicit number(this_class const& x)
             :    m_value(x.value()){}
@@ -347,8 +344,12 @@ namespace utils {
         template<typename T>
         inline sum_type operator +(T const& x) const
         {
+            typedef sum_type::value_type type;
+
             // any overflow is impossible
-            return sum_type::wrap(this->value() + this_class(x).value());
+            return sum_type::wrap(
+                type(this->value()) + type(this_class(x).value())
+            );
         }
 
         template<typename T>
@@ -366,8 +367,12 @@ namespace utils {
         template<typename T>
         inline diff_type operator -(T const& x) const
         {
+            typedef diff_type::value_type type;
+
             // any overflow is impossible
-            return diff_type::wrap(this->value() - this_class(x).value());
+            return diff_type::wrap(
+                type(this->value()) - type(this_class(x).value())
+            );
         }
 
         template<typename T>
@@ -483,6 +488,11 @@ namespace utils {
 
         value_type const& value() const{ return this->m_value; }
 
+    // USEFUL MATHEMATICAL CONSTANTS:
+        static this_class const CONST_E, CONST_LOG2E, CONST_LOG10E, CONST_LN2,
+            CONST_LN10, CONST_PI, CONST_PI_2, CONST_PI_4, CONST_1_PI,
+            CONST_2_PI, CONST_2_SQRTPI, CONST_SQRT2, CONST_SQRT1_2;
+
     private:
         value_type m_value;
         this_class& value(value_type const x)
@@ -569,11 +579,42 @@ namespace utils {
 #undef _tmpl_head_
 #undef _cls_name_
 
+// mathematical constants
+#define math_constant(name, val) \
+    template<typename T, size_t n, size_t f, class op, class up> \
+    utils::number<T, n, f, op, up> const utils::number<T, n, f, op, up>::##name(##val);
+
+math_constant(CONST_E, 2.71828182845904523536)
+math_constant(CONST_LOG2E, 1.44269504088896340736)
+math_constant(CONST_LOG10E, 0.434294481903251827651)
+math_constant(CONST_LN2, 0.693147180559945309417)
+math_constant(CONST_LN10, 2.30258509299404568402)
+math_constant(CONST_PI, 3.14159265358979323846)
+math_constant(CONST_PI_2, 1.57079632679489661923)
+math_constant(CONST_PI_4, 0.785398163397448309616)
+math_constant(CONST_1_PI, 0.318309886183790671538)
+math_constant(CONST_2_PI, 0.636619772367581343076)
+math_constant(CONST_2_SQRTPI, 1.12837916709551257390)
+math_constant(CONST_SQRT2, 1.41421356237309504880)
+math_constant(CONST_SQRT1_2, 0.707106781186547524401)
+
+#undef math_constant
+
 // CORDIC-based fixed-point implementation of elementary functions
 #include "./../../fixed_point_lib/src/CORDIC/cos.inl"
 #include "./../../fixed_point_lib/src/CORDIC/sin.inl"
 #include "./../../fixed_point_lib/src/CORDIC/tan.inl"
 #include "./../../fixed_point_lib/src/CORDIC/log.inl"
 #include "./../../fixed_point_lib/src/CORDIC/exp.inl"
+#include "./../../fixed_point_lib/src/CORDIC/arccos.inl"
+#include "./../../fixed_point_lib/src/CORDIC/arcsin.inl"
+#include "./../../fixed_point_lib/src/CORDIC/arctan.inl"
+#include "./../../fixed_point_lib/src/CORDIC/sqrt.inl"
+#include "./../../fixed_point_lib/src/CORDIC/sinh.inl"
+#include "./../../fixed_point_lib/src/CORDIC/cosh.inl"
+#include "./../../fixed_point_lib/src/CORDIC/tanh.inl"
+#include "./../../fixed_point_lib/src/CORDIC/arcsinh.inl"
+#include "./../../fixed_point_lib/src/CORDIC/arccosh.inl"
+#include "./../../fixed_point_lib/src/CORDIC/arctanh.inl"
 
 #endif
