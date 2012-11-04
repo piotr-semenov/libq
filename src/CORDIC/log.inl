@@ -14,7 +14,10 @@ namespace std {
         typedef utils::number<T, n, f, op, up> fixed_point;
         typedef utils::cordic::lut<f, fixed_point> lut_type;
 
-        assert(("log2: argument has to be positive", val > fixed_point(0)));
+        assert(("log2: argument must be positive", val >= fixed_point(0)));
+        if (val < fixed_point(0)) {
+            throw std::exception("log2: argument must be positive");
+        }
 
         // reduces argument to interval [1.0, 2.0]
         int power(0);
