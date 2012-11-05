@@ -7,57 +7,50 @@ namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
     utils::number<T, n, f, op, up> acos(utils::number<T, n, f, op, up> val)
     {
-        typedef utils::number<T, n, f, op, up> fixed_point;
-        using utils::cordic::lut;
+        typedef utils::number<T, n, f, op, up> fp;
+        typedef utils::cordic::lut<f, fp> lut;
 
-        // one need integer part bits to represent pi number
-        #define pi fixed_point(3.141592653589793)
-        assert(("fixed-point format is illegal", n - f >= 2));
+        BOOST_STATIC_ASSERT(n - f >= 2); // to enable pi representative
+        assert(("argument has to be from interval [1.0, 1.0]", val <= fp(1.0)));
+        if (val > fp(1.0)) {
+            throw std::exception("acos: argument must be from [-1.0, 1.0]");
+        }
+        if (val == fp(1.0)) {
+            return fp::wrap(0);
+        }
+        else if (val == fp(-1.0)) {
+            return fp::CONST_PI;
+        }
+        else if (val == fp::wrap(0)) {
+            return fp::CONST_PI_2;
+        }
 
-        bool const is_negative = (val < fixed_point(0));
-        val = std::fabs(val);   // make the value positive
-        assert(("argument has to be from interval [0.0, 1.0]", val <= fixed_point(1.0)));
+        bool const is_negative = val.value() < 0;
+        val = std::fabs(val);
 
-        typedef lut<f, fixed_point> lut_type;
-        static lut_type const angles = lut_type::build_arctan_lut();
-        static lut_type const scales = lut_type::build_circular_scales_lut();
+        static lut const angles = lut::build_arctan_lut();
+        static lut const scales = lut::build_circular_scales_lut();
 
         // rotation mode: see page 6
         // shift sequence is just 0, 1, ... (circular coordinate system)
-        fixed_point x(1.0), y(0.0), z(0.0);
-        fixed_point x1, y1;
+        fp x(1.0), y(0.0), z(0.0);
         BOOST_FOREACH(size_t i, boost::irange<size_t>(0, f, 1))
         {
-            int s, sign(0);
-            if (y < 0.0) {
-                s = -1;
-            }
-            else {
-                s = +1;
-            }
-
+            int sign(0);
             if (val <= x) {
-                sign = +s;
+                sign = (y < 0.0) ? -1 : +1;
             }
             else {
-                sign = -s;
+                sign = (y < 0.0) ? +1 : -1;
             }
 
-            fixed_point const x_scaled = fixed_point::wrap(sign * (x.value() >> i));
-            fixed_point const y_scaled = fixed_point::wrap(sign * (y.value() >> i));
-
-            x1 = fixed_point(x - y_scaled);
-            y1 = fixed_point(y + x_scaled);
-
-            x = x1; y = y1;
-            z = z + ((sign > 0) ? angles[i] : -angles[i]);
-
-            // multiply by square of scale parameter K(n)
-            val = fixed_point(val * scales[i]);
+            fp::value_type const storage(x.value());
+            x = x - fp::wrap(sign * (y.value() >> i));
+            y = y + fp::wrap(sign * (storage >> i));
+            z = (sign > 0)? z + angles[i] : z - angles[i];
+            val = val * scales[i]; // multiply by square of K(n)
         }
 
-        return (is_negative) ? fixed_point(pi - std::fabs(z)) : std::fabs(z);
-
-        #undef pi
+        return (is_negative) ? fp(fp::CONST_PI - std::fabs(z)) : std::fabs(z);
     }
 }
