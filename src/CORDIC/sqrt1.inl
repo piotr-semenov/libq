@@ -29,10 +29,9 @@ namespace std {
         // So format must reserve two bits at least for integer part.
         typedef utils::number<boost::int_t<1u+n+2u>::least, n+2u, f, op, up> work_type;
 
-        // reduces argument to interval [1.0, 2.0]
         int power(0);
         work_type arg(val);
-        while (arg >= work_type(2.0)) {
+        while (arg >= work_type(2.0 )) {
             as_native(arg) >>= 1u;
             power--;
         }
