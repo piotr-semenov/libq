@@ -1,11 +1,7 @@
 /// @brief provides stuff for std::numeric_limits
 
-#include <math.h>
-
 namespace std {
-    #define M_LOG10E 0.434294481903251827651
-    #define M_LOG2E 1.44269504088896340736
-    #define M_LOG10_2 M_LOG10E/M_LOG2E
+    #define M_LOG10_2 0.301029995663981195214
 
     /// @brief numeric limits specialization for fixed-point
     template<typename T, size_t n, size_t f, class op, class up>
@@ -37,14 +33,14 @@ namespace std {
         /// @brief type represents finite sets of values
         static bool const is_bounded = true;
 
-        /// @brief type does not use an exact representation of values
-        static bool const is_exact = false;
+        /// @brief type uses an exact representation of values
+        static bool const is_exact = true;
 
         static const bool is_iec599 = false;
         static const bool is_integer = false;
 
-        /// @brief type handles overflows with modulo arithmetic
-        static bool const is_modulo = true;
+        /// @brief note: type handles overflows with modulo arithmetic
+        static bool const is_modulo = !has_exceptions<op>::value;
 
         static bool const is_signed = std::numeric_limits<typename type::value_type>::is_signed;
 
