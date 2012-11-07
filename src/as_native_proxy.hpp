@@ -3,8 +3,7 @@
 #include <boost/operators.hpp>
 
 namespace utils {
-    template<typename storage_type, size_t total, size_t fractionals, class op,
-    class up>
+    template<typename T, size_t n, size_t f, class op, class up>
     class number;
 
     /// @brief proxy class for dealing with fixed-point numbers as with integers
@@ -232,8 +231,10 @@ namespace utils {
         as_native_proxy(fixed_point_class& x)
             :    m_value(x.m_value){};
 
-
         template<typename T1, size_t n1, size_t f1, class op1, class up1>
         friend as_native_proxy<T1, n1, f1, op1, up1> as_native(number<T1, n1, f1, op1, up1>&);
+
+        template<typename T1, size_t n1, size_t f1, class op1, class up1>
+        friend class number;
     };
 }
