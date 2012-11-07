@@ -227,6 +227,12 @@ namespace utils {
             return this->value(normalize<T, f1>(x.value()));
         }
 
+        template<typename T, size_t n1, size_t f1, class op1, class up1>
+        this_class& operator =(as_native_proxy<T, n1, f1, op1, up1> const& x)
+        {
+            return this->value(convert_from(x.value()));
+        }
+
         /// @brief represents any arithmetic value in current fixed-point format
         template<typename T>
         static value_type convert_from(T const x)
@@ -489,9 +495,9 @@ namespace utils {
         value_type const& value() const{ return this->m_value; }
 
     // USEFUL MATHEMATICAL CONSTANTS:
-        static this_class const CONST_E, CONST_LOG2E, CONST_LOG10E, CONST_LN2,
-            CONST_LN10, CONST_PI, CONST_PI_2, CONST_PI_4, CONST_1_PI,
-            CONST_2_PI, CONST_2_SQRTPI, CONST_SQRT2, CONST_SQRT1_2;
+        static this_class const CONST_E, CONST_LOG2E, CONST_LOG10E, CONST_LOG102,
+            CONST_LN2, CONST_LN10, CONST_PI, CONST_PI_2, CONST_PI_4, CONST_1_PI,
+            CONST_2_PI, CONST_2_SQRTPI, CONST_SQRT2, CONST_SQRT1_2, CONST_2SQRT2;
 
     private:
         value_type m_value;
@@ -569,24 +575,17 @@ namespace utils {
     };
 }
 
-#define _tmpl_head_ template<typename T, size_t n, size_t f, class op, class up>
-#define _cls_name_ number<T, n, f, op, up>
-
-#include "./../../fixed_point_lib/src/details/arithmetics.inl"
 #include "./../../fixed_point_lib/src/details/numeric_limits.inl"
-#include "./../../fixed_point_lib/src/details/el_functions.inl"
-
-#undef _tmpl_head_
-#undef _cls_name_
 
 // mathematical constants
 #define math_constant(name, val) \
     template<typename T, size_t n, size_t f, class op, class up> \
-    utils::number<T, n, f, op, up> const utils::number<T, n, f, op, up>::##name(##val);
+    utils::number<T, n, f, op, up> const utils::number<T, n, f, op, up>::##name(val);
 
 math_constant(CONST_E, 2.71828182845904523536)
 math_constant(CONST_LOG2E, 1.44269504088896340736)
 math_constant(CONST_LOG10E, 0.434294481903251827651)
+math_constant(CONST_LOG102, 0.301029995663981195214)
 math_constant(CONST_LN2, 0.693147180559945309417)
 math_constant(CONST_LN10, 2.30258509299404568402)
 math_constant(CONST_PI, 3.14159265358979323846)
@@ -597,8 +596,16 @@ math_constant(CONST_2_PI, 0.636619772367581343076)
 math_constant(CONST_2_SQRTPI, 1.12837916709551257390)
 math_constant(CONST_SQRT2, 1.41421356237309504880)
 math_constant(CONST_SQRT1_2, 0.707106781186547524401)
+math_constant(CONST_2SQRT2, 2.82842712474619009760)
 
 #undef math_constant
+
+// redefinition for stuff from std namespace
+#include "./../../fixed_point_lib/src/details/ceil.inl"
+#include "./../../fixed_point_lib/src/details/fabs.inl"
+#include "./../../fixed_point_lib/src/details/floor.inl"
+#include "./../../fixed_point_lib/src/details/fmod.inl"
+#include "./../../fixed_point_lib/src/details/round.inl"
 
 // CORDIC-based fixed-point implementation of elementary functions
 #include "./../../fixed_point_lib/src/CORDIC/cos.inl"
