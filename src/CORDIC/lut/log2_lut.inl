@@ -1,5 +1,6 @@
-/// @brief implements look-up table for trigonometric functions
-/// @ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
+/// @brief implements look-up table for log2 function
+/// @ref see C. Baumann, "A simple and fast look-up table method to compute the
+/// exp(x) and ln(x) functions", 2004
 
 #include <boost/foreach.hpp>
 #include <boost/range/irange.hpp>
