@@ -5,9 +5,10 @@
 
 #include <cmath>
 
-namespace utils { namespace cordic {
-    template<size_t n, typename fixed_point>
-    double lut<n, fixed_point>::compute_circular_scale(size_t n)
+namespace core { namespace cordic {
+    // n is number of iterations in CORDIC algorithm
+    template<size_t n, typename fp>
+    double lut<n, fp>::compute_circular_scale(size_t n)
     {
         double scale(1.0);
 
@@ -17,5 +18,18 @@ namespace utils { namespace cordic {
         }
 
         return scale;
+    }
+
+    template<size_t n, typename fp>
+    lut<n, fp> lut<n, fp>::build_circular_scales_lut()
+    {
+        base_class scales;
+
+        BOOST_FOREACH(size_t i, boost::irange<size_t>(0, n, 1))
+        {
+            scales[i] = std::sqrt(1.0 + std::powl(2.0, -2.0 * i));
+        }
+
+        return this_class(scales);
     }
 }}
