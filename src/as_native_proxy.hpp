@@ -1,10 +1,11 @@
 /// @brief provides a proxy class to deal with integer below fixed-point number
 
 #include <boost/operators.hpp>
+#include <boost/numeric/conversion/cast.hpp>
 
-namespace utils {
+namespace core {
     template<typename T, size_t n, size_t f, class op, class up>
-    class number;
+    class fixed_point;
 
     /// @brief proxy class for dealing with fixed-point numbers as with integers
     template<typename T, size_t n, size_t f, class op, class up>
@@ -15,7 +16,7 @@ namespace utils {
              boost::shiftable2<as_native_proxy<T, n, f, op, up>, T>
     {
         typedef as_native_proxy<T, n, f, op, up> this_class;
-        typedef number<T, n, f, op, up> fixed_point_class;
+        typedef fixed_point<T, n, f, op, up> fixed_point_class;
 
     public:
         template<typename T>
@@ -40,25 +41,24 @@ namespace utils {
         bool operator ==(this_class const& x) const{ return x.value() == this->value(); }
         bool operator ==(T x) const{ return x == this->value(); }
 
+#define checked_arithmetics(f, val) \
+    fixed_point_class::handle_underflow( \
+        this->value(), \
+        fixed_point_class::handle_overflow(this->value() f val, op()), \
+        up() \
+    )
+
         /// @brief addition operator. It checks if result fits the bounds drawn
         /// from n bits of length
         this_class& operator +=(this_class const& x)
         {
-            fixed_point_class::handle_underflow(
-                this->value(),
-                fixed_point_class::handle_overflow(this->value() += x.value(), op()),
-                up()
-            );
+            checked_arithmetics(+=, x.value());
 
             return *this;
         }
         this_class& operator +=(T x)
         {
-            fixed_point_class::handle_underflow(
-                this->value(),
-                fixed_point_class::handle_overflow(this->value() += x, op()),
-                up()
-            );
+            checked_arithmetics(+=, x);
 
             return *this;
         }
@@ -67,21 +67,13 @@ namespace utils {
         /// from n bits of length (signed/unsigned).
         this_class& operator -=(this_class const& x)
         {
-            fixed_point_class::handle_underflow(
-                this->value(),
-                fixed_point_class::handle_overflow(this->value() -= x.value(), op()),
-                up()
-            );
+            checked_arithmetics(-=, x.value());
 
             return *this;
         }
         this_class& operator -=(T x)
         {
-            fixed_point_class::handle_underflow(
-                this->value(),
-                fixed_point_class::handle_overflow(this->value() -= x, op()),
-                up()
-            );
+            checked_arithmetics(-=, x);
 
             return *this;
         }
@@ -90,21 +82,13 @@ namespace utils {
         /// drawn from n bits of length.
         this_class& operator *=(this_class const& x)
         {
-            fixed_point_class::handle_underflow(
-                this->value(),
-                fixed_point_class::handle_overflow(this->value() *= x.value(), op()),
-                up()
-            );
+            checked_arithmetics(*=, x.value());
 
             return *this;
         }
         this_class& operator *=(T x)
         {
-            fixed_point_class::handle_underflow(
-                this->value(),
-                fixed_point_class::handle_overflow(this->value() *= x, op()),
-                up()
-            );
+            checked_arithmetics(*=, x);
 
             return *this;
         }
@@ -113,20 +97,18 @@ namespace utils {
         /// from n bits of length.
         this_class& operator /=(this_class const& x)
         {
-            fixed_point_class::handle_underflow(
-                this->value(),
-                fixed_point_class::handle_underflow(this->value() /= x.value(), op()),
-                up()
-            );
+            checked_arithmetics(/=, x.value());
 
             return *this;
         }
         this_class& operator /=(T x)
         {
-            /*fixed_point_class::bounds::check*/(this->value() /= x);
+            checked_arithmetics(/=, x);
 
             return *this;
         }
+#undef checked_arithmetics
+
         /// @brief mod operator. It is the same as one for native types is.
         this_class& operator %=(this_class const& x)
         {
@@ -140,13 +122,13 @@ namespace utils {
         /// n bits of length
         this_class& operator ^=(this_class const& x)
         {
-            /*fixed_point_class::bounds::check*/(this->value() ^= x.value());
+            this->value() ^= x.value();
 
             return *this;
         }
         this_class& operator ^=(T x)
         {
-            /*fixed_point_class::bounds::check*/(this->value() ^= x);
+            this->value() ^= boost::numeric_cast<fixed_point_class::word_type>(x);
 
             return *this;
         }
@@ -164,13 +146,13 @@ namespace utils {
         /// n bits of length
         this_class& operator |=(this_class const& x)
         {
-            /*fixed_point_class::bounds::check*/(this->value() |= x.value());
+            this->value() |= x.value();
 
             return *this;
         }
-        this_class& operator !=(T x)
+        this_class& operator |=(T x)
         {
-            /*fixed_point_class::bounds::check*/(this->value() |= x);
+            this->value() |= boost::numeric_cast<fixed_point_class::word_type>(x);
 
             return *this;
         }
@@ -179,7 +161,7 @@ namespace utils {
         /// from n bits of length.
         this_class& operator ++()
         {
-            /*fixed_point_class::bounds::check*/(this->value()++);
+            fixed_point_class::handle_overflow(this->value()++, op());
 
             return *this;
         }
@@ -188,7 +170,7 @@ namespace utils {
         /// from n bits of length.
         this_class& operator --()
         {
-            /*fixed_point_class::bounds::check*/(this->value()--);
+            fixed_point_class::handle_overflow(this->value()--, op());
 
             return *this;
         }
@@ -212,13 +194,13 @@ namespace utils {
         /// is.
         this_class& operator >>=(this_class const& x)
         {
-            fixed_point_class::handle_underflow(this->value() >>= x.value(), op());
+            this->value() >>= x.value();
 
             return *this;
         }
         this_class& operator >>=(T x)
         {
-            fixed_point_class::handle_underflow(this->value(), this->value() >>= x, up());
+            this->value() >>= x;
 
             return *this;
         }
@@ -232,9 +214,9 @@ namespace utils {
             :    m_value(x.m_value){};
 
         template<typename T1, size_t n1, size_t f1, class op1, class up1>
-        friend as_native_proxy<T1, n1, f1, op1, up1> as_native(number<T1, n1, f1, op1, up1>&);
+        friend as_native_proxy<T1, n1, f1, op1, up1> as_native(fixed_point<T1, n1, f1, op1, up1>&);
 
         template<typename T1, size_t n1, size_t f1, class op1, class up1>
-        friend class number;
+        friend class fixed_point;
     };
 }
