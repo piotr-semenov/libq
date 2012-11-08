@@ -8,10 +8,10 @@
 
 #include <cmath>
 
-namespace utils { namespace cordic {
+namespace core { namespace cordic {
     /// @ref page 5, equation 7, m = 1 (circular coordinate system)
-    template<size_t n, typename fixed_point>
-    typename lut<n, fixed_point> lut<n, fixed_point>::build_arctan_lut()
+    template<size_t n, typename fp>
+    typename lut<n, fp> lut<n, fp>::build_arctan_lut()
     {
         base_class table;
 
@@ -19,7 +19,7 @@ namespace utils { namespace cordic {
         /// @ref page 10, table 24.1, m = 1
         BOOST_FOREACH(size_t i, boost::irange<size_t>(0, n, 1))
         {
-            table[i] = fixed_point(std::atan(1.0 / std::pow(2.0, double(i))));
+            table[i] = fp(std::atan(1.0 / std::pow(2.0, double(i))));
         }
 
         return this_class(table);
