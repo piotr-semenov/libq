@@ -1,7 +1,7 @@
 /// @brief provides stuff for std::numeric_limits
 
 namespace std {
-    #define M_LOG102 0.301029995663981195214
+#define M_LOG102 0.301029995663981195214
 
     /// @brief numeric limits specialization for fixed-point
     template<typename T, size_t n, size_t f, class op, class up>
@@ -95,5 +95,5 @@ namespace std {
         static type signaling_NaN(){ return type(0); }
     };
 
-    #undef M_LOG10_2
+#undef M_LOG10_2
 }
