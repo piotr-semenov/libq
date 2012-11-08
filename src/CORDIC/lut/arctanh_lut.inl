@@ -16,7 +16,7 @@ namespace core { namespace cordic {
         base_class table;
 
         // Shift sequence is 1, 2, 3, ..., i, ... united with (3k + 1, k = 1, 2, ...).
-        // So repeated numbers are in the sequence.
+        // But lut uses only 1, 2, 3 ,... sequence.
         /// @ref page 10, table 24.1, m = -1
         {
             BOOST_FOREACH(size_t i, boost::irange<size_t>(0, n, 1))
