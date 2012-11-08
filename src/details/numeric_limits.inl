@@ -1,13 +1,13 @@
 /// @brief provides stuff for std::numeric_limits
 
 namespace std {
-    #define M_LOG10_2 0.301029995663981195214
+    #define M_LOG102 0.301029995663981195214
 
     /// @brief numeric limits specialization for fixed-point
     template<typename T, size_t n, size_t f, class op, class up>
-    class numeric_limits<utils::number<T, n, f, op, up> >
+    class numeric_limits<core::fixed_point<T, n, f, op, up> >
     {
-        typedef utils::number<T, n, f, op, up> type;
+        typedef core::fixed_point<T, n, f, op, up> type;
 
         template<class U>
         struct has_exceptions
@@ -16,7 +16,7 @@ namespace std {
         };
 
         template<>
-        struct has_exceptions<utils::do_exception>
+        struct has_exceptions<core::do_exception>
         {
             enum { value = true };
         };
@@ -42,7 +42,7 @@ namespace std {
         /// @brief note: type handles overflows with modulo arithmetic
         static bool const is_modulo = !has_exceptions<op>::value;
 
-        static bool const is_signed = std::numeric_limits<typename type::value_type>::is_signed;
+        static bool const is_signed = std::numeric_limits<typename type::word_type>::is_signed;
 
         /// @brief this is the explicit specialization of std::numeric_limits for 
         ///        fixed-point number type
@@ -58,18 +58,18 @@ namespace std {
         static float_round_style const round_style = round_toward_zero;
 
         static int const digits = n;
-        static int const digits10 = static_cast<int>(n * M_LOG10_2 + 0.5);
+        static int const digits10 = static_cast<int>(n * M_LOG102 + 0.5);
 
         static int const max_exponent = n-f;
-        static int const max_exponent10 = static_cast<int>(max_exponent * M_LOG10_2);
+        static int const max_exponent10 = static_cast<int>(max_exponent * M_LOG102);
         static int const min_exponent = f;
-        static int const min_exponent10 = static_cast<int>(min_exponent * M_LOG10_2);
+        static int const min_exponent10 = static_cast<int>(min_exponent * M_LOG102);
         static int const radix = 2;
 
         /// @brief minimum value that can be achieved by fixed-point type
         static type min()
         {
-            typedef typename type::value_type word_type;
+            typedef typename type::word_type word_type;
 
             return type::wrap(static_cast<word_type>(type::bounds::min));
         }
@@ -77,7 +77,7 @@ namespace std {
         /// @brief maximum value that can be achieved by fixed-point type
         static type max()
         {
-            typedef typename type::value_type word_type;
+            typedef typename type::word_type word_type;
 
             return type::wrap(static_cast<word_type>(type::bounds::max));
         }
