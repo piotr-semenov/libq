@@ -25,6 +25,7 @@
 #include <boost/type_traits/make_signed.hpp>
 #include <boost/type_traits/make_unsigned.hpp>
 
+#include <boost/integer/integer_mask.hpp>
 #include <boost/integer_traits.hpp>
 
 #include <limits>
