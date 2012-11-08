@@ -1,7 +1,7 @@
 /// @brief provides std::round stuff in case of fixed-point numbers
 
 namespace std {
-    /// @brief rounds
+    /// @brief std::round in case of fixed-point number
     template<typename T, size_t n, size_t f, class op, class up>
     core::fixed_point<T, n, f, op, up> round(core::fixed_point<T, n, f, op, up> const& x)
     {

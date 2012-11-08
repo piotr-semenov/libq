@@ -1,7 +1,7 @@
 /// @brief provides std::fmod stuff in case of fixed-point numbers
 
 namespace std {
-    /// @brief computes fixed-point remainder of x/y
+    /// @brief std::fmod computes fixed-point remainder of double(x)/double(y)
     template<typename T, size_t n, size_t f, class op, class up>
     core::fixed_point<T, n, f, op, up> fmod(core::fixed_point<T, n, f, op, up> const& a,
         core::fixed_point<T, n, f, op, up> const& b)
