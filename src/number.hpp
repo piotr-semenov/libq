@@ -1,8 +1,8 @@
 /// @mainpage fixed-point template library for easy integral simulations of
 /// floating-point algorithms
 
-#ifndef INC_FIXED_POINT_NUMBER_HPP_
-#define INC_FIXED_POINT_NUMBER_HPP_
+#ifndef INC_CORE_FIXED_POINT_HPP_
+#define INC_CORE_FIXED_POINT_HPP_
 
 #include "./../../fixed_point_lib/src/quotient_info.hpp"
 #include "./../../fixed_point_lib/src/product_info.hpp"
@@ -34,7 +34,7 @@
 /// @detailed it contains fixed-point arithmetics, inference tools for product/
 /// quotient/summand types, CORDIC implementation for couple of widely-used elementary
 /// functions
-namespace utils {
+namespace core {
     /// @brief class to define the "throw an exception" behaviour in case of
     /// overflow/underflow events
     class do_exception{};
@@ -56,7 +56,7 @@ namespace utils {
 
     /// @brief in case of fixed-point number type
     template<typename T, size_t n, size_t f, class op, class up>
-    inline as_native_proxy<T, n, f, op, up> as_native(number<T, n, f, op, up>& x)
+    inline as_native_proxy<T, n, f, op, up> as_native(fixed_point<T, n, f, op, up>& x)
     {
         return as_native_proxy<T, n, f, op, up>(x);
     }
@@ -69,14 +69,14 @@ namespace utils {
     /// @param OP overflow policy
     /// @param UP underflow policy
     template<typename storage_type, size_t n, size_t f, class op, class up>
-    class number
+    class fixed_point
     {
         BOOST_CONCEPT_ASSERT((boost::IntegerConcept<storage_type>));
 
         BOOST_STATIC_ASSERT((f >= 0));
         BOOST_STATIC_ASSERT((n <= std::numeric_limits<storage_type>::digits));
 
-        typedef number<storage_type, n, f, op, up> this_class;
+        typedef fixed_point<storage_type, n, f, op, up> this_class;
 
     // POSITIVE/NEGATIVE OVERFLOW HANDLERS
         // handles positive/negative overflow event with exception raising
@@ -94,27 +94,27 @@ namespace utils {
                 throw negative;
             }
 
-            return static_cast<value_type>(val);
+            return static_cast<word_type>(val);
         }
 
         // handles positive/negative overflow event
         template<typename T>
         static storage_type handle_overflow(T val, do_overflow)
         {
-            value_type u(0);
+            word_type u(0);
 
             if (is_signed) {
                 if (val > boost::intmax_t(bounds::max)) {
-                    u = static_cast<value_type>((val & bounds::max) - bounds::max);
+                    u = static_cast<word_type>((val & bounds::max) - bounds::max);
                 }
                 else {
                     int const sign_bit(val > 0 ? 1 : -1);
-                    u = sign_bit * static_cast<value_type>((sign_bit * val) &
+                    u = sign_bit * static_cast<word_type>((sign_bit * val) &
                         bounds::max);
                 }
             }
             else {
-                u = static_cast<value_type>(val & bounds::max);
+                u = static_cast<word_type>(val & bounds::max);
             }
 
             return u;
@@ -144,21 +144,21 @@ namespace utils {
     public:
         typedef this_class type;
 
-        typedef storage_type value_type; ///< integral type below fixed-point logics
+        typedef storage_type word_type; ///< integral type below fixed-point logics
         static size_t const fractionals = f; ///< count of bits for fractional part
         static size_t const total = n; ///< fixed-point number total
 
         ///< scale factor in fixed-point arithmetics
-        static boost::uintmax_t const scale = static_pow<2, fractionals>::value;
-        static bool const is_signed = std::numeric_limits<value_type>::is_signed;
+        static boost::uintmax_t const scale = details::static_pow<2, fractionals>::value;
+        static bool const is_signed = std::numeric_limits<word_type>::is_signed;
 
         /// @brief range bounds for storage_type
         class bounds
         {
         public:
             ///< range upper bound
-            static boost::uintmax_t const max = (boost::integer_traits<value_type>::const_max >>
-                (boost::integer_traits<value_type>::digits - total));
+            static boost::uintmax_t const max = (boost::integer_traits<word_type>::const_max >>
+                (boost::integer_traits<word_type>::digits - total));
 
         private:
             // case of signed logics
@@ -172,7 +172,7 @@ namespace utils {
             template<>
             struct min_bound_traits<false>
             {
-                static boost::intmax_t const value = value_type(0);
+                static boost::intmax_t const value = word_type(0);
             };
 
         public:
@@ -180,11 +180,11 @@ namespace utils {
             static boost::intmax_t const min = min_bound_traits<is_signed>::value;
         };
 
-        explicit number()
+        explicit fixed_point()
             :    m_value(0){}
 
         template<typename T>
-        explicit number(T value)
+        explicit fixed_point(T value)
             :    m_value(
                     handle_underflow(
                         convert_from(value),
@@ -193,11 +193,11 @@ namespace utils {
                     )
                  ){}
 
-        explicit number(this_class const& x)
+        explicit fixed_point(this_class const& x)
             :    m_value(x.value()){}
 
         template<typename T, size_t n1, size_t f1, class op1, class up1>
-        number(number<T, n1, f1, op1, up1> const& x)
+        fixed_point(fixed_point<T, n1, f1, op1, up1> const& x)
             :    m_value(this_class::normalize<T, f1>(x.value())){}
 
         template<typename T>
@@ -222,7 +222,7 @@ namespace utils {
         }
 
         template<typename T, size_t n1, size_t f1, class op1, class up1>
-        this_class& operator =(number<T, n1, f1, op1, up1> const& x)
+        this_class& operator =(fixed_point<T, n1, f1, op1, up1> const& x)
         {
             return this->value(normalize<T, f1>(x.value()));
         }
@@ -235,16 +235,16 @@ namespace utils {
 
         /// @brief represents any arithmetic value in current fixed-point format
         template<typename T>
-        static value_type convert_from(T const x)
+        static word_type convert_from(T const x)
         {
             BOOST_STATIC_ASSERT((boost::is_arithmetic<T>::value));
 
-            return static_cast<value_type>(x * this_class::scale);
+            return static_cast<word_type>(x * this_class::scale);
         }
 
         /// @brief normalizes any fixed-point format to current one
         template<typename T, size_t f1>
-        static value_type normalize(T const x)
+        static word_type normalize(T const x)
         {
             BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
 
@@ -257,12 +257,12 @@ namespace utils {
                 // overflow is possible
                 val <<= shifts;
 
-                return this_class::handle_overflow(static_cast<value_type>(val), op());
+                return this_class::handle_overflow(static_cast<word_type>(val), op());
             }
 
             // overflow, underflow are possible
             return this_class::handle_overflow(
-                handle_underflow(x, static_cast<value_type>(x >> shifts),
+                handle_underflow(x, static_cast<word_type>(x >> shifts),
                     up()),
                 op()
             );
@@ -281,7 +281,7 @@ namespace utils {
             BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
             this_class x;
 
-            x.value(value_type(val));
+            x.value(word_type(val));
             return x;
         }
 
@@ -319,16 +319,16 @@ namespace utils {
         bool operator !=(T const& x) const{ return this->value() != this_class(x).value(); }
 
         /// @brief 'not equal to zero' binary relation for fixed-point numbers
-        bool operator !() const{ return this->value() != value_type(0); }
+        bool operator !() const{ return this->value() != word_type(0); }
 
 
     // FIXED-POINT ARITHMETICS:
         /// @brief extends current type to signed one (adds signed bit if needed)
-        typedef number<typename boost::make_signed<value_type>::type, total, fractionals,
+        typedef fixed_point<typename boost::make_signed<word_type>::type, total, fractionals,
             op, up> to_signed_type;
 
         /// @brief reduces current type to unsigned one (remove signed bit if needed)
-        typedef number<typename boost::make_unsigned<value_type>::type, total, fractionals,
+        typedef fixed_point<typename boost::make_unsigned<word_type>::type, total, fractionals,
             op, up> to_unsigned_type;
 
         /// @brief result type for summation operation
@@ -350,7 +350,7 @@ namespace utils {
         template<typename T>
         inline sum_type operator +(T const& x) const
         {
-            typedef sum_type::value_type type;
+            typedef sum_type::word_type type;
 
             // any overflow is impossible
             return sum_type::wrap(
@@ -373,7 +373,7 @@ namespace utils {
         template<typename T>
         inline diff_type operator -(T const& x) const
         {
-            typedef diff_type::value_type type;
+            typedef diff_type::word_type type;
 
             // any overflow is impossible
             return diff_type::wrap(
@@ -405,7 +405,7 @@ namespace utils {
                 static this_class product(this_class const& a, T const& x, bool_<true>)
                 {
                     // overflow is possible
-                    value_type const val(a.value() * this_class(x).value());
+                    word_type const val(a.value() * this_class(x).value());
 
                     return this_class::wrap(
                         this_class::handle_overflow(val >> fractionals, op())
@@ -416,7 +416,7 @@ namespace utils {
                 static product_type product(this_class const& a, T const& x, bool_<false>)
                 {
                     // overflow is impossible
-                    typedef product_type::value_type type;
+                    typedef product_type::word_type type;
 
                     type const val(type(a.value()) * type(this_class(x).value()));
                     return product_type::wrap(val);
@@ -431,7 +431,7 @@ namespace utils {
         {
             product_type const val(*this * this_class(x));
 
-            return this->value(value_type(val.value()));
+            return this->value(word_type(val.value()));
         }
 
         /// @brief division operation
@@ -449,7 +449,7 @@ namespace utils {
                 static this_class divide(this_class const& a, T const& x, bool_<true>)
                 {
                     // otherflow, underflow are possible
-                    quotient_type::value_type const val(a.value() / this_class(x).value());
+                    quotient_type::word_type const val(a.value() / this_class(x).value());
                     handle_underflow(a.value(), val, up());
 
                     return quotient_type::wrap(this_class::handle_overflow(
@@ -460,11 +460,11 @@ namespace utils {
                 static quotient_type divide(this_class const& a, T const& x, bool_<false>)
                 {
                     // overflow, underflow are impossible
-                    typedef quotient_type::value_type quotient_value_type;
+                    typedef quotient_type::word_type quotient_word_type;
 
-                    quotient_value_type const shifted = static_cast<quotient_value_type>(a.value())
+                    quotient_word_type const shifted = static_cast<quotient_word_type>(a.value())
                         << fractionals;
-                    quotient_value_type const val = shifted / this_class(x).value();
+                    quotient_word_type const val = shifted / this_class(x).value();
                     handle_underflow(a.value(), val, up());
 
                     return quotient_type::wrap(val << fractionals);
@@ -492,16 +492,21 @@ namespace utils {
             return this_class::wrap(-value());
         }
 
-        value_type const& value() const{ return this->m_value; }
+        word_type const& value() const{ return this->m_value; }
 
     // USEFUL MATHEMATICAL CONSTANTS:
+        /// @brief naming conventions:
+        /// 1. CONST_2PI means 2*pi;
+        /// 2. CONST_2_PI means 2/pi;
+        /// 3. CONST PI_2 means pi/2.
         static this_class const CONST_E, CONST_LOG2E, CONST_LOG10E, CONST_LOG102,
-            CONST_LN2, CONST_LN10, CONST_PI, CONST_PI_2, CONST_PI_4, CONST_1_PI,
-            CONST_2_PI, CONST_2_SQRTPI, CONST_SQRT2, CONST_SQRT1_2, CONST_2SQRT2;
+            CONST_LN2, CONST_LN10, CONST_2PI, CONST_PI, CONST_PI_2, CONST_PI_4,
+            CONST_1_PI, CONST_2_PI, CONST_2_SQRTPI, CONST_SQRT2, CONST_SQRT1_2,
+            CONST_2SQRT2;
 
     private:
-        value_type m_value;
-        this_class& value(value_type const x)
+        word_type m_value;
+        this_class& value(word_type const x)
         {
             this->m_value = x;
 
@@ -513,64 +518,64 @@ namespace utils {
 
     /// @brief type class in case of signed integral storages
     template<size_t n, size_t f>
-    struct S_number
+    struct S_fixed_point
     {
         // boost::int_t takes into account a sign bit
-        typedef number<typename boost::int_t<1u + n>::least, n, f, do_overflow,
+        typedef fixed_point<typename boost::int_t<1u + n>::least, n, f, do_overflow,
             do_underflow> type;
     };
 
     template<size_t n, size_t f>
-    struct SO_number
+    struct SO_fixed_point
     {
-        typedef number<typename boost::int_t<1u + n>::least, n, f, do_exception,
+        typedef fixed_point<typename boost::int_t<1u + n>::least, n, f, do_exception,
             do_underflow> type;
     };
 
     template<size_t n, size_t f>
-    struct SU_number
+    struct SU_fixed_point
     {
-        typedef number<typename boost::int_t<1u + n>::least, n, f, do_overflow,
+        typedef fixed_point<typename boost::int_t<1u + n>::least, n, f, do_overflow,
             do_exception> type;
     };
 
     template<size_t n, size_t f>
-    struct SOU_number
+    struct SOU_fixed_point
     {
-        typedef number<typename boost::int_t<1u + n>::least, n, f, do_exception,
+        typedef fixed_point<typename boost::int_t<1u + n>::least, n, f, do_exception,
             do_exception> type;
     };
 
     /// @brief type class in case of unsigned integral storages
     template<size_t n, size_t f>
-    struct U_number
+    struct U_fixed_point
     {
         // boost::uint_t does not take into account a sign bit
-        typedef number<typename boost::uint_t<n>::least, n, f, do_overflow,
+        typedef fixed_point<typename boost::uint_t<n>::least, n, f, do_overflow,
             do_underflow> type;
     };
 
     template<size_t n, size_t f>
-    struct UO_number
+    struct UO_fixed_point
     {
         // boost::uint_t does not take into account a sign bit
-        typedef number<typename boost::uint_t<n>::least, n, f, do_exception,
+        typedef fixed_point<typename boost::uint_t<n>::least, n, f, do_exception,
             do_underflow> type;
     };
 
     template<size_t n, size_t f>
-    struct UU_number
+    struct UU_fixed_point
     {
         // boost::uint_t does not take into account a sign bit
-        typedef number<typename boost::uint_t<n>::least, n, f, do_overflow,
+        typedef fixed_point<typename boost::uint_t<n>::least, n, f, do_overflow,
             do_exception> type;
     };
 
     template<size_t n, size_t f>
-    struct UOU_number
+    struct UOU_fixed_point
     {
         // boost::uint_t does not take into account a sign bit
-        typedef number<typename boost::uint_t<n>::least, n, f, do_exception,
+        typedef fixed_point<typename boost::uint_t<n>::least, n, f, do_exception,
             do_exception> type;
     };
 }
@@ -580,7 +585,7 @@ namespace utils {
 // mathematical constants
 #define math_constant(name, val) \
     template<typename T, size_t n, size_t f, class op, class up> \
-    utils::number<T, n, f, op, up> const utils::number<T, n, f, op, up>::##name(val);
+    core::fixed_point<T, n, f, op, up> const core::fixed_point<T, n, f, op, up>::##name(val);
 
 math_constant(CONST_E, 2.71828182845904523536)
 math_constant(CONST_LOG2E, 1.44269504088896340736)
@@ -588,6 +593,7 @@ math_constant(CONST_LOG10E, 0.434294481903251827651)
 math_constant(CONST_LOG102, 0.301029995663981195214)
 math_constant(CONST_LN2, 0.693147180559945309417)
 math_constant(CONST_LN10, 2.30258509299404568402)
+math_constant(CONST_2PI, 6.283185307179586)
 math_constant(CONST_PI, 3.14159265358979323846)
 math_constant(CONST_PI_2, 1.57079632679489661923)
 math_constant(CONST_PI_4, 0.785398163397448309616)
