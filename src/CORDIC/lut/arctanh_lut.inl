@@ -11,7 +11,7 @@
 namespace core { namespace cordic {
     /// @ref page 5, equation 7, m = -1 (hyperbolic coordinate system)
     template<size_t n, typename fp>
-    typename lut<n, fp> lut<n, fp>::build_arctanh_lut()
+    typename lut<n, fp> lut<n, fp>::hyperbolic_wo_repeated_iterations()
     {
         base_class table;
 
