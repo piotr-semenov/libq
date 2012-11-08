@@ -1,10 +1,12 @@
+/// @brief provides stuff for std::tan in case of fixed-point numbers
+
 #include <exception>
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    utils::number<T, n, f, op, up> tan(utils::number<T, n, f, op, up> const& val)
+    core::fixed_point<T, n, f, op, up> tan(core::fixed_point<T, n, f, op, up> const& val)
     {
-        typedef utils::number<T, n, f, op, up> type;
+        typedef core::fixed_point<T, n, f, op, up> type;
 
         type const sin = std::sin(val);
         type const cos = std::cos(val);

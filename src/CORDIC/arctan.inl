@@ -5,10 +5,10 @@
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    utils::number<T, n, f, op, up> atan(utils::number<T, n, f, op, up> val)
+    core::fixed_point<T, n, f, op, up> atan(core::fixed_point<T, n, f, op, up> val)
     {
-        typedef utils::number<T, n, f, op, up> fp;
-        typedef utils::cordic::lut<f, fp> lut;
+        typedef core::fixed_point<T, n, f, op, up> fp;
+        typedef core::cordic::lut<f, fp> lut;
 
         static lut const angles = lut::build_arctan_lut();
 

@@ -5,10 +5,10 @@
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    utils::number<T, n, f, op, up> asin(utils::number<T, n, f, op, up> val)
+    core::fixed_point<T, n, f, op, up> asin(core::fixed_point<T, n, f, op, up> val)
     {
-        typedef utils::number<T, n, f, op, up> fp;
-        typedef utils::cordic::lut<f, fp> lut;
+        typedef core::fixed_point<T, n, f, op, up> fp;
+        typedef core::cordic::lut<f, fp> lut;
 
         assert(("argument has to be from interval [-1.0, 1.0]", std::fabs(val) <= fp(1.0)));
         if (std::fabs(val) > fp(1.0)) {
