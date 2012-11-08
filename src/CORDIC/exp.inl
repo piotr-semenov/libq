@@ -9,35 +9,35 @@
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    utils::number<T, n, f, op, up> exp(utils::number<T, n, f, op, up> const& val)
+    core::fixed_point<T, n, f, op, up> exp(core::fixed_point<T, n, f, op, up> const& val)
     {
-        typedef utils::number<T, n, f, op, up> fixed_point;
-        typedef utils::cordic::lut<f, fixed_point> lut_type;
+        typedef core::fixed_point<T, n, f, op, up> fp;
+        typedef core::cordic::lut<f, fixed_point> lut_type;
 
         // reduces argument to interval [1.0, 2.0]
         int power(0);
-        fixed_point arg(val);
-        while (arg >= fixed_point(1.0)) {
+        fp arg(val);
+        while (arg >= fp(1.0)) {
             arg = arg - 1u;
             power++;
         }
-        while (arg < fixed_point(0.0)) {
+        while (arg < fp(0.0)) {
             arg = arg + 1u;
             power--;
         }
 
         static lut_type const log2_lut = lut_type::build_log2_lut();
-        fixed_point result(1.0);
+        fp result(1.0);
         BOOST_FOREACH(size_t i, boost::irange<size_t>(0, f, 1))
         {
-            if (fixed_point(arg - fixed_point::wrap(T(1u) << (f - i - 1u))) >= fixed_point(0.0)) {
-                arg = arg - fixed_point::wrap(T(1u) << (f- i -1u));
+            if (fp(arg - fp::wrap(T(1u) << (f - i - 1u))) >= fp(0.0)) {
+                arg = arg - fp::wrap(T(1u) << (f- i -1u));
 
-                result = fixed_point(result * log2_lut[i]);
+                result = fp(result * log2_lut[i]);
             }
         }
 
-        result = result * (fixed_point::wrap(T(1u) << (f + power)));
+        result = result * (fp::wrap(T(1u) << (f + power)));
         return result;
     }
 }

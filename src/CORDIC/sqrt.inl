@@ -5,9 +5,9 @@ namespace std {
     /// @brief computes square root by CORDIC-algorithm
     /// @ref page 11
     template<typename T, size_t n, size_t f, class op, class up>
-    utils::number<T, n, f, op, up> sqrt(utils::number<T, n, f, op, up> const val)
+    core::fixed_point<T, n, f, op, up> sqrt(core::fixed_point<T, n, f, op, up> const val)
     {
-        typedef utils::number<T, n, f, op, up> fp;
+        typedef core::fixed_point<T, n, f, op, up> fp;
 
         assert(("sqrt parameter is negative", val > fp(0)));
         if (val < fp(0)) {
@@ -24,8 +24,8 @@ namespace std {
         // Chosen fixed-point format must have several bits to represent
         // lut. Also format must enable argument translating to interval [1.0, 2.0].
         // So format must reserve two bits at least for integer part.
-        typedef utils::number<boost::int_t<1u+f+2u>::least, f+2u, f, op, up> work_type;
-        typedef utils::cordic::lut<f, work_type> lut;
+        typedef core::fixed_point<boost::int_t<1u+f+2u>::least, f+2u, f, op, up> work_type;
+        typedef core::cordic::lut<f, work_type> lut;
 
         int power(0);
         fp arg(val);
@@ -45,7 +45,8 @@ namespace std {
         {
             size_t repeated(4u);
             size_t num(0);
-            for(size_t i(1); i < f + 1u; ++i)
+
+            for (size_t i(1u); i < f + 1u; ++i)
             {
                 int const sign = ((x.value() < 0)? -1 : +1) * ((y.value() < 0)? -1 : +1);
                 work_type::value_type const store(x.value());
@@ -53,7 +54,7 @@ namespace std {
                 y = y - work_type::wrap(sign * (store >> (num + 1u)));
                 z = (sign > 0) ? z + angles[num] : z - angles[num];
 
-                // repeat for convergence
+                // do repetition to receive convergence
                 if (i == repeated && i != n - 1) {
                     int const sign = ((x.value() < 0)? -1 : +1) * ((y.value() < 0)? -1 : +1);
                     work_type::value_type const store(x.value());
