@@ -1,7 +1,7 @@
 /// @brief provides info class for product result type
 
-#ifndef INC_PRODUCT_INFO_HPP_
-#define INC_PRODUCT_INFO_HPP_
+#ifndef INC_CORE_PRODUCT_INFO_HPP_
+#define INC_CORE_PRODUCT_INFO_HPP_
 
 #include <boost/integer.hpp>
 
@@ -11,24 +11,23 @@
 #include <limits>
 #include <boost/cstdint.hpp>
 
-namespace utils {
+namespace core {
     namespace {
         using boost::mpl::if_;
         using boost::mpl::eval_if;
     }
 
-    template<typename storage_type, size_t total, size_t fractionals, class op,
-    class up>
-    class number;
+    template<typename T, size_t n, size_t f, class op, class up>
+    class fixed_point;
 
     /// @brief tool for type inference of the product result with fixed-point and
     /// floating-point numbers
-    template<typename value_type>
+    template<typename word_type>
     class product_info
     {
     public:
-        typedef value_type product_type;
-        typedef value_type product_value_type;
+        typedef word_type product_type;
+        typedef word_type product_word_type;
 
         struct is_signed
         {
@@ -43,9 +42,9 @@ namespace utils {
 
     /// @brief in case of fixed-point numbers
     template<typename T, size_t n, size_t f, class op, class up>
-    class product_info<number<T, n, f, op, up> >
+    class product_info<fixed_point<T, n, f, op, up> >
     {
-        typedef number<T, n, f, op, up> operand_type;
+        typedef fixed_point<T, n, f, op, up> operand_type;
 
     public:
         ///< is the type of product a signed type?
@@ -67,7 +66,7 @@ namespace utils {
         //           it has to interpret multiplication as a closed operation;
         //        2. boost::int_t template parameter takes into account a sign bit.
         ///< integral value type below fixed-point number as a product result type
-        struct value_type_info
+        struct word_type_info
         {
             ///< in case if product type is not closed under arithmetic operations
             struct op
@@ -85,12 +84,12 @@ namespace utils {
 
         ///< integral value type that is below of fixed-point result type of the
         /// multiplication
-        typedef typename eval_if<is_closed, typename value_type_info::cl,
-            typename value_type_info::op>::type product_value_type;
+        typedef typename eval_if<is_closed, typename word_type_info::cl,
+            typename word_type_info::op>::type product_word_type;
 
         ///< fixed-point type for product result
         typedef typename if_<is_closed, operand_type,
-            number<product_value_type, 2u * n, 2u * f, op, up> >::type product_type;
+            fixed_point<product_word_type, 2u * n, 2u * f, op, up> >::type product_type;
     };
 }
 
