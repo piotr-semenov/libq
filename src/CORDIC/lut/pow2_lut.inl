@@ -10,9 +10,8 @@
 #include <cmath>
 
 namespace core { namespace cordic {
-    /// @ref page 5, equation 7, m = 1 (circular coordinate system)
     template<size_t n, typename fp>
-    typename lut<n, fp> lut<n, fp>::build_log2_lut()
+    typename lut<n, fp> lut<n, fp>::pow2()
     {
         base_class table;
 
