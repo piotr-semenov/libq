@@ -1,7 +1,7 @@
 /// @brief provides std::ceil stuff in case of fixed-point numbers
 
 namespace std {
-    /// @brief ceil
+    /// @brief std::ceil in case of fixed-point numbers
     template<typename T, size_t n, size_t f, class op, class up>
     core::fixed_point<T, n, f, op, up> ceil(core::fixed_point<T, n, f, op, up> const& x)
     {
