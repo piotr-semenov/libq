@@ -1,13 +1,6 @@
 /// @brief implements look-up table for trigonometric functions
 /// @ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 
-#include <boost/foreach.hpp>
-#include <boost/range/irange.hpp>
-
-#include <boost/integer.hpp>
-
-#include <cmath>
-
 namespace core { namespace cordic {
     /// @ref page 5, equation 7, m = -1 (hyperbolic coordinate system)
     template<size_t n, typename fp>

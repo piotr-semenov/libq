@@ -2,13 +2,6 @@
 /// @ref see C. Baumann, "A simple and fast look-up table method to compute the
 /// exp(x) and ln(x) functions", 2004
 
-#include <boost/foreach.hpp>
-#include <boost/range/irange.hpp>
-
-#include <boost/integer.hpp>
-
-#include <cmath>
-
 namespace core { namespace cordic {
     template<size_t n, typename fp>
     typename lut<n, fp> lut<n, fp>::pow2()
