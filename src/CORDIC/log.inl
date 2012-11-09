@@ -12,7 +12,7 @@ namespace std {
     core::fixed_point<T, n, f, op, up> log(core::fixed_point<T, n, f, op, up> const& val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
-        typedef core::cordic::lut<f, fp> lut_type;
+        typedef core::cordic::lut<f, fp> lut;
 
         assert(("log2: argument must be positive", val >= fp(0)));
         if (val < fp(0)) {
@@ -31,23 +31,28 @@ namespace std {
             power--;
         }
 
+        // approximation in case argument approaches 1.0
+        if (arg - fp(1.0) <= fp(0.01)) {
+            return fp((fp(power) / fp::CONST_LOG2E) + (arg - fp(1.0))); 
+        }
+
         // one can consider 0 < y = log(2, x) < 1 as x = 2^y
         // so CORDIC rotation is just a multiplication by 2^{1/2^i}:
         // 2^y = 2^{a1/2} * 2^{a2/4} * ... * 2^{ai/2^i}, where ai is from
         // {0, 1}
-        static lut_type const inv_roots_from2_lut = lut_type::build_inv_2roots_lut();
+        static lut const inv_pow2_lut = lut::inv_pow2();
 
         fp result(0);
         BOOST_FOREACH(size_t i, boost::irange<size_t>(0, f, 1))
         {
-            if (fp(arg * inv_roots_from2_lut[i]) >= fp(1.0)) {
-                arg = fp(arg * inv_roots_from2_lut[i]);
+            if (fp(arg * inv_pow2_lut[i]) >= fp(1.0)) {
+                arg = fp(arg * inv_pow2_lut[i]);
 
                 as_native(result) += T(1u) << (f - i - 1u);
             }
         }
 
         result += fp(power);
-        return result;
+        return fp(result / fp::CONST_LOG2E);
     }
 }
