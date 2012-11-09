@@ -240,7 +240,11 @@ namespace core {
         {
             BOOST_STATIC_ASSERT((boost::is_arithmetic<T>::value));
 
-            return static_cast<word_type>(x * this_class::scale);
+            if (x > 0.0) {
+                return word_type(std::floor(double(x) * this_class::scale + 0.5));
+            }
+
+            return word_type(std::ceil(double(x) * this_class::scale - 0.5));
         }
 
         /// @brief normalizes any fixed-point format to current one

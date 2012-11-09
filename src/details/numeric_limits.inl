@@ -55,7 +55,7 @@ namespace std {
         static bool const traps = has_exceptions<up>::value;
 
         /// @brief type rounds the values by rejecting bits
-        static float_round_style const round_style = round_toward_zero;
+        static float_round_style const round_style = round_to_nearest;
 
         static int const digits = n;
         static int const digits10 = static_cast<int>(n * M_LOG102 + 0.5);
