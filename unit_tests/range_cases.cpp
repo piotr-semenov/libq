@@ -6,12 +6,12 @@
 #include <limits>
 #include <stdexcept>
 
-#include "./../../fixed_point_lib/src/number.hpp"
+#include "./../../fixed_point_lib/src/fixed_point.hpp"
 
-namespace utils { namespace unit_tests {
+namespace core { namespace unit_tests {
     namespace {
-        using utils::SOU_number;
-        using utils::UOU_number;
+        using core::SOU_fixed_point;
+        using core::UOU_fixed_point;
     }
 
     BOOST_AUTO_TEST_SUITE(Range)
@@ -23,11 +23,11 @@ namespace utils { namespace unit_tests {
     ///     as for built-in integers
     BOOST_AUTO_TEST_CASE(rangeFitBultinCheck)
     {
-        typedef SOU_number<7, 6>::type type1;
-        typedef UOU_number<16, 23>::type type2;
-        typedef UOU_number<32, 12>::type type3;
-        typedef UOU_number<64, 54>::type type4;
-        typedef SOU_number<15, 12>::type type5;
+        typedef SOU_fixed_point<7, 6>::type type1;
+        typedef UOU_fixed_point<16, 23>::type type2;
+        typedef UOU_fixed_point<32, 12>::type type3;
+        typedef UOU_fixed_point<64, 54>::type type4;
+        typedef SOU_fixed_point<15, 12>::type type5;
 
         std::string const message("fixed-point has wrong range");
         typedef boost::int_t<8>::exact bit8_stype;
@@ -56,8 +56,8 @@ namespace utils { namespace unit_tests {
     ///     of range
     BOOST_AUTO_TEST_CASE(outOfRangeCheck)
     {
-        typedef SOU_number<8, 13>::type type1;
-        typedef UOU_number<13, 1>::type type2;
+        typedef SOU_fixed_point<8, 13>::type type1;
+        typedef UOU_fixed_point<13, 1>::type type2;
 
         std::string const message("Positive overflow was not detected");
         try {
