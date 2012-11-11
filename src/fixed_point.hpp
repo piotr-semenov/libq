@@ -166,6 +166,7 @@ namespace core {
             template<bool t>
             struct min_bound_traits
             {
+                // it is two's complement logics
                 static boost::intmax_t const value = -static_cast<boost::intmax_t>(max) - 1;
             };
 
@@ -347,6 +348,24 @@ namespace core {
 
         /// @brief result type for division operation
         typedef typename quotient_info<this_class>::quotient_type quotient_type;
+
+        /// @brief result type for std::log operation
+    private:
+        template<size_t fbits>
+        struct log_info
+        {
+            typedef fixed_point<typename boost::int_t<1u + fbits + (boost::static_log2<fbits>::value + 1u)>::least,
+            fbits + (boost::static_log2<fbits>::value + 1u), fbits, op, up> type;
+        };
+
+        template<>
+        struct log_info<0>
+        {
+            typedef this_class type;
+        };
+
+    public:
+        typedef typename log_info<f>::type log_type;
 
     // FIXED-POINT ARITHMETICS:
         /// @brief addition operation
