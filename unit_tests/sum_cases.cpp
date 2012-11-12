@@ -12,14 +12,14 @@
 #include <iomanip>
 #include <stdexcept>
 
-#include "./../../fixed_point_lib/src/number.hpp"
+#include "./../../fixed_point_lib/src/fixed_point.hpp"
 
-namespace utils { namespace unit_tests {
-    #define iterations 100000
+namespace core { namespace unit_tests {
+#define iterations 100000
 
     namespace {
-        using utils::SOU_number;
-        using utils::UOU_number;
+        using core::SOU_fixed_point;
+        using core::UOU_fixed_point;
 
         double r(double low, double high)
         {
@@ -27,8 +27,8 @@ namespace utils { namespace unit_tests {
         }
     }
 
-    #define fmin(type) double(std::numeric_limits<type>::min())
-    #define fmax(type) double(std::numeric_limits<type>::max())
+#define fmin(type) double(std::numeric_limits<type>::min())
+#define fmax(type) double(std::numeric_limits<type>::max())
 
     BOOST_AUTO_TEST_SUITE(Summation)
 
@@ -41,8 +41,8 @@ namespace utils { namespace unit_tests {
     ///     non-captured digits.
     BOOST_AUTO_TEST_CASE(commonCheck1)
     {
-        typedef UOU_number<28, 13>::type type1;
-        typedef UOU_number<37, 15>::type type2;
+        typedef UOU_fixed_point<28, 13>::type type1;
+        typedef UOU_fixed_point<37, 15>::type type2;
 
         std::srand(static_cast<unsigned int>(std::time(0)));
 
@@ -72,8 +72,8 @@ namespace utils { namespace unit_tests {
 
     BOOST_AUTO_TEST_CASE(commonCheck2)
     {
-        typedef SOU_number<56, 34>::type type1;
-        typedef SOU_number<56, 47>::type type2;
+        typedef SOU_fixed_point<56, 34>::type type1;
+        typedef SOU_fixed_point<56, 47>::type type2;
 
         std::srand(static_cast<unsigned int>(std::time(0)));
 
@@ -105,7 +105,7 @@ namespace utils { namespace unit_tests {
     //////////////////////////////////////////////////////////////////////////
     BOOST_AUTO_TEST_CASE(positiveOverflow)
     {
-        typedef SOU_number<8, 3>::type type;
+        typedef SOU_fixed_point<8, 3>::type type;
 
         type const a(31.9);
         type const b(0.2);
@@ -119,7 +119,7 @@ namespace utils { namespace unit_tests {
 
     BOOST_AUTO_TEST_CASE(negativeOverflow)
     {
-        typedef SOU_number<8, 3>::type type;
+        typedef SOU_fixed_point<8, 3>::type type;
 
         type const a(-31.9);
         type const b(-1.1);
@@ -133,7 +133,7 @@ namespace utils { namespace unit_tests {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-    #undef iterations
-    #undef fmin
-    #undef fmax
+#undef fmin
+#undef fmax
+#undef iterations
 }}
