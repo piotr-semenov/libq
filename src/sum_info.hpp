@@ -41,7 +41,7 @@ namespace core {
 
         struct word_type_info
         {
-            struct op
+            struct ex
             {
                 typedef word_type type;
             };
@@ -83,7 +83,7 @@ namespace core {
         struct word_type_info
         {
             ///< in case if summ type is not closed under arithmetic operations
-            struct op
+            struct ex
             {
                 // Bits includes sign bit in boost::int_t<Bits> template
                 typedef typename if_<is_signed, typename boost::int_t<n + 2u>::least,
@@ -99,7 +99,7 @@ namespace core {
 
         ///< integral value type that is below of fixed-point result type of the summ
         typedef typename eval_if<is_closed, typename word_type_info::cl,
-            typename word_type_info::op>::type sum_word_type;
+            typename word_type_info::ex>::type sum_word_type;
 
         ///< fixed-point type for summ result
         typedef typename if_<is_closed, operand_type, fixed_point<sum_word_type, n + 1u,

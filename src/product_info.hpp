@@ -70,7 +70,8 @@ namespace core {
         struct word_type_info
         {
             ///< in case if product type is not closed under arithmetic operations
-            struct op
+            ///< (proposed type exists)
+            struct ex
             {
                 typedef typename if_<is_signed, typename boost::int_t<n1 + n2 + 1u>::least,
                     typename boost::uint_t<n1 + n2>::least>::type type;
@@ -86,7 +87,7 @@ namespace core {
         ///< integral value type that is below of fixed-point result type of the
         /// multiplication
         typedef typename eval_if<is_closed, typename word_type_info::cl,
-            typename word_type_info::op>::type product_word_type;
+            typename word_type_info::ex>::type product_word_type;
 
         ///< fixed-point type for product result
         typedef typename if_<is_closed,
