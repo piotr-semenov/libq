@@ -442,7 +442,7 @@ namespace core {
         template<typename T>
         inline sum_type operator +(T const& x) const
         {
-            typedef sum_type::word_type type;
+            typedef sum<this_class>::word_type type;
 
             // any overflow is impossible
             return sum_type::wrap(
@@ -465,7 +465,7 @@ namespace core {
         template<typename T>
         inline diff_type operator -(T const& x) const
         {
-            typedef diff_type::word_type type;
+            typedef diff<this_class>::word_type type;
 
             // any overflow is impossible
             return diff_type::wrap(
