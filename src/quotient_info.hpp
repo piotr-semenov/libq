@@ -22,16 +22,16 @@ namespace core {
 
     /// @brief tool for type inference of the division result with fixed-point and
     /// floating-point numbers
-    template<typename word_type>
+    template<typename T, typename U>
     class quotient_info
     {
     public:
-        typedef word_type quotient_type;
-        typedef word_type quotient_word_type;
+        typedef T quotient_type;
+        typedef T quotient_word_type;
 
         struct is_signed
         {
-            enum { value = true };
+            enum { value = std::numeric_limits<T>::is_signed };
         };
 
         struct is_closed
@@ -41,25 +41,26 @@ namespace core {
     };
 
     /// @brief in case of fixed-point numbers
-    template<typename T, size_t n, size_t f, class op, class up>
-    class quotient_info<fixed_point<T, n, f, op, up> >
+    template<typename T1, size_t n1, size_t f1, class op1, class up1,
+        typename T2, size_t n2, size_t f2, class op2, class up2>
+    class quotient_info<fixed_point<T1, n1, f1, op1, up1>,
+        fixed_point<T2, n2, f2, op2, up2> >
     {
-        typedef fixed_point<T, n, f, op, up> operand_type;
-
     public:
         ///< is the type of division a signed type?
         struct is_signed
         {
-            enum { value = std::numeric_limits<T>::is_signed };
+            enum { value = std::numeric_limits<T1>::is_signed };
         };
 
         ///< is type of the division closed under arithmetic operations?
         struct is_closed
         {
-            typedef typename if_<is_signed, boost::intmax_t, boost::uintmax_t>::type max_type;
+            typedef typename if_<is_signed, boost::intmax_t, boost::uintmax_t>::type
+                max_type;
 
             // total bits and std::numeric_limits do not count sign bit
-            enum { value = !(n + f <= std::numeric_limits<max_type>::digits) };
+            enum { value = !(n1 + n2 <= std::numeric_limits<max_type>::digits) };
         };
 
         // logics: 1. if we don't have integral type with enough bits amount then we 
@@ -71,14 +72,14 @@ namespace core {
             ///< in case if quotient type is not closed under arithmetic operations
             struct op
             {
-                typedef typename if_<is_signed, typename boost::int_t<is_signed::value + n + f>::least,
-                    typename boost::uint_t<n + f>::least>::type type;
+                typedef typename if_<is_signed, typename boost::int_t<n1 + n2 + 1u>::least,
+                    typename boost::uint_t<n1 + n2>::least>::type type;
             };
 
             /// @brief in case if quotient type is closed under arithmetic operations
             struct cl
             {
-                typedef T type;
+                typedef T1 type;
             };
         };
 
@@ -88,8 +89,10 @@ namespace core {
             typename word_type_info::op>::type quotient_word_type;
 
         ///< fixed-point type for division result
-        typedef typename if_<is_closed, operand_type,
-            fixed_point<quotient_word_type, n + f, 2u * f, op, up> >::type quotient_type;
+        typedef typename if_<is_closed,
+            fixed_point<T1, n1, f1, op1, up1>,
+            fixed_point<quotient_word_type, n1 + n2, f1 + (n2 - f2), op1, up1>
+        >::type quotient_type;
     };
 }
 
