@@ -36,6 +36,44 @@
 /// quotient/summand types, CORDIC implementation for couple of widely-used elementary
 /// functions
 namespace core {
+    namespace {
+        using boost::mpl::bool_;
+
+        template<typename T1, size_t n1, size_t f1, class op1, class up1,
+            typename T2, size_t n2, size_t f2, class op2, class up2>
+        class product_details
+        {
+            typedef fixed_point<T1, n1, f1, op1, up1> operand_type1;
+            typedef fixed_point<T2, n2, f2, op2, up2> operand_type2;
+
+        public:
+            // in case if product is a closed operation
+            static operand_type1 perform(operand_type1 const& a, operand_type2 const& b,
+                bool_<true>)
+            {
+                // overflow is possible
+                typename operand_type1::word_type const val(a.value() *
+                    operand_type1(x).value());
+
+                return operand_type1::wrap(
+                    operand_type1::handle_overflow(val >> f, op())
+                );
+            }
+
+            // in case if product is not a closed operation
+            static typename product_info<operand_type1, operand_type2>::product_type
+                product(operand_type1 const& a, operand_type2 const& b, bool_<false>)
+            {
+                // overflow is impossible
+                typedef product_info<operand_type1, operand_type2> info;
+                typedef info::product_word_type word_type;
+
+                word_type const val(word_type(a.value()) * word_type(b.value()));
+                return info::product_type::wrap(val);
+            }
+        };
+    }
+
     /// @brief class to define the "throw an exception" behaviour in case of
     /// overflow/underflow events
     class do_exception{};
@@ -344,7 +382,7 @@ namespace core {
         typedef typename diff_info<this_class>::diff_type diff_type;
 
         /// @brief result type for multiplication operation
-        typedef typename product_info<this_class>::product_type product_type;
+        typedef typename product_info<this_class, this_class>::product_type product_type;
 
         /// @brief result type for division operation
         typedef typename quotient_info<this_class>::quotient_type quotient_type;
@@ -420,36 +458,24 @@ namespace core {
         template<typename T>
         inline product_type operator *(T const& x) const
         {
-            using boost::mpl::bool_;
-
-            class doer
-            {
-            public:
-                // in case product is a closed operation
-                static this_class product(this_class const& a, T const& x, bool_<true>)
-                {
-                    // overflow is possible
-                    word_type const val(a.value() * this_class(x).value());
-
-                    return this_class::wrap(
-                        this_class::handle_overflow(val >> fractionals, op())
-                    );
-                }
-
-                // in case product is not a closed operation
-                static product_type product(this_class const& a, T const& x, bool_<false>)
-                {
-                    // overflow is impossible
-                    typedef product_type::word_type type;
-
-                    type const val(type(a.value()) * type(this_class(x).value()));
-                    return product_type::wrap(val);
-                }
-            };
-
-            return doer::product(*this, x, bool_<product_info<this_class>::is_closed::value>());
+            return product_details<this_class, this_class>::perform(
+                *this,
+                this_class(x),
+                bool_<product_info<this_class, this_class>::is_closed::value>()
+            );
         }
+        template<typename T1, size_t n1, size_t f1, class op1, class up1>
+        inline typename product_info<this_class, fixed_point<T1, n1, f1, op1, up1> >::product_type
+            operator *(fixed_point<T1, n1, f1, op1, up1> const& x) const
+        {
+            typedef fixed_point<T1, n1, f1, op1, up1> operand_type;
 
+            return product_details::perform<this_class, operand_type> >(
+                *this,
+                x,
+                bool_<product_info<this_class, operand_type>::is_closed::value()>()
+            );
+        }
         template<typename T>
         inline this_class& operator *=(T const& x)
         {
@@ -458,53 +484,53 @@ namespace core {
             return this->value(word_type(val.value()));
         }
 
-        /// @brief division operation
-        /// @detailed number to divide by has to be converted to a fixed-point number
-        /// of current format firstly. Result will be of type(a)::quotient_type.
-        template<typename T>
-        inline quotient_type operator /(T const& x) const
-        {
-            using boost::mpl::bool_;
+        ///// @brief division operation
+        ///// @detailed number to divide by has to be converted to a fixed-point number
+        ///// of current format firstly. Result will be of type(a)::quotient_type.
+        //template<typename T>
+        //inline quotient_type operator /(T const& x) const
+        //{
+        //    using boost::mpl::bool_;
 
-            class doer
-            {
-            public:
-                // in case division is a closed operation
-                static this_class divide(this_class const& a, T const& x, bool_<true>)
-                {
-                    // otherflow, underflow are possible
-                    quotient_type::word_type const val(a.value() / this_class(x).value());
-                    handle_underflow(a.value(), val, up());
+        //    class doer
+        //    {
+        //    public:
+        //        // in case division is a closed operation
+        //        static this_class divide(this_class const& a, T const& x, bool_<true>)
+        //        {
+        //            // otherflow, underflow are possible
+        //            quotient_type::word_type const val(a.value() / this_class(x).value());
+        //            handle_underflow(a.value(), val, up());
 
-                    return quotient_type::wrap(this_class::handle_overflow(
-                        val << fractionals, op()));
-                }
+        //            return quotient_type::wrap(this_class::handle_overflow(
+        //                val << fractionals, op()));
+        //        }
 
-                // in case division is not a closed operation
-                static quotient_type divide(this_class const& a, T const& x, bool_<false>)
-                {
-                    // overflow, underflow are impossible
-                    typedef quotient_type::word_type quotient_word_type;
+        //        // in case division is not a closed operation
+        //        static quotient_type divide(this_class const& a, T const& x, bool_<false>)
+        //        {
+        //            // overflow, underflow are impossible
+        //            typedef quotient_type::word_type quotient_word_type;
 
-                    quotient_word_type const shifted = static_cast<quotient_word_type>(a.value())
-                        << fractionals;
-                    quotient_word_type const val = shifted / this_class(x).value();
-                    handle_underflow(a.value(), val, up());
+        //            quotient_word_type const shifted = static_cast<quotient_word_type>(a.value())
+        //                << fractionals;
+        //            quotient_word_type const val = shifted / this_class(x).value();
+        //            handle_underflow(a.value(), val, up());
 
-                    return quotient_type::wrap(val << fractionals);
-                }
-            };
+        //            return quotient_type::wrap(val << fractionals);
+        //        }
+        //    };
 
-            return doer::divide(*this, x, bool_<quotient_info<this_class>::is_closed::value>());
-        }
+        //    return doer::divide(*this, x, bool_<quotient_info<this_class>::is_closed::value>());
+        //}
 
-        template<typename T>
-        inline this_class& operator /=(T const& x)
-        {
-            quotient_type const val(*this / this_class(x));
+        //template<typename T>
+        //inline this_class& operator /=(T const& x)
+        //{
+        //    quotient_type const val(*this / this_class(x));
 
-            return this->value(val.value());
-        }
+        //    return this->value(val.value());
+        //}
 
     // UNARY OPERATORS:
         this_class operator -() const
