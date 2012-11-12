@@ -39,13 +39,9 @@ namespace core {
     namespace {
         using boost::mpl::bool_;
 
-        template<typename T1, size_t n1, size_t f1, class op1, class up1,
-            typename T2, size_t n2, size_t f2, class op2, class up2>
+        template<typename operand_type1, typename operand_type2>
         class product_details
         {
-            typedef fixed_point<T1, n1, f1, op1, up1> operand_type1;
-            typedef fixed_point<T2, n2, f2, op2, up2> operand_type2;
-
         public:
             // in case if product is a closed operation
             static operand_type1 perform(operand_type1 const& a, operand_type2 const& b,
@@ -56,7 +52,7 @@ namespace core {
                     operand_type1(x).value());
 
                 return operand_type1::wrap(
-                    operand_type1::handle_overflow(val >> f, op())
+                    operand_type1::handle_overflow(val >> operand_type1::fractionals, op())
                 );
             }
 
@@ -70,6 +66,37 @@ namespace core {
 
                 word_type const val(word_type(a.value()) * word_type(b.value()));
                 return info::product_type::wrap(val);
+            }
+        };
+
+        template<typename operand_type1, typename operand_type2>
+        class division_details
+        {
+        public:
+            // in case if division is a closed operation
+            static operand_type1 perform(operand_type1 const& a, operand_type2 const& b,
+                bool_<true>)
+            {
+                // otherflow, underflow are possible
+                operand_type1::word_type const val(a.value() / operand_type1(b).value());
+                operand_type1::handle_underflow(a.value(), val, operand_type1::u_policy());
+
+                return operand_type1::wrap(operand_type1::handle_overflow(
+                    val << operand_type2::fractionals, operand_type1::o_policy()));
+            }
+
+            // in case division is not a closed operation
+            static typename quotient_info<operand_type1, operand_type2>::quotient_type
+                perform(operand_type1 const& a, operand_type2 const& b, bool_<false>)
+            {
+                // overflow, underflow are impossible
+                typedef quotient_info<operand_type1, operand_type2> info;
+                typedef info::quotient_word_type word_type;
+
+                word_type const shifted = word_type(a.value()) << operand_type2::total;
+                word_type const val = shifted / word_type(b.value());
+
+                return info::quotient_type::wrap(val);
             }
         };
     }
@@ -112,10 +139,13 @@ namespace core {
     {
         BOOST_CONCEPT_ASSERT((boost::IntegerConcept<storage_type>));
 
-        BOOST_STATIC_ASSERT((f >= 0));
+        BOOST_STATIC_ASSERT((n - f >= 0));
         BOOST_STATIC_ASSERT((n <= std::numeric_limits<storage_type>::digits));
 
         typedef fixed_point<storage_type, n, f, op, up> this_class;
+
+        typedef op o_policy;
+        typedef up u_policy;
 
     // POSITIVE/NEGATIVE OVERFLOW HANDLERS
         // handles positive/negative overflow event with exception raising
@@ -385,7 +415,7 @@ namespace core {
         typedef typename product_info<this_class, this_class>::product_type product_type;
 
         /// @brief result type for division operation
-        typedef typename quotient_info<this_class>::quotient_type quotient_type;
+        typedef typename quotient_info<this_class, this_class>::quotient_type quotient_type;
 
         /// @brief result type for std::log operation
     private:
@@ -470,10 +500,10 @@ namespace core {
         {
             typedef fixed_point<T1, n1, f1, op1, up1> operand_type;
 
-            return product_details::perform<this_class, operand_type> >(
+            return product_details<this_class, operand_type>::perform(
                 *this,
                 x,
-                bool_<product_info<this_class, operand_type>::is_closed::value()>()
+                bool_<product_info<this_class, operand_type>::is_closed::value>()
             );
         }
         template<typename T>
@@ -484,53 +514,28 @@ namespace core {
             return this->value(word_type(val.value()));
         }
 
-        ///// @brief division operation
-        ///// @detailed number to divide by has to be converted to a fixed-point number
-        ///// of current format firstly. Result will be of type(a)::quotient_type.
-        //template<typename T>
-        //inline quotient_type operator /(T const& x) const
-        //{
-        //    using boost::mpl::bool_;
+        /// @brief division operation
+        /// @detailed number to divide by has to be converted to a fixed-point number
+        /// of current format firstly. Result will be of type(a)::quotient_type.
+        template<typename T1, size_t n1, size_t f1, class op1, class up1>
+        inline typename quotient_info<this_class, fixed_point<T1, n1, f1, op1, up1> >::quotient_type
+            operator /(fixed_point<T1, n1, f1, op1, up1> const& x) const
+        {
+            typedef fixed_point<T1, n1, f1, op1, up1> operand_type;
 
-        //    class doer
-        //    {
-        //    public:
-        //        // in case division is a closed operation
-        //        static this_class divide(this_class const& a, T const& x, bool_<true>)
-        //        {
-        //            // otherflow, underflow are possible
-        //            quotient_type::word_type const val(a.value() / this_class(x).value());
-        //            handle_underflow(a.value(), val, up());
+            return division_details<this_class, operand_type>::perform(
+                *this,
+                x,
+                bool_<quotient_info<this_class, operand_type>::is_closed::value>()
+            );
+        }
+        template<typename T>
+        inline this_class& operator /=(T const& x)
+        {
+            quotient_type const val(*this / this_class(x));
 
-        //            return quotient_type::wrap(this_class::handle_overflow(
-        //                val << fractionals, op()));
-        //        }
-
-        //        // in case division is not a closed operation
-        //        static quotient_type divide(this_class const& a, T const& x, bool_<false>)
-        //        {
-        //            // overflow, underflow are impossible
-        //            typedef quotient_type::word_type quotient_word_type;
-
-        //            quotient_word_type const shifted = static_cast<quotient_word_type>(a.value())
-        //                << fractionals;
-        //            quotient_word_type const val = shifted / this_class(x).value();
-        //            handle_underflow(a.value(), val, up());
-
-        //            return quotient_type::wrap(val << fractionals);
-        //        }
-        //    };
-
-        //    return doer::divide(*this, x, bool_<quotient_info<this_class>::is_closed::value>());
-        //}
-
-        //template<typename T>
-        //inline this_class& operator /=(T const& x)
-        //{
-        //    quotient_type const val(*this / this_class(x));
-
-        //    return this->value(val.value());
-        //}
+            return this->value(word_type(val.value()));
+        }
 
     // UNARY OPERATORS:
         this_class operator -() const
@@ -564,6 +569,12 @@ namespace core {
         }
 
         friend class as_native_proxy<storage_type, n, f, op, up>;
+
+        template<typename operand_type1, typename operand_type2>
+        friend class product_details;
+
+        template<typename operand_type1, typename operand_type2>
+        friend class division_details;
     };
 
     /// @brief type class in case of signed integral storages
