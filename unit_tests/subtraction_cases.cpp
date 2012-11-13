@@ -11,14 +11,14 @@
 #include <iomanip>
 #include <stdexcept>
 
-#include "./../../fixed_point_lib/src/number.hpp"
+#include "./../../fixed_point_lib/src/fixed_point.hpp"
 
-namespace utils { namespace unit_tests {
-    #define iterations 100000
+namespace core { namespace unit_tests {
+#define iterations 100000
 
     namespace {
-        using utils::SOU_number;
-        using utils::UOU_number;
+        using core::SOU_fixed_point;
+        using core::UOU_fixed_point;
 
         double r(double low, double high)
         {
@@ -26,8 +26,8 @@ namespace utils { namespace unit_tests {
         }
     }
 
-    #define fmin(type) double(std::numeric_limits<type>::min())
-    #define fmax(type) double(std::numeric_limits<type>::max())
+#define fmin(type) double(std::numeric_limits<type>::min())
+#define fmax(type) double(std::numeric_limits<type>::max())
 
     BOOST_AUTO_TEST_SUITE(Subtraction)
 
@@ -41,8 +41,8 @@ namespace utils { namespace unit_tests {
         ///     the same.
     BOOST_AUTO_TEST_CASE(commonCheck1)
     {
-        typedef SOU_number<59, 48>::type type1;
-        typedef UOU_number<37, 48>::type type2;
+        typedef SOU_fixed_point<59, 48>::type type1;
+        typedef UOU_fixed_point<37, 48>::type type2;
 
         std::srand(static_cast<unsigned int>(std::time(0)));
 
@@ -71,8 +71,8 @@ namespace utils { namespace unit_tests {
 
     BOOST_AUTO_TEST_CASE(commonCheck2)
     {
-        typedef SOU_number<32, 13>::type type1;
-        typedef UOU_number<42, 23>::type type2;
+        typedef SOU_fixed_point<32, 13>::type type1;
+        typedef UOU_fixed_point<42, 23>::type type2;
 
         std::srand(static_cast<unsigned int>(std::time(0)));
 
@@ -86,7 +86,6 @@ namespace utils { namespace unit_tests {
             type1 const a(u1);
             type2 const b(u2);
             type1::sum_type const result = a - b;
-            //double x = double(result);
 
             std::stringstream message_stream;
             message_stream
@@ -103,7 +102,7 @@ namespace utils { namespace unit_tests {
 
     BOOST_AUTO_TEST_SUITE_END()
 
-    #undef iterations
-    #undef fmin
-    #undef fmax
+#undef fmin
+#undef fmax
+#undef iterations
 }}
