@@ -49,23 +49,24 @@ namespace core {
             {
                 // overflow is possible
                 typename operand_type1::word_type const val(a.value() *
-                    operand_type1(x).value());
+                    operand_type1(b).value());
 
                 return operand_type1::wrap(
-                    operand_type1::handle_overflow(val >> operand_type1::fractionals, op())
+                    operand_type1::handle_overflow(val >> operand_type1::fractionals,
+                    operand_type1::o_policy())
                 );
             }
 
             // in case if product is not a closed operation
             static typename product<operand_type1, operand_type2>::type
-                product(operand_type1 const& a, operand_type2 const& b, bool_<false>)
+                perform(operand_type1 const& a, operand_type2 const& b, bool_<false>)
             {
                 // overflow is impossible
                 typedef product<operand_type1, operand_type2> info;
-                typedef info::product_word_type word_type;
+                typedef info::word_type word_type;
 
                 word_type const val(word_type(a.value()) * word_type(b.value()));
-                return info::product_type::wrap(val);
+                return info::type::wrap(val);
             }
         };
 
@@ -418,22 +419,6 @@ namespace core {
         typedef typename quotient<this_class, this_class>::type quotient_type;
 
         /// @brief result type for std::log operation
-    private:
-        template<size_t fbits>
-        struct log_info
-        {
-            typedef fixed_point<typename boost::int_t<1u + fbits + (boost::static_log2<fbits>::value + 1u)>::least,
-            fbits + (boost::static_log2<fbits>::value + 1u), fbits, op, up> type;
-        };
-
-        template<>
-        struct log_info<0>
-        {
-            typedef this_class type;
-        };
-
-    public:
-        typedef typename log_info<f>::type log_type;
 
     // FIXED-POINT ARITHMETICS:
         /// @brief addition operation
