@@ -13,6 +13,7 @@
 #include "./../../fixed_point_lib/src/static_pow.hpp"
 
 #include "./../../fixed_point_lib/src/as_native_proxy.hpp"
+#include "./../../fixed_point_lib/src/get_.hpp"
 
 #include <boost/static_assert.hpp>
 #include <boost/concept_check.hpp>
@@ -539,10 +540,16 @@ namespace core {
         /// 1. CONST_2PI means 2*pi;
         /// 2. CONST_2_PI means 2/pi;
         /// 3. CONST PI_2 means pi/2.
-        static this_class const CONST_E, CONST_LOG2E, CONST_LOG10E, CONST_LOG102,
-            CONST_LN2, CONST_LN10, CONST_2PI, CONST_PI, CONST_PI_2, CONST_PI_4,
-            CONST_1_PI, CONST_2_PI, CONST_2_SQRTPI, CONST_SQRT2, CONST_SQRT1_2,
-            CONST_2SQRT2;
+        static this_class const CONST_E, CONST_LOG2E, CONST_1_LOG2E, CONST_LOG10E,
+            CONST_LOG102, CONST_LN2, CONST_LN10, CONST_2PI, CONST_PI, CONST_PI_2,
+            CONST_PI_4, CONST_1_PI, CONST_2_PI, CONST_2_SQRTPI, CONST_SQRT2,
+            CONST_SQRT1_2, CONST_2SQRT2;
+
+    // TYPES FOR ELEMENTARY_FUNCTIONS:
+        typedef typename get_<this_class>::log_type log_type;
+        typedef typename get_<this_class>::sqrt_type sqrt_type;
+        typedef typename get_<this_class>::sin_type sin_type;
+        typedef typename get_<this_class>::cos_type cos_type;
 
     private:
         word_type m_value;
@@ -634,6 +641,7 @@ namespace core {
     core::fixed_point<T, n, f, op, up> const core::fixed_point<T, n, f, op, up>::##name(val);
 
 math_constant(CONST_E, 2.71828182845904523536)
+math_constant(CONST_1_LOG2E, 0.6931471805599453);
 math_constant(CONST_LOG2E, 1.44269504088896340736)
 math_constant(CONST_LOG10E, 0.434294481903251827651)
 math_constant(CONST_LOG102, 0.301029995663981195214)
