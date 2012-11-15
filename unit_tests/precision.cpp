@@ -154,7 +154,9 @@ namespace core { namespace unit_tests {
         \
         try { \
             t1 const a(u1); t2 const b(u2); \
-            if (std::fabs(double(a / b) - (u1 / u2)) > error * (u1 + u2) / (u2 * (u2 - error))) { \
+            double const u1a(std::fabs(u1)); double const u2a(std::fabs(u2)); \
+            /* supremum of the error */ \
+            if (std::fabs(double(a / b) - (u1 / u2)) > error * ((u1a + u2a) / (u2a * std::fabs(u2a - error)))) { \
                 std::stringstream message_stream; \
                 message_stream \
                     << std::setprecision(5) \
@@ -181,11 +183,13 @@ namespace core { namespace unit_tests {
 #undef PRECISION_TEST
     }
 
-#define PRECISION_TEST(fp, low, high, f, error) \
+    BOOST_AUTO_TEST_CASE(log)
+    {
+#define PRECISION_TEST(t, low, high, f, error) \
     BOOST_FOREACH(size_t i, boost::irange<size_t>(0, ITERATIONS, 1)) \
     { \
         double const u(r(low, high)); \
-        fp::##f##_type const x = std::##f##(fp(u)); \
+        t::##f##_type const x = std::##f##(fp(u)); \
         \
         if (std::fabs(double(x) - std::##f##(u)) > error) { \
             std::stringstream message_stream; \
@@ -202,6 +206,11 @@ namespace core { namespace unit_tests {
             \
             BOOST_CHECK_MESSAGE(false, message_stream.str()); \
         } \
+    }
+
+    //U(23,17,t1); PRECISION_TEST(t, 
+
+#undef PRECISION_TEST
     }
 
     BOOST_AUTO_TEST_SUITE_END()
