@@ -39,8 +39,8 @@ namespace std {
         }
 
         // CORDIC vectoring mode:
-        lut const angles = lut::build_arctanh_lut();
-        fp const norm(1.0 / lut::compute_hyperbolic_scale(n));
+        lut const angles = lut::hyperbolic_wo_repeated_iterations();
+        fp const norm(1.0 / lut::hyperbolic_scale_with_repeated_iterations(n));
         work_type x(work_type(arg) + 0.25), y(work_type(arg) - 0.25), z(arg);
         {
             size_t repeated(4u);
@@ -49,7 +49,7 @@ namespace std {
             for (size_t i(1u); i < f + 1u; ++i)
             {
                 int const sign = ((x.value() < 0)? -1 : +1) * ((y.value() < 0)? -1 : +1);
-                work_type::value_type const store(x.value());
+                work_type::word_type const store(x.value());
                 x = x - work_type::wrap(sign * (y.value() >> (num + 1u)));
                 y = y - work_type::wrap(sign * (store >> (num + 1u)));
                 z = (sign > 0) ? z + angles[num] : z - angles[num];
@@ -57,7 +57,7 @@ namespace std {
                 // do repetition to receive convergence
                 if (i == repeated && i != n - 1) {
                     int const sign = ((x.value() < 0)? -1 : +1) * ((y.value() < 0)? -1 : +1);
-                    work_type::value_type const store(x.value());
+                    work_type::word_type const store(x.value());
                     x = x - work_type::wrap(sign * (y.value() >> (num + 1u)));
                     y = y - work_type::wrap(sign * (store >> (num + 1u)));
                     z = (sign > 0) ? z + angles[num] : z - angles[num];
