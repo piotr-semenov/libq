@@ -9,7 +9,7 @@ namespace std {
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
 
-        assert(("sqrt parameter is negative", val > fp(0)));
+        assert(("sqrt parameter is negative", val >= fp(0)));
         if (val < fp(0)) {
             throw std::exception("sqrt: arg is negative");
         }
@@ -40,7 +40,7 @@ namespace std {
 
         // CORDIC vectoring mode:
         lut const angles = lut::hyperbolic_wo_repeated_iterations();
-        fp const norm(1.0 / lut::hyperbolic_scale_with_repeated_iterations(n));
+        typename core::U_fixed_point<f + 1u, f>::type const norm(1.0 / lut::hyperbolic_scale_with_repeated_iterations(n));
         work_type x(work_type(arg) + 0.25), y(work_type(arg) - 0.25), z(arg);
         {
             size_t repeated(4u);
@@ -70,7 +70,7 @@ namespace std {
             }
         }
 
-        fp result(norm * x); // interval [1.0, 2.0]
+        fp result(x * norm); // interval [1.0, 2.0]
         if (power > 0) {
             as_native(result) >>= (power >> 1u);
             if (power & 1u) {
