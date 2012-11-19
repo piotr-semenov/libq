@@ -3,7 +3,7 @@
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    core::fixed_point<T, n, f, op, up> sin(core::fixed_point<T, n, f, op, up> const& val)
+    typename core::fixed_point<T, n, f, op, up>::sin_type sin(core::fixed_point<T, n, f, op, up> const& val)
     {
         BOOST_STATIC_ASSERT(n - f >= 3);
 
@@ -60,6 +60,6 @@ namespace std {
             x = x1; y = y1; z = z1;
         }
 
-        return (sign > 0) ? y : -y;
+        return fp::sin_type((sign > 0) ? y : -y);
     }
 }

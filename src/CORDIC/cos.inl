@@ -3,7 +3,7 @@
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    core::fixed_point<T, n, f, op, up> cos(core::fixed_point<T, n, f, op, up> const& val)
+    typename core::fixed_point<T, n, f, op, up>::cos_type cos(core::fixed_point<T, n, f, op, up> const& val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
         BOOST_STATIC_ASSERT(std::numeric_limits<fp>::is_signed);
@@ -58,6 +58,6 @@ namespace std {
             x = x1; y = y1; z = z1;
         }
 
-        return (sign > 0) ? x : - x;
+        return fp::cos_type((sign > 0) ? x : - x);
     }
 }

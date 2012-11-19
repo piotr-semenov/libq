@@ -1,20 +1,18 @@
 /// @brief provides stuff for std::tan in case of fixed-point numbers
 
-#include <exception>
-
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    core::fixed_point<T, n, f, op, up> tan(core::fixed_point<T, n, f, op, up> const& val)
+    typename core::fixed_point<T, n, f, op, up>::tan_type tan(core::fixed_point<T, n, f, op, up> const& val)
     {
-        typedef core::fixed_point<T, n, f, op, up> type;
+        typedef core::fixed_point<T, n, f, op, up> fp;
 
-        type const sin = std::sin(val);
-        type const cos = std::cos(val);
+        fp::sin_type const sin = std::sin(val);
+        fp::cos_type const cos = std::cos(val);
 
-        if (cos == type(0)) {
+        if (cos == fp::cos_type(0)) {
             throw std::exception("tan: cos is zero");
         }
 
-        return type(sin / cos);
+        return fp::tan_type(sin / cos);
     }
 }
