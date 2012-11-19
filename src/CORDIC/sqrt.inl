@@ -78,11 +78,11 @@ namespace std {
             }
         }
 
-        work_type result(x / norm);
+        reduce_type result(x / norm);
         if (power > 0) {
             as_native(result) >>= (power >> 1u);
             if (power & 1u) {
-                result = result * work_type::CONST_SQRT1_2;
+                result = result / reduce_type::CONST_SQRT2;
             }
         }
         else {
