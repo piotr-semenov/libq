@@ -5,7 +5,7 @@ namespace std {
     /// @brief computes square root by CORDIC-algorithm
     /// @ref page 11
     template<typename T, size_t n, size_t f, class op, class up>
-    core::fixed_point<T, n, f, op, up> sqrt(core::fixed_point<T, n, f, op, up> const val)
+    typename core::fixed_point<T, n, f, op, up>::sqrt_type sqrt(core::fixed_point<T, n, f, op, up> const val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
 
@@ -15,10 +15,7 @@ namespace std {
         }
 
         if (val == fp(0.0)) {
-            return fp(0.0);
-        }
-        else if (val == fp(1.0)) {
-            return fp(1.0);
+            return fp::sqrt_type(0.0);
         }
 
         // Chosen fixed-point format must have several bits to represent
@@ -27,20 +24,31 @@ namespace std {
         typedef core::fixed_point<boost::int_t<1u+f+2u>::least, f+2u, f, op, up> work_type;
         typedef core::cordic::lut<f, work_type> lut;
 
+        using boost::mpl::if_;
+        struct chooser
+        {
+            enum { value = (fp::total - fp::fractionals) >= 2 };
+        };
+        typedef if_<chooser, fp, work_type>::type reduce_type;
+
         int power(0);
-        fp arg(val);
-        while (arg >= fp(2.0 )) {
+        reduce_type arg(val);
+        if (arg == reduce_type(1.0)) {
+            return fp::sqrt_type(1.0);
+        }
+
+        while (arg >= work_type(2.0)) {
             as_native(arg) >>= 1u;
             power--;
         }
-        while (arg < fp(1.0)) {
+        while (arg < work_type(1.0)) {
             as_native(arg) <<= 1u;
             power++;
         }
 
         // CORDIC vectoring mode:
         lut const angles = lut::hyperbolic_wo_repeated_iterations();
-        typename core::U_fixed_point<f + 1u, f>::type const norm(1.0 / lut::hyperbolic_scale_with_repeated_iterations(n));
+        typename core::U_fixed_point<f, f>::type const norm(lut::hyperbolic_scale_with_repeated_iterations(n));
         work_type x(work_type(arg) + 0.25), y(work_type(arg) - 0.25), z(arg);
         {
             size_t repeated(4u);
@@ -70,7 +78,7 @@ namespace std {
             }
         }
 
-        fp result(x * norm); // interval [1.0, 2.0]
+        work_type result(x / norm);
         if (power > 0) {
             as_native(result) >>= (power >> 1u);
             if (power & 1u) {
@@ -85,6 +93,6 @@ namespace std {
             }
         }
 
-        return result;
+        return fp::sqrt_type(result);
     }
 }
