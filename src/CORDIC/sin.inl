@@ -36,14 +36,14 @@ namespace std {
         }
 
         typedef lut<f, fp> lut_type;
-        static lut_type const angles = lut_type::build_arctan_lut();
+        static lut_type const angles = lut_type::circular();
 
         // normalization factor: see page 10, table 24.1 and pages 4-5, equations
         // (5)-(6)
         // factor converges to the limit 1.64676 very fast: it tooks 8 iterations
         // only. 8 iterations correpsonds to precision of size 0.007812 for
         // angle approximation
-        static fp norm_factor(1.0 / lut_type::compute_circular_scale(f));
+        static fp norm_factor(1.0 / lut_type::circular_scale(f));
 
         // rotation mode: see page 6
         // shift sequence is just 0, 1, ... (circular coordinate system)
