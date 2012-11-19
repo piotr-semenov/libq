@@ -7,9 +7,14 @@ namespace std {
         core::fixed_point<T, n, f, op, up> const& b)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
-        static T const mask(boost::low_bits_mask_t<f>::sig_bits);
+        typedef fp::word_type word_type;
 
-        fp const fractional = fp::wrap(fp(a / b).value() & mask);
-        return fp(fractional * b);
+        word_type const quotient = word_type(a.value()) / word_type(b.value());
+        word_type remainder = word_type(a.value()) - word_type(quotient * b.value());
+        if (remainder < 0) {
+            remainder += word_type(b.value());
+        }
+
+        return fp::wrap(remainder);
     }
 }
