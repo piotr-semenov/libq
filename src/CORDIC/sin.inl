@@ -1,8 +1,6 @@
 /// @brief provides CORDIC for cos function
 /// @ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 
-#include "./../../fixed_point_lib/src/CORDIC/lut/lut.hpp"
-
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
     core::fixed_point<T, n, f, op, up> sin(core::fixed_point<T, n, f, op, up> const& val)

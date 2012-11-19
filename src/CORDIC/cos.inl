@@ -1,15 +1,12 @@
 /// @brief provides CORDIC for cos function
 /// @ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 
-#include "./../../fixed_point_lib/src/CORDIC/lut/lut.hpp"
-
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
     core::fixed_point<T, n, f, op, up> cos(core::fixed_point<T, n, f, op, up> const& val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
-        using core::cordic::lut;
-        BOOST_STATIC_ASSERT(std::numeric_limits<fixed_point>::is_signed);
+        BOOST_STATIC_ASSERT(std::numeric_limits<fp>::is_signed);
 
         // convergence interval for CORDIC rotations is [-pi/2, pi/2].
         // So one has to map input angle to that interval
@@ -34,15 +31,15 @@ namespace std {
             }
         }
 
-        typedef lut<f, fp> lut_type;
-        static lut_type const angles = lut_type::build_arctan_lut();
+        typedef core::cordic::lut<f, fp> lut;
+        static lut const angles = lut::circular();
 
         // normalization factor: see page 10, table 24.1 and pages 4-5, equations
         // (5)-(6)
         // factor converges to the limit 1.64676 very fast: it tooks 8 iterations
         // only. 8 iterations correpsonds to precision of size 0.007812 for
         // angle approximation
-        static fp norm_factor(1.0 / lut_type::compute_circular_scale(f));
+        static fp norm_factor(1.0 / lut::circular_scale(f));
 
         // rotation mode: see page 6
         // shift sequence is just 0, 1, ... (circular coordinate system)
