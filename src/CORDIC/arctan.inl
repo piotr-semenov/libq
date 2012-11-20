@@ -5,23 +5,24 @@
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    core::fixed_point<T, n, f, op, up> atan(core::fixed_point<T, n, f, op, up> val)
+    typename core::fixed_point<T, n, f, op, up>::atan_type atan(core::fixed_point<T, n, f, op, up> val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
+        typedef fp::atan_type result_type;
         typedef core::cordic::lut<f, fp> lut;
 
-        static lut const angles = lut::build_arctan_lut();
+        static lut const angles = lut::circular();
 
         // vectoring mode: see page 10, table 24.2
         // shift sequence is just 0, 1, ... (circular coordinate system)
-        fp x(1.0), y(val), z(0.0);
+        result_type x(1.0), y(val), z(0.0);
         BOOST_FOREACH(size_t i, boost::irange<size_t>(0, f, 1))
         {
             int const sign = ((x.value() > 0)? +1 : -1) * ((y.value() > 0)? +1 : -1);
 
-            fp::value_type const store(x.value());
-            x = x + fp::wrap(sign * (y.value() >> i));
-            y = y - fp::wrap(sign * (store >> i));
+            result_type::word_type const store(x.value());
+            x = x + result_type::wrap(sign * (y.value() >> i));
+            y = y - result_type::wrap(sign * (store >> i));
             z = (sign > 0)? z + angles[i] : z - angles[i];
         }
 
