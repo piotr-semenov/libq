@@ -5,10 +5,11 @@
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    core::fixed_point<T, n, f, op, up> asin(core::fixed_point<T, n, f, op, up> val)
+    typename core::fixed_point<T, n, f, op, up>::asin_type asin(core::fixed_point<T, n, f, op, up> val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
-        typedef core::cordic::lut<f, fp> lut;
+        typedef typename fp::asin_type result_type;
+        typedef core::cordic::lut<result_type::fractionals, result_type> lut;
 
         assert(("argument has to be from interval [-1.0, 1.0]", std::fabs(val) <= fp(1.0)));
         if (std::fabs(val) > fp(1.0)) {
@@ -16,20 +17,20 @@ namespace std {
         }
 
         if (val == fp(1.0)) {
-            return fp::CONST_PI_2;
+            return result_type::CONST_PI_2;
         }
         else if (val == fp(-1.0)) {
-            return -(fp::CONST_PI_2);
+            return -(result_type::CONST_PI_2);
         }
         else if (val == fp(0)) {
-            return fp::wrap(0);
+            return result_type::wrap(0);
         }
-        static lut const angles = lut::build_arctan_lut();
-        static lut const scales = lut::build_circular_scales_lut();
+        static lut const angles = lut::circular();
+        static lut const scales = lut::circular_scales();
 
         // rotation mode: see page 6
         // shift sequence is just 0, 1, ... (circular coordinate system)
-        fp x(1.0), y(0.0), z(0.0);
+        result_type x(1.0), y(0.0), z(0.0);
         BOOST_FOREACH(size_t i, boost::irange<size_t>(0, f, 1))
         {
             int sign(0);
@@ -40,18 +41,18 @@ namespace std {
                 sign = (x < 0.0)? +1 : -1;
             }
 
-            fp::value_type const store(x.value());
-            x = x - fp::wrap(sign * (y.value() >> i));
-            y = y + fp::wrap(sign * (store >> i));
+            result_type::word_type const store(x.value());
+            x = x - result_type::wrap(sign * (y.value() >> i));
+            y = y + result_type::wrap(sign * (store >> i));
             z = (sign > 0)? z + angles[i] : z - angles[i];
-            val = val * scales[i]; // multiply be square of scale factor K(n)
+            val = val * scales[i];
         }
 
-        if (z > fp::CONST_PI_2) {
-            z = fp::CONST_PI - z;
+        if (z > result_type::CONST_PI_2) {
+            z = result_type::CONST_PI - z;
         }
-        else if (z < -fp::CONST_PI_2) {
-            z = -fp::CONST_PI - z;
+        else if (z < -result_type::CONST_PI_2) {
+            z = -result_type::CONST_PI - z;
         }
 
         return z;
