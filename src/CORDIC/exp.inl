@@ -9,14 +9,15 @@
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    core::fixed_point<T, n, f, op, up> exp(core::fixed_point<T, n, f, op, up> const& val)
+    typename core::fixed_point<T, n, f, op, up>::exp_type exp(core::fixed_point<T, n, f, op, up> const& val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
-        typedef core::cordic::lut<f, fixed_point> lut_type;
+        typedef core::get_<fp>::max_signed_type work_type;
+        typedef core::cordic::lut<f, fp> lut;
 
-        // reduces argument to interval [1.0, 2.0]
+        // reduces argument to interval [0.0, 1.0]
         int power(0);
-        fp arg(val);
+        work_type arg(val * fp::CONST_LOG2E);
         while (arg >= fp(1.0)) {
             arg = arg - 1u;
             power++;
@@ -26,18 +27,24 @@ namespace std {
             power--;
         }
 
-        static lut_type const log2_lut = lut_type::build_log2_lut();
-        fp result(1.0);
+        static lut const pow2_lut = lut::pow2();
+        work_type result(1.0);
         BOOST_FOREACH(size_t i, boost::irange<size_t>(0, f, 1))
         {
-            if (fp(arg - fp::wrap(T(1u) << (f - i - 1u))) >= fp(0.0)) {
-                arg = arg - fp::wrap(T(1u) << (f- i -1u));
+            if (work_type(arg - work_type::wrap(T(1u) << (f - i - 1u))) >= work_type(0.0)) {
+                arg = arg - work_type::wrap(T(1u) << (f- i -1u));
 
-                result = fp(result * log2_lut[i]);
+                result = work_type(result * pow2_lut[i]);
             }
         }
 
-        result = result * (fp::wrap(T(1u) << (f + power)));
-        return result;
+        //result = result * (work_type::wrap(T(1u) << (f + power)));
+        if (power >= 0) {
+            as_native(result) <<= power;
+        }
+        else {
+            as_native(result) >>= (-power);
+        }
+        return fp::exp_type(result);
     }
 }
