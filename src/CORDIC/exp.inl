@@ -40,8 +40,8 @@ namespace std {
         typedef core::fixed_point<T, n, f, op, up> fp_type;
         typedef core::exp_of<fp_type>::type result_type;
 
-        typedef core::cordic::lut<f, fp_type> lut_type;
         typedef core::S_fixed_point<f+1u, f>::type work_type;
+        typedef core::cordic::lut<f, work_type> lut_type;
 
         // reduces argument to interval [0.0, 1.0]
         int power(0);
