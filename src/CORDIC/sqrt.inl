@@ -1,11 +1,43 @@
 /// @brief provides CORDIC for cos function
 /// @ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 
+#include <boost/type_traits/is_floating_point.hpp>
+
+#include <boost/integer.hpp>
+
+namespace core {
+    template<typename T>
+    class sqrt_of
+    {
+        BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+
+    public:
+        typedef T type;
+    };
+
+    template<typename T, size_t n, size_t f, class op, class up>
+    class sqrt_of<fixed_point<T, n, f, op, up> >
+    {
+        static size_t const integer_bits = ((n - f) & 1u)? ((n - f)/2u) + 1u : (n - f)/2u;
+        static size_t const fractional_bits = (f & 1u)? (f/2u) + 1u : (f/2u);
+        static size_t const total_bits = integer_bits + fractional_bits;
+
+    public:
+        typedef fixed_point<
+            typename boost::uint_t<sqrt_info::total_bits>::least,
+            total_bits,
+            fractional_bits,
+            op,
+            up
+        > type;
+    };
+}
+
 namespace std {
     /// @brief computes square root by CORDIC-algorithm
     /// @ref page 11
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::fixed_point<T, n, f, op, up>::sqrt_type sqrt(core::fixed_point<T, n, f, op, up> const val)
+    typename core::sqrt_type<fixed_point<T, n, f, op, up> >::type sqrt(core::fixed_point<T, n, f, op, up> val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
 
