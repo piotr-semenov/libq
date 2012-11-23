@@ -4,11 +4,11 @@
 #ifndef INC_CORE_FIXED_POINT_HPP_
 #define INC_CORE_FIXED_POINT_HPP_
 
-#include "./quotient.hpp"
-#include "./product.hpp"
+#include "./quotient_of.hpp"
+#include "./product_of.hpp"
 
-#include "./diff.hpp"
-#include "./sum.hpp"
+#include "./diff_of.hpp"
+#include "./sum_of.hpp"
 
 #include "./static_pow.hpp"
 
@@ -73,11 +73,11 @@ namespace core {
             }
 
             // in case if product is not a closed operation
-            static typename product<operand_type1, operand_type2>::type
+            static typename product_of<operand_type1, operand_type2>::type
                 perform(operand_type1 const& a, operand_type2 const& b, bool_<false>)
             {
                 // overflow is impossible
-                typedef product<operand_type1, operand_type2> info;
+                typedef product_of<operand_type1, operand_type2> info;
                 typedef info::word_type word_type;
 
                 word_type const val(word_type(a.value()) * word_type(b.value()));
@@ -120,11 +120,11 @@ namespace core {
             }
 
             // in case division is not a closed operation
-            static typename quotient<operand_type1, operand_type2>::type
+            static typename quotient_of<operand_type1, operand_type2>::type
                 perform(operand_type1 const& a, operand_type2 const& b, bool_<false>)
             {
                 // overflow, underflow are impossible
-                typedef quotient<operand_type1, operand_type2> info;
+                typedef quotient_of<operand_type1, operand_type2> info;
                 typedef info::word_type word_type;
 
                 word_type const shifted = word_type(a.value()) << operand_type2::total;
@@ -482,16 +482,16 @@ namespace core {
             op, up> to_unsigned_type;
 
         /// @brief result type for summation operation
-        typedef typename sum<this_class>::type sum_type;
+        typedef typename sum_of<this_class>::type sum_type;
 
         /// @brief result type for summation operation
-        typedef typename diff<this_class>::type diff_type;
+        typedef typename diff_of<this_class>::type diff_type;
 
         /// @brief result type for multiplication operation
-        typedef typename product<this_class, this_class>::type product_type;
+        typedef typename product_of<this_class, this_class>::type product_type;
 
         /// @brief result type for division operation
-        typedef typename quotient<this_class, this_class>::type quotient_type;
+        typedef typename quotient_of<this_class, this_class>::type quotient_type;
 
         /// @brief result type for std::log operation
 
@@ -502,7 +502,7 @@ namespace core {
         template<typename T>
         inline sum_type operator +(T const& x) const
         {
-            typedef sum<this_class>::word_type type;
+            typedef sum_of<this_class>::word_type type;
 
             // any overflow is impossible
             return sum_type::wrap(
@@ -525,7 +525,7 @@ namespace core {
         template<typename T>
         inline diff_type operator -(T const& x) const
         {
-            typedef diff<this_class>::word_type type;
+            typedef diff_of<this_class>::word_type type;
 
             // any overflow is impossible
             return diff_type::wrap(
@@ -546,16 +546,16 @@ namespace core {
         /// @detailed number to multiply has to be converted to a fixed-point number
         /// of current format firstly. Result will be of type(a)::product_type.
         template<typename T>
-        inline typename product<this_class, T>::type operator *(T const& x) const
+        inline typename product_of<this_class, T>::type operator *(T const& x) const
         {
             return product_details<this_class, this_class>::perform(
                 *this,
                 this_class(x),
-                bool_<product<this_class, this_class>::is_closed::value>()
+                bool_<product_of<this_class, this_class>::is_closed::value>()
             );
         }
         template<typename T1, size_t n1, size_t f1, class op1, class up1>
-        inline typename product<this_class, fixed_point<T1, n1, f1, op1, up1> >::type
+        inline typename product_of<this_class, fixed_point<T1, n1, f1, op1, up1> >::type
             operator *(fixed_point<T1, n1, f1, op1, up1> const& x) const
         {
             typedef fixed_point<T1, n1, f1, op1, up1> operand_type;
@@ -563,7 +563,7 @@ namespace core {
             return product_details<this_class, operand_type>::perform(
                 *this,
                 x,
-                bool_<product<this_class, operand_type>::is_closed::value>()
+                bool_<product_of<this_class, operand_type>::is_closed::value>()
             );
         }
         template<typename T>
@@ -578,7 +578,7 @@ namespace core {
         /// @detailed number to divide by has to be converted to a fixed-point number
         /// of current format firstly. Result will be of type(a)::quotient_type.
         template<typename T1, size_t n1, size_t f1, class op1, class up1>
-        inline typename quotient<this_class, fixed_point<T1, n1, f1, op1, up1> >::type
+        inline typename quotient_of<this_class, fixed_point<T1, n1, f1, op1, up1> >::type
             operator /(fixed_point<T1, n1, f1, op1, up1> const& x) const
         {
             typedef fixed_point<T1, n1, f1, op1, up1> operand_type;
@@ -586,7 +586,7 @@ namespace core {
             return division_details<this_class, operand_type>::perform(
                 *this,
                 x,
-                bool_<quotient<this_class, operand_type>::is_closed::value>()
+                bool_<quotient_of<this_class, operand_type>::is_closed::value>()
             );
         }
         template<typename T>

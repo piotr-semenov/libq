@@ -20,7 +20,7 @@ namespace core {
         typedef fixed_point<T, n, f, op, up> fp_type;
 
     public:
-        typedef typename quotient<
+        typedef typename quotient_of<
             typename sin_of<fp_type>::type,
             typename cos_of<fp_type>::type
         >::type type;

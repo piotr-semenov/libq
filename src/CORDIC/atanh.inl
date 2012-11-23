@@ -18,7 +18,7 @@ namespace core {
     class atanh_of<fixed_point<T, n, f, op, up> >
     {
     public:
-        typedef typename diff<typename fixed_point<T, n, f, op, up>::log_type>::type type;
+        typedef typename diff_of<typename fixed_point<T, n, f, op, up>::log_type>::type type;
     };
 }
 
