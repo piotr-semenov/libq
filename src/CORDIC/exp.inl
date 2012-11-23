@@ -45,7 +45,7 @@ namespace std {
 
         // reduces argument to interval [0.0, 1.0]
         int power(0);
-        core::product<fp_type, work_type>::type arg(val * work_type::CONST_LOG2E);
+        core::product_of<fp_type, work_type>::type arg(val * work_type::CONST_LOG2E);
         while (arg >= result_type(1.0)) {
             arg = arg - 1u;
             power++;
