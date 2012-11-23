@@ -13,7 +13,6 @@
 #include "./../../fixed_point_lib/src/static_pow.hpp"
 
 #include "./../../fixed_point_lib/src/as_native_proxy.hpp"
-#include "./../../fixed_point_lib/src/get_.hpp"
 
 #include <boost/static_assert.hpp>
 #include <boost/concept_check.hpp>
@@ -48,12 +47,27 @@ namespace core {
             static operand_type1 perform(operand_type1 const& a, operand_type2 const& b,
                 bool_<true>)
             {
+                struct chooser
+                {
+                    enum { value = std::numeric_limits<operand_type1>::is_signed };
+                };
+                typedef typename if_<chooser, boost::intmax_t, boost::uintmax_t>::type
+                    max_type;
+                static int const left_bits = std::numeric_limits<max_type>::digits -
+                    std::numeric_limits<operand_type1>::digits - (operand_type2::total -
+                    operand_type2::fractionals);
+                static int const shift1 =
+                    (left_bits < 0 || left_bits > operand_type2::fractionals)?
+                    0 : (int(operand_type2::fractionals) - left_bits);
+
                 // overflow is possible
                 typename operand_type1::word_type const val(a.value() *
-                    operand_type1(b).value());
+                    (b.value() >> shift1));
+                static int const shift2 = (left_bits > 0 && left_bits < operand_type2::fractionals)?
+                    left_bits : operand_type2::fractionals;
 
                 return operand_type1::wrap(
-                    operand_type1::handle_overflow(val >> operand_type1::fractionals,
+                    operand_type1::handle_overflow(val >> shift2,
                     operand_type1::o_policy())
                 );
             }
@@ -79,12 +93,30 @@ namespace core {
             static operand_type1 perform(operand_type1 const& a, operand_type2 const& b,
                 bool_<true>)
             {
+                using boost::mpl::bool_;
+                struct chooser
+                {
+                    enum { value = std::numeric_limits<operand_type1>::is_signed };
+                };
+                typedef typename if_<chooser, boost::intmax_t, boost::uintmax_t>::type
+                    max_type;
+                static size_t const left_bits = std::numeric_limits<max_type>::digits -
+                    std::numeric_limits<operand_type1>::digits;
+
                 // otherflow, underflow are possible
-                operand_type1::word_type const val(a.value() / operand_type1(b).value());
+                max_type const shifted = max_type(a.value()) << left_bits;
+                max_type val(shifted / operand_type1(b).value());
                 operand_type1::handle_underflow(a.value(), val, operand_type1::u_policy());
 
+                static size_t const shift = (left_bits > operand_type1::fractionals)?
+                    (left_bits - operand_type1::fractionals) :
+                    (operand_type1::fractionals - left_bits);
+                val = (left_bits > operand_type1::fractionals)? val >> shift : val << shift;
+
                 return operand_type1::wrap(operand_type1::handle_overflow(
-                    val << operand_type2::fractionals, operand_type1::o_policy()));
+                    val,
+                    operand_type1::o_policy())
+                );
             }
 
             // in case division is not a closed operation
@@ -103,6 +135,26 @@ namespace core {
         };
     }
 
+// TYPE SIGNESS MANAGEMENT
+    inline float s(float x){ return x; }
+    inline double s(double x){ return x; }
+
+    template<typename T, size_t n, size_t f, class op, class up>
+    inline typename fixed_point<T, n, f, op, up>::to_signed_type s(fixed_point<T, n, f, op, up> x)
+    {
+        return typename fixed_point<T, n, f, op, up>::to_signed_type(x);
+    }
+
+    inline float u(float x){ return x; }
+    inline double u(double x){ return x; }
+
+    template<typename T, size_t n, size_t f, class op, class up>
+    inline typename fixed_point<T, n, f, op, up>::to_unsigned_type u(fixed_point<T, n, f, op, up> x)
+    {
+        return typename fixed_point<T, n, f, op, up>::to_unsigned_type(x);
+    }
+
+// OVERFLOW/UNDERFLOW CONTROL POLICIES
     /// @brief class to define the "throw an exception" behaviour in case of
     /// overflow/underflow events
     class do_exception{};
@@ -115,6 +167,7 @@ namespace core {
     /// events
     class do_underflow{};
 
+// OPERATE WITH TYPE AS WITH NATIVE TYPE
     template<typename T, size_t n, size_t f, class op = do_overflow, class up = do_underflow>
     class as_native_proxy;
 
@@ -128,6 +181,27 @@ namespace core {
     {
         return as_native_proxy<T, n, f, op, up>(x);
     }
+
+// FORWARD DECLARATIONS FOR CLASS - TYPE PROMOTERS
+    template<typename T> class sin_of;
+    template<typename T> class cos_of;
+    template<typename T> class tan_of;
+
+    template<typename T> class asin_of;
+    template<typename T> class acos_of;
+    template<typename T> class atan_of;
+
+    template<typename T> class sinh_of;
+    template<typename T> class cosh_of;
+    template<typename T> class tanh_of;
+
+    template<typename T> class asinh_of;
+    template<typename T> class acosh_of;
+    template<typename T> class atanh_of;
+
+    template<typename T> class log_of;
+    template<typename T> class exp_of;
+    template<typename T> class sqrt_of;
 
     /// @brief fixed-point number and arithmetics
     /// @param storage_type built-in integral type representing a fixed-point number
@@ -546,10 +620,26 @@ namespace core {
             CONST_SQRT1_2, CONST_2SQRT2;
 
     // TYPES FOR ELEMENTARY_FUNCTIONS:
-        typedef typename get_<this_class>::log_type log_type;
-        typedef typename get_<this_class>::sqrt_type sqrt_type;
-        typedef typename get_<this_class>::sin_type sin_type;
-        typedef typename get_<this_class>::cos_type cos_type;
+        typedef typename log_of<this_class>::type log_type;
+        typedef typename sqrt_of<this_class>::type sqrt_type;
+
+        typedef typename sin_of<this_class>::type sin_type;
+        typedef typename cos_of<this_class>::type cos_type;
+        typedef typename tan_of<this_class>::type tan_type;
+
+        typedef typename asin_of<this_class>::type asin_type;
+        typedef typename acos_of<this_class>::type acos_type;
+        typedef typename atan_of<this_class>::type atan_type;
+
+        typedef typename exp_of<this_class>::type exp_type;
+        typedef typename sinh_of<this_class>::type sinh_type;
+        typedef typename cosh_of<this_class>::type cosh_type;
+
+        typedef typename asinh_of<this_class>::type asinh_type;
+        typedef typename acosh_of<this_class>::type acosh_type;
+
+        typedef typename atanh_of<this_class>::type atanh_type;
+        typedef typename tanh_of<this_class>::type tanh_type;
 
     private:
         word_type m_value;
@@ -636,29 +726,29 @@ namespace core {
 #include "./../../fixed_point_lib/src/details/numeric_limits.inl"
 
 // mathematical constants
-#define math_constant(name, val) \
+#define MATH_CONSTANT(name, val) \
     template<typename T, size_t n, size_t f, class op, class up> \
     core::fixed_point<T, n, f, op, up> const core::fixed_point<T, n, f, op, up>::##name(val);
 
-math_constant(CONST_E, 2.71828182845904523536)
-math_constant(CONST_1_LOG2E, 0.6931471805599453);
-math_constant(CONST_LOG2E, 1.44269504088896340736)
-math_constant(CONST_LOG10E, 0.434294481903251827651)
-math_constant(CONST_LOG102, 0.301029995663981195214)
-math_constant(CONST_LN2, 0.693147180559945309417)
-math_constant(CONST_LN10, 2.30258509299404568402)
-math_constant(CONST_2PI, 6.283185307179586)
-math_constant(CONST_PI, 3.14159265358979323846)
-math_constant(CONST_PI_2, 1.57079632679489661923)
-math_constant(CONST_PI_4, 0.785398163397448309616)
-math_constant(CONST_1_PI, 0.318309886183790671538)
-math_constant(CONST_2_PI, 0.636619772367581343076)
-math_constant(CONST_2_SQRTPI, 1.12837916709551257390)
-math_constant(CONST_SQRT2, 1.41421356237309504880)
-math_constant(CONST_SQRT1_2, 0.707106781186547524401)
-math_constant(CONST_2SQRT2, 2.82842712474619009760)
+MATH_CONSTANT(CONST_E, 2.71828182845904523536)
+MATH_CONSTANT(CONST_1_LOG2E, 0.6931471805599453);
+MATH_CONSTANT(CONST_LOG2E, 1.44269504088896340736)
+MATH_CONSTANT(CONST_LOG10E, 0.434294481903251827651)
+MATH_CONSTANT(CONST_LOG102, 0.301029995663981195214)
+MATH_CONSTANT(CONST_LN2, 0.693147180559945309417)
+MATH_CONSTANT(CONST_LN10, 2.30258509299404568402)
+MATH_CONSTANT(CONST_2PI, 6.283185307179586)
+MATH_CONSTANT(CONST_PI, 3.14159265358979323846)
+MATH_CONSTANT(CONST_PI_2, 1.57079632679489661923)
+MATH_CONSTANT(CONST_PI_4, 0.785398163397448309616)
+MATH_CONSTANT(CONST_1_PI, 0.318309886183790671538)
+MATH_CONSTANT(CONST_2_PI, 0.636619772367581343076)
+MATH_CONSTANT(CONST_2_SQRTPI, 1.12837916709551257390)
+MATH_CONSTANT(CONST_SQRT2, 1.41421356237309504880)
+MATH_CONSTANT(CONST_SQRT1_2, 0.707106781186547524401)
+MATH_CONSTANT(CONST_2SQRT2, 2.82842712474619009760)
 
-#undef math_constant
+#undef MATH_CONSTANT
 
 // redefinition for stuff from std namespace
 #include "./../../fixed_point_lib/src/details/ceil.inl"
@@ -668,20 +758,22 @@ math_constant(CONST_2SQRT2, 2.82842712474619009760)
 #include "./../../fixed_point_lib/src/details/round.inl"
 
 // CORDIC-based fixed-point implementation of elementary functions
+#include "./../../fixed_point_lib/src/CORDIC/lut/lut.hpp"
+
 #include "./../../fixed_point_lib/src/CORDIC/cos.inl"
 #include "./../../fixed_point_lib/src/CORDIC/sin.inl"
 #include "./../../fixed_point_lib/src/CORDIC/tan.inl"
 #include "./../../fixed_point_lib/src/CORDIC/log.inl"
 #include "./../../fixed_point_lib/src/CORDIC/exp.inl"
-#include "./../../fixed_point_lib/src/CORDIC/arccos.inl"
-#include "./../../fixed_point_lib/src/CORDIC/arcsin.inl"
-#include "./../../fixed_point_lib/src/CORDIC/arctan.inl"
+#include "./../../fixed_point_lib/src/CORDIC/acos.inl"
+#include "./../../fixed_point_lib/src/CORDIC/asin.inl"
+#include "./../../fixed_point_lib/src/CORDIC/atan.inl"
 #include "./../../fixed_point_lib/src/CORDIC/sqrt.inl"
 #include "./../../fixed_point_lib/src/CORDIC/sinh.inl"
 #include "./../../fixed_point_lib/src/CORDIC/cosh.inl"
 #include "./../../fixed_point_lib/src/CORDIC/tanh.inl"
-#include "./../../fixed_point_lib/src/CORDIC/arcsinh.inl"
-#include "./../../fixed_point_lib/src/CORDIC/arccosh.inl"
-#include "./../../fixed_point_lib/src/CORDIC/arctanh.inl"
+#include "./../../fixed_point_lib/src/CORDIC/asinh.inl"
+#include "./../../fixed_point_lib/src/CORDIC/acosh.inl"
+#include "./../../fixed_point_lib/src/CORDIC/atanh.inl"
 
 #endif
