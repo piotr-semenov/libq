@@ -3,9 +3,31 @@
 
 #include "./../../fixed_point_lib/src/CORDIC/lut/lut.hpp"
 
+#include <boost/type_traits/is_floating_point.hpp>
+
+#include <boost/integer.hpp>
+
+namespace core {
+    template<typename T>
+    class atan_of
+    {
+        BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+
+    public:
+        typedef T type;
+    };
+
+    template<typename T, size_t n, size_t f, class op, class up>
+    class atan_of<fixed_point<T, n, f, op, up> >
+    {
+    public:
+        typedef typename asin_of<fixed_point<T, n, f, op, up> >::type type;
+    }
+}
+
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::fixed_point<T, n, f, op, up>::atan_type atan(core::fixed_point<T, n, f, op, up> val)
+    typename core::atan_of<core::fixed_point<T, n, f, op, up> >::type atan(core::fixed_point<T, n, f, op, up> val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
         typedef fp::atan_type result_type;
