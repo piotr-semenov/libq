@@ -33,7 +33,7 @@ namespace std {
         assert(("arctanh: argument has to be from range [-1.0, 1.0]", std::fabs(val) <= 1.0));
 
         result_type x(std::log(val + 1u) - std::log(fp_type(1) - val));
-        core::as_native(x) >> 1u;
+        core::as_native(x) >>= 1u;
 
         return x;
     }

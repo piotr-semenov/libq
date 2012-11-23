@@ -24,7 +24,7 @@ namespace core {
 
     public:
         typedef fixed_point<
-            typename boost::uint_t<sqrt_info::total_bits>::least,
+            typename boost::uint_t<total_bits>::least,
             total_bits,
             fractional_bits,
             op,
@@ -37,7 +37,7 @@ namespace std {
     /// @brief computes square root by CORDIC-algorithm
     /// @ref page 11
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::sqrt_type<fixed_point<T, n, f, op, up> >::type sqrt(core::fixed_point<T, n, f, op, up> val)
+    typename core::sqrt_of<core::fixed_point<T, n, f, op, up> >::type sqrt(core::fixed_point<T, n, f, op, up> val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
 

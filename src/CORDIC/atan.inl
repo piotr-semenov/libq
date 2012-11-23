@@ -22,7 +22,7 @@ namespace core {
     {
     public:
         typedef typename asin_of<fixed_point<T, n, f, op, up> >::type type;
-    }
+    };
 }
 
 namespace std {

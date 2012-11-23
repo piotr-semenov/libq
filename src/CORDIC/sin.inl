@@ -45,13 +45,13 @@ namespace core {
         };
 
     public:
-        typedef typename boost::eval_if<can_expand, expanded, reduced>::type type;
+        typedef typename boost::mpl::eval_if<can_expand, expanded, reduced>::type type;
     };
 }
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::sin_of<fixed_point<T, n, f, op, up> >::type type sin(core::fixed_point<T, n, f, op, up> val)
+    typename core::sin_of<core::fixed_point<T, n, f, op, up> >::type sin(core::fixed_point<T, n, f, op, up> val)
     {
         BOOST_STATIC_ASSERT(n - f >= 3);
 

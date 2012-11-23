@@ -6,6 +6,7 @@
 #include <boost/type_traits/is_floating_point.hpp>
 
 #include <boost/integer.hpp>
+#include <boost/mpl/eval_if.hpp>
 
 namespace core {
     template<typename T>
@@ -50,7 +51,7 @@ namespace core {
         };
 
     public:
-        typename eval_if<can_expand, expanded, reduced>::type type;
+        typedef typename boost::mpl::eval_if<can_expand, expanded, reduced>::type type;
     };
 }
 

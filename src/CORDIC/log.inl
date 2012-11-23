@@ -9,6 +9,11 @@
 #include <boost/integer/static_log2.hpp>
 
 namespace core {
+    namespace {
+        using boost::static_unsigned_max;
+        using boost::static_log2;
+    }
+
     template<typename T>
     class log_of
     {
@@ -27,7 +32,7 @@ namespace core {
         struct can_expand
         {
             enum { value = (f != 0) &&
-                (n + log_info::extra_bits + 1u < std::numeric_limits<boost::intmax_t>::digits) };
+                (n + extra_bits + 1u < std::numeric_limits<boost::intmax_t>::digits) };
         };
 
         struct expanded
@@ -43,17 +48,17 @@ namespace core {
 
         struct same
         {
-            typedef operand_type type;
+            typedef fixed_point<T, n, f, op, up> type;
         };
 
     public:
-        typedef typename boost::eval_if<can_expand, expanded, same>::type type;
-    }
+        typedef typename boost::mpl::eval_if<can_expand, expanded, same>::type type;
+    };
 }
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::log_of<fixed_point<T, n, f, op, up> >::type log(core::fixed_point<T, n, f, op, up> val)
+    typename core::log_of<core::fixed_point<T, n, f, op, up> >::type log(core::fixed_point<T, n, f, op, up> val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
         typedef typename fp::log_type log_type;
