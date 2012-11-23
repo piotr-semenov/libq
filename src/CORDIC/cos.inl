@@ -18,35 +18,8 @@ namespace core {
     template<typename T, size_t n, size_t f, class op, class up>
     class cos_of<fixed_point<T, n, f, op, up> >
     {
-        struct can_expand
-        {
-            enum { value = (f + 1u + 1u < std::numeric_limits<boost::intmax_t>::digits) };
-        };
-
-        struct expanded
-        {
-            typedef fixed_point<
-                typename boost::int_t<f + 1u + 1u>::least,
-                f + 1u,
-                f,
-                op,
-                up
-            > type;
-        };
-
-        struct reduced
-        {
-            typedef fixed_point<
-                typename boost::int_t<f + 1u>::least,
-                f,
-                f - 1u,
-                op,
-                up
-            > type;
-        };
-
     public:
-        typedef typename boost::eval_if<can_expand, expanded, reduced>::type type;
+        typedef typename sin_of<fixed_point<T, n, f, op, up> >::type type;
     };
 }
 
