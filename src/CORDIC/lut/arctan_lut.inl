@@ -4,7 +4,7 @@
 namespace core { namespace cordic {
     /// @ref page 5, equation 7, m = 1 (circular coordinate system)
     template<size_t n, typename fp>
-    typename lut<n, fp> lut<n, fp>::build_arctan_lut()
+    typename lut<n, fp> lut<n, fp>::circular()
     {
         base_class table;
 
