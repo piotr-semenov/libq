@@ -4,15 +4,15 @@
 #ifndef INC_CORE_FIXED_POINT_HPP_
 #define INC_CORE_FIXED_POINT_HPP_
 
-#include "./../../fixed_point_lib/src/quotient.hpp"
-#include "./../../fixed_point_lib/src/product.hpp"
+#include "./quotient.hpp"
+#include "./product.hpp"
 
-#include "./../../fixed_point_lib/src/diff.hpp"
-#include "./../../fixed_point_lib/src/sum.hpp"
+#include "./diff.hpp"
+#include "./sum.hpp"
 
-#include "./../../fixed_point_lib/src/static_pow.hpp"
+#include "./static_pow.hpp"
 
-#include "./../../fixed_point_lib/src/as_native_proxy.hpp"
+#include "./as_native_proxy.hpp"
 
 #include <boost/static_assert.hpp>
 #include <boost/concept_check.hpp>
@@ -751,29 +751,29 @@ MATH_CONSTANT(CONST_2SQRT2, 2.82842712474619009760)
 #undef MATH_CONSTANT
 
 // redefinition for stuff from std namespace
-#include "./../../fixed_point_lib/src/details/ceil.inl"
-#include "./../../fixed_point_lib/src/details/fabs.inl"
-#include "./../../fixed_point_lib/src/details/floor.inl"
-#include "./../../fixed_point_lib/src/details/fmod.inl"
-#include "./../../fixed_point_lib/src/details/round.inl"
+#include "./details/ceil.inl"
+#include "./details/fabs.inl"
+#include "./details/floor.inl"
+#include "./details/fmod.inl"
+#include "./details/round.inl"
 
 // CORDIC-based fixed-point implementation of elementary functions
-#include "./../../fixed_point_lib/src/CORDIC/lut/lut.hpp"
+#include "./CORDIC/lut/lut.hpp"
 
-#include "./../../fixed_point_lib/src/CORDIC/cos.inl"
-#include "./../../fixed_point_lib/src/CORDIC/sin.inl"
-#include "./../../fixed_point_lib/src/CORDIC/tan.inl"
-#include "./../../fixed_point_lib/src/CORDIC/log.inl"
-#include "./../../fixed_point_lib/src/CORDIC/exp.inl"
-#include "./../../fixed_point_lib/src/CORDIC/acos.inl"
-#include "./../../fixed_point_lib/src/CORDIC/asin.inl"
-#include "./../../fixed_point_lib/src/CORDIC/atan.inl"
-#include "./../../fixed_point_lib/src/CORDIC/sqrt.inl"
-#include "./../../fixed_point_lib/src/CORDIC/sinh.inl"
-#include "./../../fixed_point_lib/src/CORDIC/cosh.inl"
-#include "./../../fixed_point_lib/src/CORDIC/tanh.inl"
-#include "./../../fixed_point_lib/src/CORDIC/asinh.inl"
-#include "./../../fixed_point_lib/src/CORDIC/acosh.inl"
-#include "./../../fixed_point_lib/src/CORDIC/atanh.inl"
+#include "./CORDIC/cos.inl"
+#include "./CORDIC/sin.inl"
+#include "./CORDIC/tan.inl"
+#include "./CORDIC/log.inl"
+#include "./CORDIC/exp.inl"
+#include "./CORDIC/acos.inl"
+#include "./CORDIC/asin.inl"
+#include "./CORDIC/atan.inl"
+#include "./CORDIC/sqrt.inl"
+#include "./CORDIC/sinh.inl"
+#include "./CORDIC/cosh.inl"
+#include "./CORDIC/tanh.inl"
+#include "./CORDIC/asinh.inl"
+#include "./CORDIC/acosh.inl"
+#include "./CORDIC/atanh.inl"
 
 #endif
