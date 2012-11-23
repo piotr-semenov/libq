@@ -37,9 +37,6 @@ namespace std {
     {
         typedef core::fixed_point<T, n, f, op, up> fp_type;
 
-        fp_type::sinh_type const a(std::sinh(val));
-        fp_type::cosh_type const b(std::cosh(val));
-
         return core::tanh_of<fp_type>::type(std::sinh(val) / std::cosh(val));
     }
 }
