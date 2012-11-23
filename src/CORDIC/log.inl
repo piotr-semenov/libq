@@ -2,9 +2,58 @@
 /// @ref see C. Baumann, "A simple and fast look-up table method to compute the
 /// exp(x) and ln(x) functions", 2004
 
+#include <boost/type_traits/is_floating_point.hpp>
+
+#include <boost/integer.hpp>
+#include <boost/integer/static_min_max.hpp>
+#include <boost/integer/static_log2.hpp>
+
+namespace core {
+    template<typename T>
+    class log_of
+    {
+        BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+
+    public:
+        typedef T type;
+    };
+
+    template<typename T, size_t n, size_t f, class op, class up>
+    class log_of<fixed_point<T, n, f, op, up> >
+    {
+        static size_t const extra_bits =
+            static_unsigned_max<static_log2<f>::value + 1u, n + static_log2<n>::value + 1u>::value;
+
+        struct can_expand
+        {
+            enum { value = (f != 0) &&
+                (n + log_info::extra_bits + 1u < std::numeric_limits<boost::intmax_t>::digits) };
+        };
+
+        struct expanded
+        {
+            typedef fixed_point<
+                typename boost::int_t<n + extra_bits + 1u>::least,
+                n + extra_bits,
+                f,
+                op,
+                up
+            > type;
+        };
+
+        struct same
+        {
+            typedef operand_type type;
+        };
+
+    public:
+        typedef typename boost::eval_if<can_expand, expanded, same>::type type;
+    }
+}
+
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::fixed_point<T, n, f, op, up>::log_type log(core::fixed_point<T, n, f, op, up> const& val)
+    typename core::log_of<fixed_point<T, n, f, op, up> >::type log(core::fixed_point<T, n, f, op, up> val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
         typedef typename fp::log_type log_type;
