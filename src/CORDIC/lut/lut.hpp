@@ -57,13 +57,13 @@ namespace core { namespace cordic {
     };
 }}
 
-#include "./../../../fixed_point_lib/src/CORDIC/lut/arctan_lut.inl"
-#include "./../../../fixed_point_lib/src/CORDIC/lut/arctanh_lut.inl"
+#include "arctan_lut.inl"
+#include "arctanh_lut.inl"
 
-#include "./../../../fixed_point_lib/src/CORDIC/lut/pow2_lut.inl"
-#include "./../../../fixed_point_lib/src/CORDIC/lut/inv_pow2_lut.inl"
+#include "pow2_lut.inl"
+#include "inv_pow2_lut.inl"
 
-#include "./../../../fixed_point_lib/src/CORDIC/lut/circular_scales.inl"
-#include "./../../../fixed_point_lib/src/CORDIC/lut/hyperbolic_scale.inl"
+#include "circular_scales.inl"
+#include "hyperbolic_scale.inl"
 
 #endif
