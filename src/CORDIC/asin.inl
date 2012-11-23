@@ -3,9 +3,60 @@
 
 #include "./../../fixed_point_lib/src/CORDIC/lut/lut.hpp"
 
+#include <boost/type_traits/is_floating_point.hpp>
+
+#include <boost/integer.hpp>
+
+namespace core {
+    template<typename T>
+    class asin_of
+    {
+        BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+
+    public:
+        typedef T type;
+    };
+
+    template<typename T, size_t n, size_t f, class op, class up>
+    class asin_of<fixed_point<T, n, f, op, up> >
+    {
+        static size_t const available_bits = std::numeric_limits<boost::intmax_t>::digits - f;
+
+        struct can_expand
+        {
+            enum { value = (available_bits > 2u) };
+        };
+
+        struct expanded
+        {
+            typedef fixed_point<
+                typename boost::int_t<f + 2u + 1u>::least,
+                f + 2u,
+                f,
+                op,
+                up
+            > type;
+        };
+
+        struct reduced
+        {
+            typedef fixed_point<
+                typename boost::int_t<f + 2u>::least,
+                f + available_bits,
+                f + available_bits - 2u,
+                op,
+                up
+            > type;
+        };
+
+    public:
+        typename eval_if<can_expand, expanded, reduced>::type type;
+    };
+}
+
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::fixed_point<T, n, f, op, up>::asin_type asin(core::fixed_point<T, n, f, op, up> val)
+    typename core::asin_of<core::fixed_point<T, n, f, op, up> >::type asin(core::fixed_point<T, n, f, op, up> val)
     {
         typedef core::fixed_point<T, n, f, op, up> fp;
         typedef typename fp::asin_type result_type;
