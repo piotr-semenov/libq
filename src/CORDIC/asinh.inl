@@ -34,7 +34,7 @@ namespace std {
         return result_type(
             std::log(
                 core::s(
-                    std::sqrt(val * val + 1)
+                    std::sqrt(val * val + 1u)
                 ) + val
             )
         );
