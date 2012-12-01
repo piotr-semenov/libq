@@ -20,19 +20,22 @@
     <ClCompile Include="..\product_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\range_cases.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="..\subtraction_cases.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\sum_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\as_native_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\std_ext_cases.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\el_functions_cases.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\range.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\precision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
