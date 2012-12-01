@@ -11,31 +11,31 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\division_cases.cpp">
+    <ClCompile Include="..\src\as_native_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\ordering_cases.cpp">
+    <ClCompile Include="..\src\division_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\product_cases.cpp">
+    <ClCompile Include="..\src\el_functions_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\subtraction_cases.cpp">
+    <ClCompile Include="..\src\ordering_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\as_native_cases.cpp">
+    <ClCompile Include="..\src\precision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\std_ext_cases.cpp">
+    <ClCompile Include="..\src\product_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\el_functions_cases.cpp">
+    <ClCompile Include="..\src\range.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\range.cpp">
+    <ClCompile Include="..\src\std_ext_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\precision.cpp">
+    <ClCompile Include="..\src\subtraction_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -1,9 +1,9 @@
 #define BOOST_TEST_STATIC_LINK
 
 #include <boost/test/unit_test.hpp>
-#include "./../../fixed_point_lib/src/fixed_point.hpp"
-
 #include <boost/random.hpp>
+
+#include "fixed_point.hpp"
 
 #include <ctime>
 
@@ -304,7 +304,7 @@ namespace core { namespace unit_tests {
 
     BOOST_AUTO_TEST_CASE(log)
     {
-        U(23,17,t1); PRECISION_TEST(t1, 1.0, FMAX(t1), log, 1E-3, "./log_Q6_17.dat");
+        U(23,17,t1); PRECISION_TEST(t1, 1.0, FMAX(t1), log, 1E-2, "./log_Q6_17.dat");
         U(32,16,t2); PRECISION_TEST(t2, 1.0, FMAX(t2), log, 1E-3, "./log_Q16_16.dat");
         S(43,20,t3); PRECISION_TEST(t3, 1E-2, FMAX(t3), log, 1E-4, "./log_Q23_20.dat");
         S(50,13,t4); PRECISION_TEST(t4, 1E-2, FMAX(t4), log, 1E-2, "./log_Q37_13.dat");

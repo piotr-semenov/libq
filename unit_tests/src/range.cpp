@@ -7,7 +7,7 @@
 #include <limits>
 #include <stdexcept>
 
-#include "./../../fixed_point_lib/src/fixed_point.hpp"
+#include "fixed_point.hpp"
 
 namespace core { namespace unit_tests {
     namespace {
