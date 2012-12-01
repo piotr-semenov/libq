@@ -41,7 +41,7 @@ namespace core {
         bool operator ==(this_class const& x) const{ return x.value() == this->value(); }
         bool operator ==(T x) const{ return x == this->value(); }
 
-#define checked_arithmetics(f, val) \
+#define CHECKED_ARITHMETICS(f, val) \
     fixed_point_class::handle_underflow( \
         this->value(), \
         fixed_point_class::handle_overflow(this->value() f val, op()), \
@@ -52,13 +52,13 @@ namespace core {
         /// from n bits of length
         this_class& operator +=(this_class const& x)
         {
-            checked_arithmetics(+=, x.value());
+            CHECKED_ARITHMETICS(+=, x.value());
 
             return *this;
         }
         this_class& operator +=(T x)
         {
-            checked_arithmetics(+=, x);
+            CHECKED_ARITHMETICS(+=, x);
 
             return *this;
         }
@@ -67,13 +67,13 @@ namespace core {
         /// from n bits of length (signed/unsigned).
         this_class& operator -=(this_class const& x)
         {
-            checked_arithmetics(-=, x.value());
+            CHECKED_ARITHMETICS(-=, x.value());
 
             return *this;
         }
         this_class& operator -=(T x)
         {
-            checked_arithmetics(-=, x);
+            CHECKED_ARITHMETICS(-=, x);
 
             return *this;
         }
@@ -82,13 +82,13 @@ namespace core {
         /// drawn from n bits of length.
         this_class& operator *=(this_class const& x)
         {
-            checked_arithmetics(*=, x.value());
+            CHECKED_ARITHMETICS(*=, x.value());
 
             return *this;
         }
         this_class& operator *=(T x)
         {
-            checked_arithmetics(*=, x);
+            CHECKED_ARITHMETICS(*=, x);
 
             return *this;
         }
@@ -97,17 +97,17 @@ namespace core {
         /// from n bits of length.
         this_class& operator /=(this_class const& x)
         {
-            checked_arithmetics(/=, x.value());
+            CHECKED_ARITHMETICS(/=, x.value());
 
             return *this;
         }
         this_class& operator /=(T x)
         {
-            checked_arithmetics(/=, x);
+            CHECKED_ARITHMETICS(/=, x);
 
             return *this;
         }
-#undef checked_arithmetics
+#undef CHECKED_ARITHMETICS
 
         /// @brief mod operator. It is the same as one for native types is.
         this_class& operator %=(this_class const& x)
