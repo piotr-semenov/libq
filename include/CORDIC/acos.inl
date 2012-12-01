@@ -1,8 +1,6 @@
 /// @brief provides CORDIC for arccos function
 /// @ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 
-#include "./../../fixed_point_lib/src/CORDIC/lut/lut.hpp"
-
 #include <boost/type_traits/is_floating_point.hpp>
 
 #include <boost/integer.hpp>

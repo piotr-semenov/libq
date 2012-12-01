@@ -723,7 +723,7 @@ namespace core {
     };
 }
 
-#include "./../../fixed_point_lib/src/details/numeric_limits.inl"
+#include "./details/numeric_limits.inl"
 
 // mathematical constants
 #define MATH_CONSTANT(name, val) \

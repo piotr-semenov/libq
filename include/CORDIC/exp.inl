@@ -2,8 +2,6 @@
 /// @ref see C. Baumann, "A simple and fast look-up table method to compute the
 /// exp(x) and ln(x) functions", 2004
 
-#include "./lut/lut.hpp"
-
 #include <boost/foreach.hpp>
 #include <boost/range/irange.hpp>
 
