@@ -343,13 +343,8 @@ namespace core {
         fixed_point(fixed_point<T, n1, f1, op1, up1> const& x)
             :    m_value(this_class::normalize<T, f1>(x.value())){}
 
-        template<typename T>
-        operator T() const
-        {
-            BOOST_STATIC_ASSERT((boost::is_arithmetic<T>::value));
-
-            return static_cast<T>(to_float()); 
-        }
+        inline operator float() const{ return float(to_float()); }
+        inline operator double() const{ return to_float(); }
 
         template<typename T>
         void operator =(T const x)
@@ -416,10 +411,7 @@ namespace core {
         }
 
         /// @brief converts fixed-point to float
-        double to_float() const
-        {
-            return static_cast<double>(value()) / this_class::scale;
-        }
+        inline double to_float() const{ return static_cast<double>(value()) / this_class::scale; }
 
         /// @brief wraps specified integral value as "fixed-point instance"
         template<typename T>
