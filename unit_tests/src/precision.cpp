@@ -33,19 +33,16 @@ namespace std {
 }
 
 namespace core { namespace unit_tests {
-    namespace {
-        using core::S_fixed_point;
-        using core::U_fixed_point;
+    namespace c = core;
 
-        double r(double low, double high)
-        {
-            static boost::mt19937 gen(size_t(std::time(0)));
-            static boost::uniform_01<boost::mt19937> uniform(gen);
-            if (low > high) {
-                throw std::exception("illegal range");
-            }
-            return low + uniform() * (high - low);
+    double r(double low, double high)
+    {
+        static boost::mt19937 gen(size_t(std::time(0)));
+        static boost::uniform_01<boost::mt19937> uniform(gen);
+        if (low > high) {
+            throw std::exception("illegal range");
         }
+        return low + uniform() * (high - low);
     }
 
     BOOST_AUTO_TEST_SUITE(Precision)
@@ -54,8 +51,8 @@ namespace core { namespace unit_tests {
 #define FMIN(type) double(std::numeric_limits<type>::min())
 #define FMAX(type) double(std::numeric_limits<type>::max())
 
-#define U(n, f, name) typedef UOU_fixed_point<n, f>::type name
-#define S(n, f, name) typedef SOU_fixed_point<n, f>::type name
+#define U(n, f, name) typedef c::UOU_fixed_point<n, f>::type name
+#define S(n, f, name) typedef c::SOU_fixed_point<n, f>::type name
 
 #ifdef LOGGING
 #define INIT_LOGGER(path) \
@@ -101,7 +98,7 @@ namespace core { namespace unit_tests {
                 BOOST_CHECK_MESSAGE(false, message_stream.str()); \
             } \
         } \
-        catch(std::exception){ \
+        catch(std::exception) { \
             std::stringstream message_stream; \
             message_stream \
                 << u1 << " " << u2; \
@@ -144,7 +141,7 @@ namespace core { namespace unit_tests {
                 BOOST_CHECK_MESSAGE(false, message_stream.str()); \
             } \
         } \
-        catch(std::exception){ \
+        catch(std::exception) { \
             std::stringstream message_stream; \
             message_stream \
                 << u1 << " " << u2; \
@@ -187,7 +184,7 @@ namespace core { namespace unit_tests {
                 BOOST_CHECK_MESSAGE(false, message_stream.str()); \
             } \
         } \
-        catch(std::exception){ \
+        catch(std::exception) { \
             std::stringstream message_stream; \
             message_stream \
                 << u1 << " " << u2; \
@@ -241,7 +238,7 @@ namespace core { namespace unit_tests {
                 BOOST_CHECK_MESSAGE(false, message_stream.str()); \
             } \
         } \
-        catch(std::exception){ \
+        catch(std::exception) { \
             std::stringstream message_stream; \
             message_stream \
                 << u1 << " " << u2; \
@@ -291,7 +288,7 @@ namespace core { namespace unit_tests {
                 BOOST_CHECK_MESSAGE(false, message_stream.str()); \
             } \
         } \
-        catch(std::exception){ \
+        catch(std::exception) { \
             std::stringstream message_stream; \
             message_stream \
                 << "Q" << (t::total - t::fractionals) << "." << t::fractionals << " = " \

@@ -10,12 +10,7 @@
 #include "./../../fixed_point_lib/src/number.hpp"
 
 namespace utils { namespace unit_tests {
-    namespace {
-        using utils::S_number;
-        using utils::SOU_number;
-
-        using utils::U_number;
-    }
+    namespace c = core;
 
     BOOST_AUTO_TEST_SUITE(Division)
 
@@ -27,10 +22,10 @@ namespace utils { namespace unit_tests {
     /// so, fixed-point alignment has to be failed during fixed-point numbers division
     BOOST_AUTO_TEST_CASE(positiveOverflowCheck)
     {
-        SOU_number<28, 20>::type const a(-230.2);
-        SOU_number<28, 20>::type const b(0.0001);
-        SOU_number<38, 4>::type const c(100123);
-        SOU_number<38, 4>::type const d(255);
+        c::SOU_number<28, 20>::type const a(-230.2);
+        c::SOU_number<28, 20>::type const b(0.0001);
+        c::SOU_number<38, 4>::type const c(100123);
+        c::SOU_number<38, 4>::type const d(255);
 
         try {
             a / b;
@@ -55,9 +50,9 @@ namespace utils { namespace unit_tests {
     /// check a precision of fixed-point division by several cases with floating-point numbers
     BOOST_AUTO_TEST_CASE(legalDivision)
     {
-        S_number<28, 14>::type const a(-1.232);
-        S_number<28, 20>::type const b(-2.13245);
-        U_number<34, 19>::type const c(1201.232);
+        c::S_number<28, 14>::type const a(-1.232);
+        c::S_number<28, 20>::type const b(-2.13245);
+        c::U_number<34, 19>::type const c(1201.232);
 
         float c12(a / b);
         float c21(b / a);
