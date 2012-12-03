@@ -1,5 +1,4 @@
 #define BOOST_TEST_STATIC_LINK
-#define BOOST_TEST_MODULE FIXED_POINT_LIB_COMMON_USE_CASES
 
 #include <boost/test/unit_test.hpp>
 
