@@ -36,22 +36,20 @@
 /// quotient/summand types, CORDIC implementation for couple of widely-used elementary
 /// functions
 namespace core {
-    namespace {
-        using boost::mpl::bool_;
-
+    namespace details {
         template<typename operand_type1, typename operand_type2>
-        class product_details
+        class product
         {
         public:
             // in case if product is a closed operation
             static operand_type1 perform(operand_type1 const& a, operand_type2 const& b,
-                bool_<true>)
+                boost::mpl::bool_<true>)
             {
                 struct chooser
                 {
                     enum { value = std::numeric_limits<operand_type1>::is_signed };
                 };
-                typedef typename if_<chooser, boost::intmax_t, boost::uintmax_t>::type
+                typedef typename boost::mpl::if_<chooser, boost::intmax_t, boost::uintmax_t>::type
                     max_type;
                 static int const left_bits = std::numeric_limits<max_type>::digits -
                     std::numeric_limits<operand_type1>::digits - (operand_type2::total -
@@ -74,7 +72,7 @@ namespace core {
 
             // in case if product is not a closed operation
             static typename product_of<operand_type1, operand_type2>::type
-                perform(operand_type1 const& a, operand_type2 const& b, bool_<false>)
+                perform(operand_type1 const& a, operand_type2 const& b, boost::mpl::bool_<false>)
             {
                 // overflow is impossible
                 typedef product_of<operand_type1, operand_type2> info;
@@ -86,19 +84,18 @@ namespace core {
         };
 
         template<typename operand_type1, typename operand_type2>
-        class division_details
+        class division
         {
         public:
             // in case if division is a closed operation
             static operand_type1 perform(operand_type1 const& a, operand_type2 const& b,
-                bool_<true>)
+                boost::mpl::bool_<true>)
             {
-                using boost::mpl::bool_;
                 struct chooser
                 {
                     enum { value = std::numeric_limits<operand_type1>::is_signed };
                 };
-                typedef typename if_<chooser, boost::intmax_t, boost::uintmax_t>::type
+                typedef typename boost::mpl::if_<chooser, boost::intmax_t, boost::uintmax_t>::type
                     max_type;
                 static size_t const left_bits = std::numeric_limits<max_type>::digits -
                     std::numeric_limits<operand_type1>::digits;
@@ -121,7 +118,7 @@ namespace core {
 
             // in case division is not a closed operation
             static typename quotient_of<operand_type1, operand_type2>::type
-                perform(operand_type1 const& a, operand_type2 const& b, bool_<false>)
+                perform(operand_type1 const& a, operand_type2 const& b, boost::mpl::bool_<false>)
             {
                 // overflow, underflow are impossible
                 typedef quotient_of<operand_type1, operand_type2> info;
@@ -548,10 +545,10 @@ namespace core {
         template<typename T>
         inline typename product_of<this_class, T>::type operator *(T const& x) const
         {
-            return product_details<this_class, this_class>::perform(
+            return details::product<this_class, this_class>::perform(
                 *this,
                 this_class(x),
-                bool_<product_of<this_class, this_class>::is_closed::value>()
+                boost::mpl::bool_<product_of<this_class, this_class>::is_closed::value>()
             );
         }
         template<typename T1, size_t n1, size_t f1, class op1, class up1>
@@ -560,10 +557,10 @@ namespace core {
         {
             typedef fixed_point<T1, n1, f1, op1, up1> operand_type;
 
-            return product_details<this_class, operand_type>::perform(
+            return details::product<this_class, operand_type>::perform(
                 *this,
                 x,
-                bool_<product_of<this_class, operand_type>::is_closed::value>()
+                boost::mpl::bool_<product_of<this_class, operand_type>::is_closed::value>()
             );
         }
         template<typename T>
@@ -583,10 +580,10 @@ namespace core {
         {
             typedef fixed_point<T1, n1, f1, op1, up1> operand_type;
 
-            return division_details<this_class, operand_type>::perform(
+            return details::division<this_class, operand_type>::perform(
                 *this,
                 x,
-                bool_<quotient_of<this_class, operand_type>::is_closed::value>()
+                boost::mpl::bool_<quotient_of<this_class, operand_type>::is_closed::value>()
             );
         }
         template<typename T>
@@ -653,10 +650,10 @@ namespace core {
         friend class as_native_proxy<storage_type, n, f, op, up>;
 
         template<typename operand_type1, typename operand_type2>
-        friend class product_details;
+        friend class details::product;
 
         template<typename operand_type1, typename operand_type2>
-        friend class division_details;
+        friend class details::division;
     };
 
     /// @brief type class in case of signed integral storages
