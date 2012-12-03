@@ -165,7 +165,7 @@ namespace core {
     class do_underflow{};
 
 // OPERATE WITH TYPE AS WITH NATIVE TYPE
-    template<typename T, size_t n, size_t f, class op = do_overflow, class up = do_underflow>
+    template<typename T, size_t n, size_t f, class op, class up>
     class as_native_proxy;
 
     /// @brief just an id map in case of floating-point types
