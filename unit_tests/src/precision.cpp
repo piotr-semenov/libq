@@ -33,8 +33,6 @@ namespace std {
 }
 
 namespace core { namespace unit_tests {
-    namespace c = core;
-
     double r(double low, double high)
     {
         static boost::mt19937 gen(size_t(std::time(0)));
@@ -51,8 +49,8 @@ namespace core { namespace unit_tests {
 #define FMIN(type) double(std::numeric_limits<type>::min())
 #define FMAX(type) double(std::numeric_limits<type>::max())
 
-#define U(n, f, name) typedef c::UOU_fixed_point<n, f>::type name
-#define S(n, f, name) typedef c::SOU_fixed_point<n, f>::type name
+#define U(n, f, name) typedef core::UOU_fixed_point<n, f>::type name
+#define S(n, f, name) typedef core::SOU_fixed_point<n, f>::type name
 
 #ifdef LOGGING
 #define INIT_LOGGER(path) \

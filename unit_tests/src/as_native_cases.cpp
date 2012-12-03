@@ -10,8 +10,6 @@
 #include "./../../fixed_point_lib/src/as_native_proxy.hpp"
 
 namespace core { namespace unit_tests {
-    namespace c = core;
-
     BOOST_AUTO_TEST_SUITE(as_native)
 
     /// idea of test:
@@ -22,11 +20,11 @@ namespace core { namespace unit_tests {
     /// so, fixed-point alignment has to be failed during fixed-point numbers division
     BOOST_AUTO_TEST_CASE(bitCheck)
     {
-        c::S_fixed_point<28, 20>::type a(-2.302);
-        c::S_fixed_point<28, 2>::type b(1000123);
-        c::S_fixed_point<38, 4>::type c(10123);
+        core::S_fixed_point<28, 20>::type a(-2.302);
+        core::S_fixed_point<28, 2>::type b(1000123);
+        core::S_fixed_point<38, 4>::type c(10123);
 
-        c::as_native(a) += (1u << 20);
+        core::as_native(a) += (1u << 20);
         double const value = static_cast<double>(a);
         as_native(b) /= 23;
     }

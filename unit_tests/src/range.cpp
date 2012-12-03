@@ -10,8 +10,6 @@
 #include "fixed_point.hpp"
 
 namespace core { namespace unit_tests {
-    namespace c = core;
-
     BOOST_AUTO_TEST_SUITE(Range)
 
     /// test 'division_checkRange':
@@ -20,7 +18,7 @@ namespace core { namespace unit_tests {
     BOOST_AUTO_TEST_CASE(division_check_range)
     {
 #define MAX(n, f) std::numeric_limits<S_fixed_point<n, f>::type>::max()
-#define MIN(n, f) c::SOU_fixed_point<n, f>::type::wrap(1)
+#define MIN(n, f) core::SOU_fixed_point<n, f>::type::wrap(1)
 
 #define PRECISION_CHECK(fp, val, precision, msg) \
     BOOST_CHECK_MESSAGE(std::fabs(double(fp) - val) < precision, msg);
