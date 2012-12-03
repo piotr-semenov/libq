@@ -1,4 +1,5 @@
 #define BOOST_TEST_STATIC_LINK
+#define BOOST_TEST_MODULE FIXED_POINT_LIB_UNIT_TESTS
 
 #include <boost/test/unit_test.hpp>
 #include <boost/integer.hpp>
@@ -6,27 +7,27 @@
 #include <limits>
 #include <string>
 
-#include "./../../fixed_point_lib/src/number.hpp"
-#include "./../../fixed_point_lib/src/as_native_proxy.hpp"
+#include "./fixed_point.hpp"
+#include "./as_native_proxy.hpp"
 
 namespace core { namespace unit_tests {
     BOOST_AUTO_TEST_SUITE(as_native)
 
-    /// idea of test:
-    /// 1. we choose two fixed-number formats [t1, f1] and [t2, f2] those satisfy:
-    ///    t1 = t2 and f1 >> f2
-    /// 2. we assign first format to variable A and second one to variable B
-    /// 3. B has such value that (B << (f1 - f2)) is out of t1 dynamic interval bounds
-    /// so, fixed-point alignment has to be failed during fixed-point numbers division
-    BOOST_AUTO_TEST_CASE(bitCheck)
-    {
+    BOOST_AUTO_TEST_CASE(as_native)
+    { 
         core::S_fixed_point<28, 20>::type a(-2.302);
         core::S_fixed_point<28, 2>::type b(1000123);
         core::S_fixed_point<38, 4>::type c(10123);
 
         core::as_native(a) += (1u << 20);
-        double const value = static_cast<double>(a);
-        as_native(b) /= 23;
+        core::as_native(b) /= 29;
+        BOOST_CHECK_MESSAGE(std::fabs(double(a) + 1.302) < 1E-4, "as_native operator += has a bug");
+        BOOST_CHECK_MESSAGE(size_t(~core::as_native(b)) == 268297507, "as_native operator ~ has a bug");
+        BOOST_CHECK_MESSAGE(size_t(double(b)) == 34487, "as_native operator /= has a bug");
+
+        long const x = core::as_native(a) + 23u;
+        long const y = 23u + core::as_native(a); 
+        BOOST_CHECK_MESSAGE(x == -1365223 && y == -1365223, "as_native operator + has a bug");
     }
 
     BOOST_AUTO_TEST_SUITE_END()
