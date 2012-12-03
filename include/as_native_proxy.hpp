@@ -128,12 +128,7 @@ namespace core {
         OPERATOR(&);
 #undef OPERATOR
 
-        this_class& operator ~()
-        {
-            this->m_value ^= boost::low_bits_mask_t<n>::value;
-
-            return *this;
-        }
+        T operator ~() const{ return this->m_value ^ T(boost::low_bits_mask_t<n>::sig_bits); }
 
     private:
         T& m_value;
