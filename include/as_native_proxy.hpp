@@ -4,6 +4,7 @@
 #define INC_CORE_AS_NATIVE_PROXY_HPP_
 
 #include <boost/integer/integer_mask.hpp>
+#include <boost/noncopyable.hpp>
 
 namespace core {
     template<typename T, size_t n, size_t f, class op, class up>
@@ -12,6 +13,7 @@ namespace core {
     /// @brief proxy class for dealing with fixed-point numbers as with integers
     template<typename T, size_t n, size_t f, class op, class up>
     class as_native_proxy
+        :    public boost::noncopyable
     {
         typedef as_native_proxy<T, n, f, op, up> this_class;
         typedef fixed_point<T, n, f, op, up> fixed_point_class;
