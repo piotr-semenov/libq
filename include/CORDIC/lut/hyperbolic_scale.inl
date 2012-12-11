@@ -6,13 +6,12 @@ namespace core { namespace cordic {
     {
         double scale(1.0);
 
-        size_t num(0);
         size_t repeated(4u);
         BOOST_FOREACH(size_t i, boost::irange<size_t>(1, n, 1))
         {
-            scale *= std::sqrt(1 - std::powl(2.0, -2.0 * i));
+            scale *= std::sqrt(1 - std::pow(2.0, -2.0 * i));
             if (i == repeated && i != n - 1) {
-                scale *= std::sqrt(1 - std::powl(2.0, -2.0 * i++));
+                scale *= std::sqrt(1 - std::pow(2.0, -2.0 * i++));
 
                 repeated = 3u * repeated  + 1u;
             }
