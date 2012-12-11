@@ -8,7 +8,7 @@ namespace core { namespace cordic {
 
         BOOST_FOREACH(size_t i, boost::irange<size_t>(0, n, 1))
         {
-            scale *= std::sqrt(1.0 + std::powl(2.0, -2.0 * i));
+            scale *= std::sqrt(1.0 + std::pow(2.0, -2.0 * i));
         }
 
         return scale;
@@ -21,7 +21,7 @@ namespace core { namespace cordic {
 
         BOOST_FOREACH(size_t i, boost::irange<size_t>(0, n, 1))
         {
-            scales[i] = std::sqrt(1.0 + std::powl(2.0, -2.0 * i));
+            scales[i] = std::sqrt(1.0 + std::pow(2.0, -2.0 * i));
         }
 
         return this_class(scales);
