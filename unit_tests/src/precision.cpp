@@ -75,7 +75,7 @@ namespace core { namespace unit_tests {
 #define PRECISION_TEST(t, error, path) \
 { \
     INIT_LOGGER(path); \
-    BOOST_FOREACH(size_t it, boost::irange<size_t>(0, ITERATIONS, 1)) { \
+    for (size_t it(0); it != ITERATIONS; ++it) { \
     /* shortening range not to take care about rounding errors at the bounds */ \
         double u1 = r(FMIN(t) + 1u, FMAX(t) - 1u); \
         double u2 = r(FMIN(t) + 1u, FMAX(t) - 1u); \
@@ -119,7 +119,7 @@ namespace core { namespace unit_tests {
 #define PRECISION_TEST(t, error, path) \
 { \
     INIT_LOGGER(path); \
-    BOOST_FOREACH(size_t it, boost::irange<size_t>(0, ITERATIONS, 1)) { \
+    for (size_t it(0); it != ITERATIONS; ++it) { \
     /* shortening range not to take care about rounding errors at the bounds */ \
         double u1 = r(FMIN(t) + 1u, FMAX(t) - 1u); \
         double u2 = r(FMIN(t) + 1u, FMAX(t) - 1u); \
@@ -162,7 +162,7 @@ namespace core { namespace unit_tests {
 #define PRECISION_TEST(t1, t2, error, path) \
 { \
     INIT_LOGGER(path); \
-    BOOST_FOREACH(size_t it, boost::irange<size_t>(0, ITERATIONS, 1)) { \
+    for (size_t it(0); it != ITERATIONS; ++it) { \
         double u1 = r(FMIN(t1), FMAX(t1)); \
         double u2 = r(FMIN(t2), FMAX(t2)); \
         \
@@ -210,7 +210,7 @@ namespace core { namespace unit_tests {
 #define PRECISION_TEST(t1, t2, error, path) \
 { \
     INIT_LOGGER(path); \
-    BOOST_FOREACH(size_t it, boost::irange<size_t>(0, ITERATIONS, 1)) { \
+    for (size_t it(0); it != ITERATIONS; ++it) { \
         double u1 = r(FMIN(t1), FMAX(t1)); \
         double u2 = r(FMIN(t2), FMAX(t2)); \
         if (u2 == 0 || t2(u2).value() == 0) { \
@@ -262,7 +262,7 @@ namespace core { namespace unit_tests {
 #define PRECISION_TEST(t, low, high, f, error, path) \
 { \
     INIT_LOGGER(path); \
-    BOOST_FOREACH(size_t i, boost::irange<size_t>(0, ITERATIONS, 1)) \
+    for (size_t i(0); i != ITERATIONS; ++i) \
     { \
         double const u(r(low, high)); \
         try { \
