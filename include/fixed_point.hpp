@@ -15,7 +15,6 @@
 #include "./as_native_proxy.hpp"
 
 #include <boost/static_assert.hpp>
-#include <boost/concept_check.hpp>
 
 #include <boost/integer.hpp>
 #include <boost/cstdint.hpp>
@@ -37,6 +36,9 @@
 /// functions
 namespace core {
     namespace details {
+        template<typename T>
+        T id(T val){ return val; }
+
         template<typename operand_type1, typename operand_type2>
         class product
         {
@@ -210,7 +212,7 @@ namespace core {
     template<typename storage_type, size_t n, size_t f, class op, class up>
     class fixed_point
     {
-        BOOST_CONCEPT_ASSERT((boost::IntegerConcept<storage_type>));
+        BOOST_STATIC_ASSERT((boost::is_integral<storage_type>::value));
 
         BOOST_STATIC_ASSERT((n - f >= 0));
         BOOST_STATIC_ASSERT((n <= std::numeric_limits<storage_type>::digits));
@@ -245,14 +247,14 @@ namespace core {
         {
             word_type u(0);
 
-            if (is_signed) {
+            if (details::id(is_signed)) {
                 if (val > boost::intmax_t(bounds::max)) {
                     u = static_cast<word_type>((val & bounds::max) - bounds::max);
                 }
                 else {
                     int const sign_bit(val > 0 ? 1 : -1);
-                    u = sign_bit * static_cast<word_type>((sign_bit * val) &
-                        bounds::max);
+                    u = word_type(sign_bit * static_cast<word_type>((sign_bit * val) &
+                        bounds::max));
                 }
             }
             else {
@@ -265,7 +267,7 @@ namespace core {
     // UNDERFLOW HANDLERS
         // handles underflow event with exception raising
         template<typename U, typename V>
-        static V handle_underflow(U was, V become, do_underflow)
+        static V handle_underflow(U, V become, do_underflow)
         {
             return become;
         }
@@ -336,7 +338,7 @@ namespace core {
                     )
                  ){}
 
-        explicit fixed_point(this_class const& x)
+        fixed_point(this_class const& x)
             :    m_value(x.value()){}
 
         template<typename T, size_t n1, size_t f1, class op1, class up1>
@@ -388,12 +390,12 @@ namespace core {
         template<typename T, size_t f1>
         static word_type normalize(T const x)
         {
-            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
+            BOOST_STATIC_ASSERT((boost::is_integral<T>::value));
 
             static size_t const shifts = (fractionals > f1) ? (fractionals - f1) :
                 (f1 - fractionals);
 
-            if (fractionals > f1) {
+            if (details::id(fractionals > f1)) {
                 boost::mpl::if_c<is_signed, boost::intmax_t, boost::uintmax_t>::type
                     val(x);
                 // overflow is possible
@@ -417,7 +419,7 @@ namespace core {
         template<typename T>
         static this_class wrap(T const val)
         {
-            BOOST_CONCEPT_ASSERT((boost::IntegerConcept<T>));
+            BOOST_STATIC_ASSERT((boost::is_integral<T>::value));
             this_class x;
 
             x.value(word_type(val));
@@ -720,7 +722,7 @@ namespace core {
     core::fixed_point<T, n, f, op, up> const core::fixed_point<T, n, f, op, up>::##name(val);
 
 MATH_CONSTANT(CONST_E, 2.71828182845904523536)
-MATH_CONSTANT(CONST_1_LOG2E, 0.6931471805599453);
+MATH_CONSTANT(CONST_1_LOG2E, 0.6931471805599453)
 MATH_CONSTANT(CONST_LOG2E, 1.44269504088896340736)
 MATH_CONSTANT(CONST_LOG10E, 0.434294481903251827651)
 MATH_CONSTANT(CONST_LOG102, 0.301029995663981195214)
