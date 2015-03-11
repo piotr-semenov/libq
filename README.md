@@ -26,3 +26,5 @@ numbers (CORDIC-based algorithms);
 to achieve max possible precision of the result;
 7.	Lib is easy-scalable for any computation platform (24-bit, 28-bit, 32-bit,
 64-bit, 128-bit and so on).
+8. Lib allows to capture the numbers range explicitly. For example, using
+wordlength = 10 and fractional bits = 32, we define the pre-factor 2^-22.
