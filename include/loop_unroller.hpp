@@ -4,7 +4,7 @@
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
 /*!
- @file fixed_point.hpp
+ @file loop_unroller.hpp
 
  Provides the loop unroller to improve the generated code performance. It works nice with closures and
  functor objects.
