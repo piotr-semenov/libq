@@ -215,14 +215,13 @@ template<typename T> class sqrt_of;
  \tparam n word length excepting the sign bit if existed. Note, if storage_type is signed then bits count is (n+1)
  \tparam f number of fractional bits. Note, f can be greater than n. Note, the number of integer bits is just max(n-f, 0).
  \tparam op overflow policy (actions to do if overflow occurred)
- \tparam up underflow policy (actions to do if underflow occured)
+ \tparam up underflow policy (actions to do if underflow occurred)
 */
 template<typename storage_type, size_t n, size_t f, class op, class up>
 class fixed_point
 {
     static_assert(std::is_integral<storage_type>::value);
     static_assert(n <= std::numeric_limits<storage_type>::digits);
-
 
     typedef fixed_point<storage_type, n, f, op, up> this_class;
 
@@ -358,7 +357,7 @@ public:
     template<typename T>
     void operator =(T const x)
     {
-        BOOST_STATIC_ASSERT((boost::is_arithmetic<T>::value));
+        static_assert(std::is_arithmetic<T>::value));
 
         this->value(convert_from(x)); 
     }
@@ -384,7 +383,7 @@ public:
     template<typename T>
     static word_type convert_from(T const x)
     {
-        BOOST_STATIC_ASSERT((boost::is_arithmetic<T>::value));
+        static_assert(std::is_arithmetic<T>::value);
 
         if (x > 0.0) {
             return word_type(std::floor(double(x) * this_class::scale + 0.5));
@@ -397,7 +396,7 @@ public:
     template<typename T, size_t f1>
     static word_type normalize(T const x)
     {
-        BOOST_STATIC_ASSERT((boost::is_integral<T>::value));
+        static_assert(std::is_integral<T>::value);
 
         static size_t const shifts = (fractionals > f1) ? (fractionals - f1) :
             (f1 - fractionals);
@@ -426,7 +425,7 @@ public:
     template<typename T>
     static this_class wrap(T const val)
     {
-        BOOST_STATIC_ASSERT((boost::is_integral<T>::value));
+        static_assert(std::is_integral<T>::value);
         this_class x;
 
         x.value(word_type(val));
