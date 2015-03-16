@@ -211,12 +211,18 @@ template<typename T> class exp_of;
 template<typename T> class sqrt_of;
 
 /*!
- \brief fixed-point number and its arithmetics. It allows the formats like UQn.f for unsigned numbers and Qn.f for signed ones
- \tparam storate_type built-in integral type to represent a fixed-point number
- \tparam n word length excepting the sign bit if existed. Note, if storage_type is signed then bits count is (n+1)
- \tparam f number of fractional bits. Note, f can be greater than n. Note, the number of integer bits is just max(n-f, 0).
- \tparam op overflow policy (actions to do if overflow occurred)
- \tparam up underflow policy (actions to do if underflow occurred)
+ \brief fixed-point number and its arithmetics. It allows the formats like UQm._f for unsigned numbers and Qm._f for signed ones,
+ where \f$m = \_f + max(\_n - \_f, 0)\f$.
+ \tparam _storate_type built-in integral type to represent a fixed-point number.
+ \tparam _n number of significant bits (except the sign bit).
+ \remark note, if storage_type is signed then number of used bits is \f$(\_n+1)\f$.
+ \tparam _f number of fractional bits.
+ \remark note, if \f$\_f \geq \_n\f$ then number has fixed pre-scale \f$2^{\_n - \_f}\f$.
+ \remark note, the number of integer bits is \f$\max(\_n-\_f, 0)\f$.
+ \tparam _op overflow policy specifying the actions to do if overflow occurred
+ \tparam _up underflow policy specifying the actions to do if underflow occurred
+
+ \ref see http://en.wikipedia.org/wiki/Q_(number_format) for details
 */
 template<typename _storage_type, size_t _n, size_t _f, class _op, class _up>
 class fixed_point
