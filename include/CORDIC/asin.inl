@@ -6,7 +6,7 @@
 #include <boost/integer.hpp>
 #include <boost/mpl/eval_if.hpp>
 
-namespace core {
+namespace libq {
     template<typename T>
     class asin_of
     {
@@ -55,11 +55,11 @@ namespace core {
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::asin_of<core::fixed_point<T, n, f, op, up> >::type asin(core::fixed_point<T, n, f, op, up> val)
+    typename libq::asin_of<libq::fixed_point<T, n, f, op, up> >::type asin(libq::fixed_point<T, n, f, op, up> val)
     {
-        typedef core::fixed_point<T, n, f, op, up> fp;
+        typedef libq::fixed_point<T, n, f, op, up> fp;
         typedef typename fp::asin_type result_type;
-        typedef core::cordic::lut<result_type::fractionals, result_type> lut;
+        typedef libq::cordic::lut<result_type::fractionals, result_type> lut;
 
         assert(("argument has to be from interval [-1.0, 1.0]", std::fabs(val) <= fp(1.0)));
         if (std::fabs(val) > fp(1.0)) {

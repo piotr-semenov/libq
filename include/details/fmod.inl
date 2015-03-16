@@ -3,10 +3,10 @@
 namespace std {
     /// @brief std::fmod computes fixed-point remainder of double(x)/double(y)
     template<typename T, size_t n, size_t f, class op, class up>
-    core::fixed_point<T, n, f, op, up> fmod(core::fixed_point<T, n, f, op, up> const& a,
-        core::fixed_point<T, n, f, op, up> const& b)
+    libq::fixed_point<T, n, f, op, up> fmod(libq::fixed_point<T, n, f, op, up> const& a,
+        libq::fixed_point<T, n, f, op, up> const& b)
     {
-        typedef core::fixed_point<T, n, f, op, up> fp;
+        typedef libq::fixed_point<T, n, f, op, up> fp;
         typedef fp::word_type word_type;
 
         word_type const quotient = word_type(a.value()) / word_type(b.value());

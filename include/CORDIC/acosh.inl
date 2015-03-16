@@ -4,7 +4,7 @@
 
 #include <boost/integer.hpp>
 
-namespace core {
+namespace libq {
     template<typename T>
     class acosh_of
     {
@@ -25,10 +25,10 @@ namespace core {
 namespace std {
     /// @brief computes arccosh as logarithm
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::acosh_of<core::fixed_point<T, n, f, op, up> >::type acosh(core::fixed_point<T, n, f, op, up> val)
+    typename libq::acosh_of<libq::fixed_point<T, n, f, op, up> >::type acosh(libq::fixed_point<T, n, f, op, up> val)
     {
-        typedef core::fixed_point<T, n, f, op, up> fp_type;
-        typedef core::acosh_of<fp_type>::type result_type;
+        typedef libq::fixed_point<T, n, f, op, up> fp_type;
+        typedef libq::acosh_of<fp_type>::type result_type;
 
         assert(("acosh: illegal argument", val > fp_type(1.0)));
 

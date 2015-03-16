@@ -5,7 +5,7 @@
 
 #include <boost/integer.hpp>
 
-namespace core {
+namespace libq {
     template<typename T>
     class sqrt_of
     {
@@ -37,9 +37,9 @@ namespace std {
     /// @brief computes square root by CORDIC-algorithm
     /// @ref page 11
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::sqrt_of<core::fixed_point<T, n, f, op, up> >::type sqrt(core::fixed_point<T, n, f, op, up> val)
+    typename libq::sqrt_of<libq::fixed_point<T, n, f, op, up> >::type sqrt(libq::fixed_point<T, n, f, op, up> val)
     {
-        typedef core::fixed_point<T, n, f, op, up> fp;
+        typedef libq::fixed_point<T, n, f, op, up> fp;
 
         assert(("sqrt parameter is negative", val >= fp(0)));
         if (val < fp(0)) {
@@ -53,8 +53,8 @@ namespace std {
         // Chosen fixed-point format must have several bits to represent
         // lut. Also format must enable argument translating to interval [1.0, 2.0].
         // So format must reserve two bits at least for integer part.
-        typedef core::fixed_point<boost::int_t<1u+f+2u>::least, f+2u, f, op, up> work_type;
-        typedef core::cordic::lut<f, work_type> lut;
+        typedef libq::fixed_point<boost::int_t<1u+f+2u>::least, f+2u, f, op, up> work_type;
+        typedef libq::cordic::lut<f, work_type> lut;
 
         using boost::mpl::if_;
         struct chooser
@@ -80,7 +80,7 @@ namespace std {
 
         // CORDIC vectoring mode:
         lut const angles = lut::hyperbolic_wo_repeated_iterations();
-        typename core::U_fixed_point<f, f>::type const norm(lut::hyperbolic_scale_with_repeated_iterations(n));
+        typename libq::U_fixed_point<f, f>::type const norm(lut::hyperbolic_scale_with_repeated_iterations(n));
         work_type x(work_type(arg) + 0.25), y(work_type(arg) - 0.25), z(arg);
         {
             size_t repeated(4u);

@@ -4,7 +4,7 @@
 
 #include <boost/integer.hpp>
 
-namespace core {
+namespace libq {
     template<typename T>
     class asinh_of
     {
@@ -26,14 +26,14 @@ namespace std {
 
     /// @brief computes arcinh as logarithm
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::asinh_of<core::fixed_point<T, n, f, op, up> >::type asinh(core::fixed_point<T, n, f, op, up> val)
+    typename libq::asinh_of<libq::fixed_point<T, n, f, op, up> >::type asinh(libq::fixed_point<T, n, f, op, up> val)
     {
-        typedef core::fixed_point<T, n, f, op, up> fp_type;
-        typedef core::asinh_of<fp_type>::type result_type;
+        typedef libq::fixed_point<T, n, f, op, up> fp_type;
+        typedef libq::asinh_of<fp_type>::type result_type;
 
         return result_type(
             std::log(
-                core::s(
+                libq::s(
                     std::sqrt(val * val + 1u)
                 ) + val
             )

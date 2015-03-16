@@ -22,6 +22,7 @@
 
 #include "./as_native_proxy.hpp"
 
+#include <cstdint>
 #include <boost/integer.hpp>
 #include <boost/cstdint.hpp>
 
@@ -58,7 +59,7 @@ public:
         {
             enum { value = std::numeric_limits<operand_type1>::is_signed };
         };
-        typedef typename boost::mpl::if_<chooser, boost::intmax_t, boost::uintmax_t>::type
+        typedef typename boost::mpl::if_<chooser, std::intmax_t, std::uintmax_t>::type
             max_type;
         static int const left_bits = std::numeric_limits<max_type>::digits -
             std::numeric_limits<operand_type1>::digits - (operand_type2::total -
@@ -104,7 +105,7 @@ public:
         {
             enum { value = std::numeric_limits<operand_type1>::is_signed };
         };
-        typedef typename boost::mpl::if_<chooser, boost::intmax_t, boost::uintmax_t>::type
+        typedef typename boost::mpl::if_<chooser, std::intmax_t, std::uintmax_t>::type
             max_type;
         static size_t const left_bits = std::numeric_limits<max_type>::digits -
             std::numeric_limits<operand_type1>::digits;
@@ -217,16 +218,15 @@ template<typename T> class sqrt_of;
  \tparam op overflow policy (actions to do if overflow occurred)
  \tparam up underflow policy (actions to do if underflow occurred)
 */
-template<typename storage_type, size_t n, size_t f, class op, class up>
+template<typename _storage_type, size_t _n, size_t _f, class _op, class _up>
 class fixed_point
 {
-    static_assert(std::is_integral<storage_type>::value);
-    static_assert(n <= std::numeric_limits<storage_type>::digits);
+    static_assert(std::is_integral<_storage_type>::value, "storage_type must be of the built-in integral type like std::uint8_t");
 
-    typedef fixed_point<storage_type, n, f, op, up> this_class;
+    typedef fixed_point<_storage_type, _n, _f, _op, _up> this_class;
 
-    typedef op o_policy;
-    typedef up u_policy;
+    typedef op overflow_policy;
+    typedef up underflow_policy;
 
 // POSITIVE/NEGATIVE OVERFLOW HANDLERS
     // handles positive/negative overflow event with exception raising
@@ -236,11 +236,11 @@ class fixed_point
         static std::overflow_error const positive("positive overflow");
         static std::overflow_error const negative("negative overflow");
 
-        if (val > T(0) && boost::uintmax_t(val) > bounds::max) {
+        if (val > T(0) && std::uintmax_t(val) > bounds::max) {
             throw positive;
         }
 
-        if (is_signed && boost::intmax_t(val) < bounds::min) {
+        if (is_signed && std::intmax_t(val) < bounds::min) {
             throw negative;
         }
 
@@ -254,7 +254,7 @@ class fixed_point
         word_type u(0);
 
         if (details::id(is_signed)) {
-            if (val > boost::intmax_t(bounds::max)) {
+            if (val > std::intmax_t(bounds::max)) {
                 u = static_cast<word_type>((val & bounds::max) - bounds::max);
             }
             else {
@@ -299,7 +299,7 @@ public:
     static size_t const total = n; ///< fixed-point number total
 
     ///< scale factor in fixed-point arithmetics
-    static boost::uintmax_t const scale = details::static_pow<2, fractionals>::value;
+    static std::uintmax_t const scale = details::static_pow<2, fractionals>::value;
     static bool const is_signed = std::numeric_limits<word_type>::is_signed;
 
     /// @brief range bounds for storage_type
@@ -307,7 +307,7 @@ public:
     {
     public:
         ///< range upper bound
-        static boost::uintmax_t const max = (boost::integer_traits<word_type>::const_max >>
+        static std::uintmax_t const max = (boost::integer_traits<word_type>::const_max >>
             (boost::integer_traits<word_type>::digits - total));
 
     private:
@@ -316,19 +316,19 @@ public:
         struct min_bound_traits
         {
             // it is two's complement logics
-            static boost::intmax_t const value = -static_cast<boost::intmax_t>(max) - 1;
+            static std::intmax_t const value = -static_cast<std::intmax_t>(max) - 1;
         };
 
         // case of unsigned logics
         template<>
         struct min_bound_traits<false>
         {
-            static boost::intmax_t const value = word_type(0);
+            static std::intmax_t const value = word_type(0);
         };
 
     public:
         ///< range lower bound
-        static boost::intmax_t const min = min_bound_traits<is_signed>::value;
+        static std::intmax_t const min = min_bound_traits<is_signed>::value;
     };
 
     explicit fixed_point()
@@ -357,7 +357,7 @@ public:
     template<typename T>
     void operator =(T const x)
     {
-        static_assert(std::is_arithmetic<T>::value));
+        static_assert(std::is_arithmetic<T>::value, "T must be of the arithmetic type");
 
         this->value(convert_from(x)); 
     }
@@ -383,7 +383,7 @@ public:
     template<typename T>
     static word_type convert_from(T const x)
     {
-        static_assert(std::is_arithmetic<T>::value);
+        static_assert(std::is_arithmetic<T>::value, "T must be of the arithmetic type");
 
         if (x > 0.0) {
             return word_type(std::floor(double(x) * this_class::scale + 0.5));
@@ -396,13 +396,13 @@ public:
     template<typename T, size_t f1>
     static word_type normalize(T const x)
     {
-        static_assert(std::is_integral<T>::value);
+        static_assert(std::is_integral<T>::value, "T must of the integral type");
 
         static size_t const shifts = (fractionals > f1) ? (fractionals - f1) :
             (f1 - fractionals);
 
         if (details::id(fractionals > f1)) {
-            boost::mpl::if_c<is_signed, boost::intmax_t, boost::uintmax_t>::type
+            boost::mpl::if_c<is_signed, std::intmax_t, std::uintmax_t>::type
                 val(x);
             // overflow is possible
             val <<= shifts;
@@ -425,7 +425,7 @@ public:
     template<typename T>
     static this_class wrap(T const val)
     {
-        static_assert(std::is_integral<T>::value);
+        static_assert(std::is_integral<T>::value, "input tparam must be of the built-in integral type");
         this_class x;
 
         x.value(word_type(val));
@@ -660,7 +660,7 @@ private:
 template<size_t n, size_t f>
 struct S_fixed_point
 {
-    // boost::int_t takes into account a sign bit
+    // std::int_t takes into account a sign bit
     typedef fixed_point<typename boost::int_t<1u + n>::least, n, f, do_overflow,
         do_underflow> type;
 };
@@ -725,7 +725,7 @@ struct UOU_fixed_point
 // mathematical constants
 #define MATH_CONSTANT(name, val) \
     template<typename T, size_t n, size_t f, class op, class up> \
-    core::fixed_point<T, n, f, op, up> const core::fixed_point<T, n, f, op, up>::##name(val);
+    libq::fixed_point<T, n, f, op, up> const libq::fixed_point<T, n, f, op, up>::##name(val);
 
 MATH_CONSTANT(CONST_E, 2.71828182845904523536)
 MATH_CONSTANT(CONST_1_LOG2E, 0.6931471805599453)

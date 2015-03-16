@@ -7,7 +7,7 @@
 
 #include <boost/type_traits/is_floating_point.hpp>
 
-namespace core {
+namespace libq {
     template<typename T>
     class exp_of
     {
@@ -33,17 +33,17 @@ namespace core {
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::exp_of<core::fixed_point<T, n, f, op, up> >::type exp(core::fixed_point<T, n, f, op, up> val)
+    typename libq::exp_of<libq::fixed_point<T, n, f, op, up> >::type exp(libq::fixed_point<T, n, f, op, up> val)
     {
-        typedef core::fixed_point<T, n, f, op, up> fp_type;
-        typedef core::exp_of<fp_type>::type result_type;
+        typedef libq::fixed_point<T, n, f, op, up> fp_type;
+        typedef libq::exp_of<fp_type>::type result_type;
 
-        typedef core::S_fixed_point<f+1u, f>::type work_type;
-        typedef core::cordic::lut<f, work_type> lut_type;
+        typedef libq::S_fixed_point<f+1u, f>::type work_type;
+        typedef libq::cordic::lut<f, work_type> lut_type;
 
         // reduces argument to interval [0.0, 1.0]
         int power(0);
-        core::product_of<fp_type, work_type>::type arg(val * work_type::CONST_LOG2E);
+        libq::product_of<fp_type, work_type>::type arg(val * work_type::CONST_LOG2E);
         while (arg >= result_type(1.0)) {
             arg = arg - 1u;
             power++;

@@ -11,7 +11,7 @@
 #include <limits>
 #include <boost/cstdint.hpp>
 
-namespace core {
+namespace libq {
     namespace {
         using boost::mpl::if_;
         using boost::mpl::eval_if;

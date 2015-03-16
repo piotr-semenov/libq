@@ -4,7 +4,7 @@
 
 #include <boost/integer.hpp>
 
-namespace core {
+namespace libq {
     template<typename T>
     class tanh_of
     {
@@ -33,10 +33,10 @@ namespace core {
 namespace std {
     /// @brief computes tanh as ratio of sinh and cosh
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::atanh_of<core::fixed_point<T, n, f, op, up> >::type tanh(core::fixed_point<T, n, f, op, up> val)
+    typename libq::atanh_of<libq::fixed_point<T, n, f, op, up> >::type tanh(libq::fixed_point<T, n, f, op, up> val)
     {
-        typedef core::fixed_point<T, n, f, op, up> fp_type;
+        typedef libq::fixed_point<T, n, f, op, up> fp_type;
 
-        return core::tanh_of<fp_type>::type(std::sinh(val) / std::cosh(val));
+        return libq::tanh_of<fp_type>::type(std::sinh(val) / std::cosh(val));
     }
 }

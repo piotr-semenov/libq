@@ -5,7 +5,7 @@
 
 #include <boost/integer.hpp>
 
-namespace core {
+namespace libq {
     template<typename T>
     class atan_of
     {
@@ -25,11 +25,11 @@ namespace core {
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::atan_of<core::fixed_point<T, n, f, op, up> >::type atan(core::fixed_point<T, n, f, op, up> val)
+    typename libq::atan_of<libq::fixed_point<T, n, f, op, up> >::type atan(libq::fixed_point<T, n, f, op, up> val)
     {
-        typedef core::fixed_point<T, n, f, op, up> fp;
+        typedef libq::fixed_point<T, n, f, op, up> fp;
         typedef fp::atan_type result_type;
-        typedef core::cordic::lut<f, fp> lut;
+        typedef libq::cordic::lut<f, fp> lut;
 
         static lut const angles = lut::circular();
 

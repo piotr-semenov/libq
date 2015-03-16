@@ -5,9 +5,9 @@ namespace std {
 
     /// @brief numeric limits specialization for fixed-point
     template<typename T, size_t n, size_t f, class op, class up>
-    class numeric_limits<core::fixed_point<T, n, f, op, up> >
+    class numeric_limits<libq::fixed_point<T, n, f, op, up> >
     {
-        typedef core::fixed_point<T, n, f, op, up> type;
+        typedef libq::fixed_point<T, n, f, op, up> type;
 
         template<class U>
         struct has_exceptions
@@ -16,7 +16,7 @@ namespace std {
         };
 
         template<>
-        struct has_exceptions<core::do_exception>
+        struct has_exceptions<libq::do_exception>
         {
             enum { value = true };
         };

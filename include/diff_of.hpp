@@ -3,7 +3,7 @@
 #ifndef INC_CORE_DIFF_OF_HPP_
 #define INC_CORE_DIFF_OF_HPP_
 
-namespace core {
+namespace libq {
     template<typename word_type>
     class sum_of;
 

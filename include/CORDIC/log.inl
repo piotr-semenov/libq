@@ -8,7 +8,7 @@
 #include <boost/integer/static_min_max.hpp>
 #include <boost/integer/static_log2.hpp>
 
-namespace core {
+namespace libq {
     namespace {
         using boost::static_unsigned_max;
         using boost::static_log2;
@@ -58,11 +58,11 @@ namespace core {
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::log_of<core::fixed_point<T, n, f, op, up> >::type log(core::fixed_point<T, n, f, op, up> val)
+    typename libq::log_of<libq::fixed_point<T, n, f, op, up> >::type log(libq::fixed_point<T, n, f, op, up> val)
     {
-        typedef core::fixed_point<T, n, f, op, up> fp;
+        typedef libq::fixed_point<T, n, f, op, up> fp;
         typedef typename fp::log_type log_type;
-        typedef core::cordic::lut<f, fp> lut;
+        typedef libq::cordic::lut<f, fp> lut;
 
         assert(("log2: argument must be positive", val >= fp(0)));
         if (val <= fp(0)) {
@@ -70,7 +70,7 @@ namespace std {
         }
 
         // one need 1 bit to represent integer part of reals from [1.0, 2.0]
-        typedef core::fixed_point<boost::uint_t<n + 1u>::least, f + 1u, f,
+        typedef libq::fixed_point<boost::uint_t<n + 1u>::least, f + 1u, f,
             op, up> work_type;
 
         // reduces argument to interval [1.0, 2.0]

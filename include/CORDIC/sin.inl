@@ -4,7 +4,7 @@
 
 #include <boost/integer.hpp>
 
-namespace core {
+namespace libq {
     template<typename T>
     class sin_of
     {
@@ -51,12 +51,12 @@ namespace core {
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::sin_of<core::fixed_point<T, n, f, op, up> >::type sin(core::fixed_point<T, n, f, op, up> val)
+    typename libq::sin_of<libq::fixed_point<T, n, f, op, up> >::type sin(libq::fixed_point<T, n, f, op, up> val)
     {
         BOOST_STATIC_ASSERT(n - f >= 3);
 
-        typedef core::fixed_point<T, n, f, op, up> fp;
-        using core::cordic::lut;
+        typedef libq::fixed_point<T, n, f, op, up> fp;
+        using libq::cordic::lut;
         BOOST_STATIC_ASSERT(std::numeric_limits<fp>::is_signed);
 
         // convergence interval for CORDIC rotations is [-pi/2, pi/2].

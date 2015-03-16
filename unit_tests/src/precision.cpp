@@ -14,25 +14,25 @@
 #include <exception>
 
 namespace std {
-    double asinh(double val)
-    {
-        double const arg(val + std::sqrt(val * val + 1));
-        return std::log(arg);
-    }
+    //double asinh(double val)
+    //{
+    //    double const arg(val + std::sqrt(val * val + 1));
+    //    return std::log(arg);
+    //}
 
-    double acosh(double val)
-    {
-        double const arg(val + std::sqrt(val * val - 1));
-        return std::log(arg);
-    }
+    //double acosh(double val)
+    //{
+    //    double const arg(val + std::sqrt(val * val - 1));
+    //    return std::log(arg);
+    //}
 
-    double atanh(double val)
-    {
-        return 0.5 * (std::log(1.0 + val) - std::log(1.0 - val));
-    }
+    //double atanh(double val)
+    //{
+    //    return 0.5 * (std::log(1.0 + val) - std::log(1.0 - val));
+    //}
 }
 
-namespace core { namespace unit_tests {
+namespace libq { namespace unit_tests {
     double r(double low, double high)
     {
         static boost::mt19937 gen(size_t(std::time(0)));
@@ -49,8 +49,8 @@ namespace core { namespace unit_tests {
 #define FMIN(type) double(std::numeric_limits<type>::min())
 #define FMAX(type) double(std::numeric_limits<type>::max())
 
-#define U(n, f, name) typedef core::UOU_fixed_point<n, f>::type name
-#define S(n, f, name) typedef core::SOU_fixed_point<n, f>::type name
+#define U(n, f, name) typedef libq::UOU_fixed_point<n, f>::type name
+#define S(n, f, name) typedef libq::SOU_fixed_point<n, f>::type name
 
 #ifdef LOGGING
 #define INIT_LOGGER(path) \

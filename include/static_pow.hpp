@@ -6,7 +6,7 @@
 #include <boost/integer.hpp>
 #include <boost/static_assert.hpp>
 
-namespace core { namespace details {
+namespace libq { namespace details {
     template<size_t n, size_t p>
     struct static_pow
     {

@@ -5,7 +5,7 @@
 
 #include <boost/integer.hpp>
 
-namespace core {
+namespace libq {
     template<typename T>
     class cos_of
     {
@@ -25,9 +25,9 @@ namespace core {
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::cos_of<core::fixed_point<T, n, f, op, up> >::type cos(core::fixed_point<T, n, f, op, up> val)
+    typename libq::cos_of<libq::fixed_point<T, n, f, op, up> >::type cos(libq::fixed_point<T, n, f, op, up> val)
     {
-        typedef core::fixed_point<T, n, f, op, up> fp;
+        typedef libq::fixed_point<T, n, f, op, up> fp;
         BOOST_STATIC_ASSERT(std::numeric_limits<fp>::is_signed);
 
         // convergence interval for CORDIC rotations is [-pi/2, pi/2].
@@ -53,7 +53,7 @@ namespace std {
             }
         }
 
-        typedef core::cordic::lut<f, fp> lut;
+        typedef libq::cordic::lut<f, fp> lut;
         static lut const angles = lut::circular();
 
         // normalization factor: see page 10, table 24.1 and pages 4-5, equations

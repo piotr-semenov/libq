@@ -5,7 +5,7 @@
 
 #include <boost/integer.hpp>
 
-namespace core {
+namespace libq {
     template<typename T>
     class acos_of
     {
@@ -54,11 +54,11 @@ namespace core {
 
 namespace std {
     template<typename T, size_t n, size_t f, class op, class up>
-    typename core::acos_of<core::fixed_point<T, n, f, op, up> >::type acos(core::fixed_point<T, n, f, op, up> val)
+    typename libq::acos_of<libq::fixed_point<T, n, f, op, up> >::type acos(libq::fixed_point<T, n, f, op, up> val)
     {
-        typedef core::fixed_point<T, n, f, op, up> fp;
+        typedef libq::fixed_point<T, n, f, op, up> fp;
         typedef typename fp::acos_type result_type;
-        typedef core::cordic::lut<f, fp> lut;
+        typedef libq::cordic::lut<f, fp> lut;
 
         assert(("argument has to be from interval [1.0, 1.0]", val <= fp(1.0)));
         if (val > fp(1.0)) {

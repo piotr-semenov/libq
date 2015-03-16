@@ -6,7 +6,7 @@
 #include <boost/integer/integer_mask.hpp>
 #include <boost/noncopyable.hpp>
 
-namespace core {
+namespace libq {
     template<typename T, size_t n, size_t f, class op, class up>
     class fixed_point;
 
