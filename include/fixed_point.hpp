@@ -20,6 +20,15 @@
 
 namespace libq {
 
+template<typename value_type, std::size_t n, std::size_t f, class overflow_policy, class underflow_policy>
+class fixed_point;
+
+/*!
+\brief provides a proxy class to deal with stored integer behind the fixed-point number
+*/
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+T& lift(fixed_point<T, n, f, op, up>& _x){ return _x.m_value; }
+
 /*!
  \brief fixed-point number and its arithmetics. It extends the formats like UQm.f, Qm.f with fixed pre-scaling factor p,
  where \f$p = 2^{min(0, n - f)}\f$, \f$m = f + max(n - f, 0)\f$.
@@ -128,7 +137,7 @@ public:
                 )
             ){}
 
-    /// \brief assign
+    /// \brief assign operator in case of rvalue being of same fixed-point format
     this_class& operator =(this_class const& _x)
     {
         this->m_value = _x.value();
@@ -136,7 +145,7 @@ public:
         return *this;
     }
 
-    /// \brief assign
+    /// \brief assign operator in case of rvalue being of different fixed-point format
     template<typename T1, std::size_t n1, std::size_t f1, typename op, typename up>
     this_class& operator =(fixed_point<T1, n1, f1, op, up> const& _x)
     {
@@ -146,7 +155,7 @@ public:
             );
     }
 
-    /// \brief assign
+    /// \brief assign operator in all other cases: rvalue is integer/floating-point number/arithmetic type
     template<typename T>
     void operator =(T const& _x)
     {
@@ -161,7 +170,7 @@ public:
     /// \brief converts this fixed-point number to the double-precision floating-point number
     operator double() const{ return to_floating_point(); }
 
-    /// \brief
+    /// \brief returns the stored integer
     storage_type value() const{ return this->m_value; }
 
 #define cond_operator(op) \
@@ -178,11 +187,13 @@ public:
 
     bool operator !() const{ return this->value() != 0; }
 
-    // type promotion
+    /// \brief 
     typedef typename libq::details::sum_of<this_class>::promoted_type sum_type;
     typedef sum_type diff_type;
     typedef typename libq::details::mult_of<this_class, this_class>::promoted_type mult_type;
     typedef typename libq::details::div_of<this_class, this_class>::promoted_type div_type;
+
+    // result types for the elementary functions
 
     // arithmetics: summation
     template<typename T>
@@ -309,6 +320,19 @@ public:
         );
     }
 
+    // unary operator
+    this_class operator -() const
+    {
+        if (details::does_unary_negation_overflow(*this)) {
+            // raise
+        }
+        if (this_class::is_signed) {
+            return this_class::make_fixed_point(this_class::largest_stored_integer - this->value());
+        }
+
+        return this_class::make_fixed_point(-this->value());
+    }
+
 private:
 
     /// \brief represents the input object being of the arithmetic type to a fixed-point number.
@@ -365,9 +389,13 @@ private:
         this->m_value = _x;
         return *this;
     }
+
+    friend storage_type& lift<value_type, n, f, op, up>(this_class&);
 };
+
 } // libq
 
-#include "./details/numeric_limits.inl"
+#include "details/numeric_limits.inl"
+#include "CORDIC/log.inl"
 
 #endif // INC_LIBQ_FIXED_POINT_HPP_
