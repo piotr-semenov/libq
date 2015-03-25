@@ -1,20 +1,35 @@
-/// @brief implements look-up table for trigonometric functions
-/// @ref see C. Baumann, "A simple and fast look-up table method to compute the
-/// exp(x) and ln(x) functions", 2004
+// inv_pow2_lut.inl
+//
+// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Distributed under the New BSD License. (See accompanying file LICENSE)
 
-namespace core { namespace cordic {
-    template<size_t n, typename fp>
-    typename lut<n, fp> lut<n, fp>::inv_pow2()
-    {
-        base_class table;
+/*!
+ \brief implements the look-up table for trigonometric functions
+ \ref see C. Baumann, "A simple and fast look-up table method to compute the
+ exp(x) and ln(x) functions", 2004
+*/
 
-        /// @ref see C. Baumann, "A simple and fast look-up table method to compute
-        /// the exp(x) and ln(x) functions", 2004
-        BOOST_FOREACH(int i, boost::irange<int>(1, n, 1))
-        {
-            table[i-1u] = fp(1.0 / std::powl(2.0, 1.0 / std::powl(2.0, i)));
-        }
+#ifndef INC_LIBQ_CORDIC_INV_POW2_LUT_INL_
+#define INC_LIBQ_CORDIC_INV_POW2_LUT_INL_
 
-        return this_class(table);
+namespace libq {
+namespace cordic {
+
+/*!
+*/
+template<std::size_t n, typename Q>
+typename lut<n, Q>
+    lut<n, Q>::inv_pow2()
+{
+    base_class table;
+
+    for (int i = 1; i != n + 1; ++i) {
+        table[i-1] = Q(1.0 / std::powl(2.0, 1.0 / std::powl(2.0, i)));
     }
-}}
+
+    return this_class(table);
+}
+} // cordic
+} // libq
+
+#endif // INC_LIBQ_CORDIC_INV_POW2_LUT_INL_

@@ -1,29 +1,50 @@
-/// @brief computes scales for CORDIC-rotations in case of circular coordiantes
+// circular_scales.inl
+//
+// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Distributed under the New BSD License. (See accompanying file LICENSE)
 
-namespace core { namespace cordic {
-    template<size_t n, typename fp>
-    double lut<n, fp>::circular_scale(size_t n)
-    {
-        double scale(1.0);
+/*!
+ \file circular_scales.inl
 
-        BOOST_FOREACH(size_t i, boost::irange<size_t>(0, n, 1))
-        {
-            scale *= std::sqrt(1.0 + std::pow(2.0, -2.0 * i));
-        }
+ Computes the scales for CORDIC-rotations performed in circular coordinates
+*/
 
-        return scale;
+#ifndef INC_LIBQ_CORDIC_CIRCULAR_SCALES_INL_
+#define INC_LIBQ_CORDIC_CIRCULAR_SCALES_INL_
+
+namespace libq {
+namespace cordic {
+
+/*!
+*/
+template<std::size_t n, typename Q>
+double
+    lut<n, Q>::circular_scale(std::size_t _n)
+{
+    double scale(1.0);
+
+    for (std::size_t i = 0; i != n; ++i) {
+        scale *= std::sqrt(1.0 + std::pow(2.0, -2.0 * i));
     }
 
-    template<size_t n, typename fp>
-    lut<n, fp> lut<n, fp>::circular_scales()
-    {
-        base_class scales;
+    return scale;
+}
 
-        BOOST_FOREACH(size_t i, boost::irange<size_t>(0, n, 1))
-        {
-            scales[i] = std::sqrt(1.0 + std::pow(2.0, -2.0 * i));
-        }
+/*!
+*/
+template<std::size_t n, typename Q>
+lut<n, Q>
+    lut<n, Q>::circular_scales()
+{
+    base_class scales;
 
-        return this_class(scales);
+    for (std::size_t i = 0; i != n; ++i) {
+        scales[i] = std::sqrt(1.0 + std::pow(2.0, -2.0 * i));
     }
-}}
+
+    return this_class(scales);
+}
+} // cordic
+} // libq
+
+#endif // INC_LIBQ_CORDIC_CIRCULAR_SCALES_INL_
