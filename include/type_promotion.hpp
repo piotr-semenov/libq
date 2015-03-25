@@ -4,9 +4,9 @@
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
 /*!
-\file type_promotion.hpp
+ \file type_promotion.hpp
 
-Provides the run-time overflow/underflow safety checks for basic arithmetics operations.
+ Provides the run-time overflow/underflow safety checks for basic arithmetics operations.
 */
 
 #ifndef INC_LIBQ_TYPE_PROMOTION_HPP_
@@ -79,7 +79,7 @@ public:
     typedef typename std::conditional<
         this_class::is_expandable
         , libq::fixed_point<promoted_storage_type, n + delta_n, f + delta_f, typename Q::op, typename Q::up>
-        , Q
+        , libq::fixed_point<promoted_storage_type, n, f + delta_f, typename Q::op, typename Q::up>
     >::type promoted_type;
 };
 
@@ -116,9 +116,18 @@ class mult_of:
     static_assert(std::is_same<T, U>::value, "unexpected use of multiplication_promoted_type_of template");
 };
 
+/*!
+ \note user has no need to take care about "fixed-point" promotion.
+ Presently, std::common_type<L, R>::type equals to type having the max number of significant bits
+*/
 template<typename T1, typename T2, std::size_t n1, std::size_t n2, std::size_t f1, std::size_t f2, typename op, typename up>
 class mult_of<libq::fixed_point<T1, n1, f1, op, up>, libq::fixed_point<T2, n2, f2, op, up> > :
-    public type_promotion_base<libq::fixed_point<T1, n1, f1, op, up>, n2, f2>
+    public
+        std::conditional<
+            (n1 > n2),
+            type_promotion_base<libq::fixed_point<T1, n1, f1, op, up>, n2, f2>,
+            type_promotion_base<libq::fixed_point<T2, n2, f2, op, up>, n1, f1>
+        >::type
 {};
 
 template<typename T, typename U>
@@ -128,9 +137,18 @@ class div_of:
     static_assert(std::is_same<T, U>::value, "unexpected use of division_promoted_type_of template");
 };
 
+/*!
+ \note user has no need to take care about "fixed-point" promotion.
+ Presently, std::common_type<L, R>::type equals to type having the max number of significant bits
+*/
 template<typename T1, typename T2, std::size_t n1, std::size_t n2, std::size_t f1, std::size_t f2, typename op, typename up>
 class div_of<libq::fixed_point<T1, n1, f1, op, up>, libq::fixed_point<T2, n2, f2, op, up> >:
-    public type_promotion_base<libq::fixed_point<T1, n1, f1, op, up>, n2, n2 - f2>
+    public
+        std::conditional<
+            (n1 > n2),
+            type_promotion_base<libq::fixed_point<T1, n1, f1, op, up>, n2, n2 - f2>,
+            type_promotion_base<libq::fixed_point<T2, n2, f2, op, up>, n1, n1 - f1>
+        >::type
 {};
 
 } // details
