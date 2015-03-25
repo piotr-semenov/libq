@@ -97,7 +97,7 @@ bool
     auto const a = _x.value();
 
     return
-        result_type::is_signed * (a == result_type::least_stored_integer);
+        result_type::is_signed && (a == result_type::least_stored_integer);
 }
 /* \} */ // arithmetics_safety
 
