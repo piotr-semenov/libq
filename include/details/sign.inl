@@ -4,9 +4,9 @@
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
 /*!
-\file remainder.inl
+ \file remainder.inl
 
-Gets the function std::signbit overloaded for fixed-point numbers.
+ Gets the function std::signbit overloaded for fixed-point numbers.
 */
 
 #ifndef INC_STD_SIGN_INL_
