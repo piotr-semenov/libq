@@ -1,14 +1,30 @@
-/// @brief provides std::floor stuff in case of fixed-point numbers
+// floor.inl
+//
+// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Distributed under the New BSD License. (See accompanying file LICENSE)
+
+/*!
+ \file floor.inl
+
+ Gets the function std::floor overloaded for fixed-point numbers.
+*/
+
+#ifndef INC_STD_FLOOR_INL_
+#define INC_STD_FLOOR_INL_
 
 namespace std {
-    /// @brief std::floor in case of fixed-point numbers
-    template<typename T, size_t n, size_t f, class op, class up>
-    libq::fixed_point<T, n, f, op, up> floor(libq::fixed_point<T, n, f, op, up> const& x)
-    {
-        typedef libq::fixed_point<T, n, f, op, up> type;
-        static T const mask(boost::high_bits_mask_t<std::numeric_limits<T>::digits -
-            f>::least);
 
-        return type::wrap(x.value() & mask);
-    }
+/*!
+ \brief std::floor in case of fixed-point numbers
+*/
+template<typename T, size_t n, size_t f, class op, class up>
+libq::fixed_point<T, n, f, op, up>
+    floor(libq::fixed_point<T, n, f, op, up> const& _x)
+{
+    typedef libq::fixed_point<T, n, f, op, up> Q;
+
+    return Q::make_fixed_point(_x.value() & Q::integer_bits_mask);
 }
+} // std
+
+#endif // INC_STD_FLOOR_INL_
