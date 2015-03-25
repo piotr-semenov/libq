@@ -232,7 +232,7 @@ public:
             // raise
         }
 
-        word_type const stored_integer = word_type(_x.value()) - word_type(converted.value());
+        word_type const stored_integer = word_type(this->value()) - word_type(converted.value());
         return diff_type::make_fixed_point(stored_integer);
     }
 
@@ -331,7 +331,7 @@ public:
         if (details::does_unary_negation_overflow(*this)) {
             // raise
         }
-        if (this_class::is_signed) {
+        if (!this_class::is_signed) {
             return this_class::make_fixed_point(this_class::largest_stored_integer - this->value());
         }
 
@@ -400,7 +400,15 @@ private:
 
 } // libq
 
+#include "details/ceil.inl"
+#include "details/fabs.inl"
+#include "details/floor.inl"
+#include "details/remainder.inl"
+#include "details/fmod.inl"
 #include "details/numeric_limits.inl"
+#include "details/round.inl"
+#include "details/sign.inl"
+
 #include "CORDIC/log.inl"
 
 #endif // INC_LIBQ_FIXED_POINT_HPP_
