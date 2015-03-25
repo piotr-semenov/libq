@@ -53,6 +53,8 @@ class fixed_point
     //using overflow_policy::raise_overflow_event;
     //using underflow_policy::raise_underflow_event;
 
+    typedef typename std::conditional<std::numeric_limits<value_type>::is_signed, std::intmax_t, std::uintmax_t>::type largest_type;
+
 public:
     typedef this_class type;
     typedef overflow_policy op;
@@ -71,12 +73,14 @@ public:
     enum: std::uintmax_t {
         scale = std::uintmax_t(1u) << bits_for_fractional, ///< scaling factor for fixed-point interval
 
-        /// \brief the value of underlying integer behind the fixed-point maximum number
-        largest_stored_integer = (std::uintmax_t(1u) << number_of_significant_bits) - 1u,
-
         integer_bits_mask = (std::uintmax_t(1u) << number_of_significant_bits) -
             (std::uintmax_t(1u) << bits_for_fractional),
         fractional_bits_mask = (std::uintmax_t(1u) << bits_for_fractional) - 1u
+    };
+    // need to avoid the signed/unsigned mismatch in arithmetic safety checks
+    enum: typename this_class::largest_type {
+        /// \brief the value of underlying integer behind the fixed-point maximum number
+        largest_stored_integer = (this_class::largest_type(1u) << number_of_significant_bits) - 1u
     };
 
     /// \brief the minimum rational value represented with current fixed-point format
@@ -100,7 +104,8 @@ public:
 
         // checks if the input integer is not within the available dynamic range
         // if raise_overflow_event does nothing then compiler will suppress this check
-        if (val < this_class::least_stored_integer || val > this_class::largest_stored_integer) {
+        if ((val < 0 && val < this_class::least_stored_integer) || 
+            (val > 0 && val > this_class::largest_stored_integer)) {
             //!!! raise_overflow_event();
         }
 
@@ -368,7 +373,7 @@ private:
     static storage_type normalize(fixed_point<T1, n1, f1, Ps...> const& _x, std::true_type)
     {
         storage_type const value =
-            _x.value() >> (f1 - this_class::bits_for_fractional);
+            static_cast<storage_type>(_x.value() >> (f1 - this_class::bits_for_fractional));
         if (!value) {
             // raise underflow
         }
