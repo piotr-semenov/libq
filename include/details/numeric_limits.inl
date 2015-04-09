@@ -45,19 +45,19 @@ public:
     static std::float_round_style const round_style = std::round_to_nearest;
 
     static int const digits = Q::number_of_significant_bits;
-    static int const digits10 = static_cast<int>(Q::number_of_significant_bits * M_LOG10_2 + 0.5);
+    static int const digits10 = static_cast<int>(Q::number_of_significant_bits * M_LOG10_2);
 
-    static int const max_exponent = n-f;
+    static int const max_exponent = int(n)-int(f);
     static int const max_exponent10 = static_cast<int>(max_exponent * M_LOG10_2);
-    static int const min_exponent = -f;
+    static int const min_exponent = -int(f);
     static int const min_exponent10 = static_cast<int>(min_exponent * M_LOG10_2);
     static int const radix = 2;
 
     /// \brief minimum value that can be achieved by fixed-point type
-    static Q min(){ return Q::make_fixed_point(Q::least_stored_integer); }
+    static Q min(){ return Q::least(); }
 
     /// \brief maximum value that can be achieved by fixed-point type
-    static Q max(){ return Q::make_fixed_point(Q::largest_stored_integer); }
+    static Q max(){ return Q::largest(); }
 
     /// \brief returns the machine epsilon, that is, the difference between
     /// 1.0 and the next value representable by the fixed-point type
