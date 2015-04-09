@@ -12,32 +12,30 @@
 #ifndef INC_LIBQ_TYPE_PROMOTION_HPP_
 #define INC_LIBQ_TYPE_PROMOTION_HPP_
 
-#include "boost/integer.hpp"
 #include "boost/mpl/eval_if.hpp"
 #include "boost/utility/enable_if.hpp"
 
 namespace libq {
-
-// forward declaration
-template<typename T, std::size_t n, std::size_t f, typename op, typename up>
-class fixed_point;
-
 namespace details {
 
 /*!
  \brief
- \tparam Fixed_point_type
+ \tparam T fixed-point type
  \tparam delta_n
  \tparam delta_f
 */
-template<typename Base_fixed_point_type, int delta_n = 0, int delta_f = 0>
+template<typename T, std::size_t delta_n, std::size_t delta_f>
 class type_promotion_base
 {
-    typedef Base_fixed_point_type Q;
-    typedef type_promotion_base<Q, delta_n, delta_f> this_class;
+public:
+    typedef T promoted_type;
+};
 
-    static_assert(Q::number_of_significant_bits + delta_n >= 0, "promoted type has a negative number of significant bits");
-    static_assert(Q::bits_for_fractional + delta_f >= 0, "promoted type has a negative number of bits for fractional");
+template<typename _T, std::size_t _n, std::size_t _f, class _op, class _up, std::size_t delta_n, std::size_t delta_f>
+class type_promotion_base<libq::fixed_point<_T, _n, _f, _op, _up>, delta_n, delta_f>
+{
+    typedef libq::fixed_point<_T, _n, _f, _op, _up> Q;
+    typedef type_promotion_base<Q, delta_n, delta_f> this_class;
 
     typedef typename std::conditional<Q::is_signed, std::intmax_t, std::uintmax_t>::type max_type;
     enum: std::size_t {
@@ -64,92 +62,29 @@ class type_promotion_base
 public:
 
     enum: bool {
-        is_expandable = (n + delta_n + this_class::sign_bit <= std::numeric_limits<max_type>::digits)
+        is_expandable_sig = (n + delta_n + this_class::sign_bit <= std::numeric_limits<max_type>::digits),
+        is_expandable_frac = (f + delta_f <= std::numeric_limits<max_type>::digits)
     };
 
     /*!
      \brief
     */
     typedef typename boost::mpl::eval_if_c<
-        this_class::is_expandable
+        this_class::is_expandable_sig
         , typename this_class::storage_type_promotion_traits
         , typename this_class::storage_type_default_traits
     >::type promoted_storage_type;
 
     typedef typename std::conditional<
-        this_class::is_expandable
-        , libq::fixed_point<promoted_storage_type, n + delta_n, f + delta_f, typename Q::op, typename Q::up>
-        , libq::fixed_point<promoted_storage_type, n, f + delta_f, typename Q::op, typename Q::up>
+        this_class::is_expandable_sig
+        , libq::fixed_point<promoted_storage_type, n + delta_n, f + delta_f, typename Q::overflow_policy, typename Q::underflow_policy>
+        , typename std::conditional<
+            this_class::is_expandable_frac,
+            libq::fixed_point<promoted_storage_type, n, f + delta_f, typename Q::overflow_policy, typename Q::underflow_policy>,
+            libq::fixed_point<promoted_storage_type, n, f, typename Q::overflow_policy, typename Q::underflow_policy>
+        >::type
     >::type promoted_type;
 };
-
-template<int n_delta, int f_delta>
-class type_promotion_base<double, n_delta, f_delta>
-{
-public:
-    typedef double promoted_type;
-};
-
-template<int n_delta, int f_delta>
-class type_promotion_base<float, n_delta, f_delta>
-{
-public:
-    typedef float promoted_type;
-};
-
-/// sum_promoted_type_of
-template<typename T>
-class sum_of:
-    public type_promotion_base<T, 0, 0>
-{};
-
-template<typename T, std::size_t n, std::size_t f, typename op, typename up>
-class sum_of<libq::fixed_point<T, n, f, op, up> >:
-    public type_promotion_base<libq::fixed_point<T, n, f, op, up>, 1u, 0>
-{};
-
-/// multiplication_promoted_type_of
-template<typename T, typename U>
-class mult_of:
-    public type_promotion_base<T>
-{
-    static_assert(std::is_same<T, U>::value, "unexpected use of multiplication_promoted_type_of template");
-};
-
-/*!
- \note user has no need to take care about "fixed-point" promotion.
- Presently, std::common_type<L, R>::type equals to type having the max number of significant bits
-*/
-template<typename T1, typename T2, std::size_t n1, std::size_t n2, std::size_t f1, std::size_t f2, typename op, typename up>
-class mult_of<libq::fixed_point<T1, n1, f1, op, up>, libq::fixed_point<T2, n2, f2, op, up> > :
-    public
-        std::conditional<
-            (n1 > n2),
-            type_promotion_base<libq::fixed_point<T1, n1, f1, op, up>, n2, f2>,
-            type_promotion_base<libq::fixed_point<T2, n2, f2, op, up>, n1, f1>
-        >::type
-{};
-
-template<typename T, typename U>
-class div_of:
-    public type_promotion_base<T>
-{
-    static_assert(std::is_same<T, U>::value, "unexpected use of division_promoted_type_of template");
-};
-
-/*!
- \note user has no need to take care about "fixed-point" promotion.
- Presently, std::common_type<L, R>::type equals to type having the max number of significant bits
-*/
-template<typename T1, typename T2, std::size_t n1, std::size_t n2, std::size_t f1, std::size_t f2, typename op, typename up>
-class div_of<libq::fixed_point<T1, n1, f1, op, up>, libq::fixed_point<T2, n2, f2, op, up> >:
-    public
-        std::conditional<
-            (n1 > n2),
-            type_promotion_base<libq::fixed_point<T1, n1, f1, op, up>, n2, n2 - f2>,
-            type_promotion_base<libq::fixed_point<T2, n2, f2, op, up>, n1, n1 - f1>
-        >::type
-{};
 
 } // details
 } // libq
