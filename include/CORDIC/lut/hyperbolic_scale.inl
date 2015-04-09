@@ -12,6 +12,9 @@
 #ifndef INC_LIBQ_CORDIC_HYPERBOLIC_SCALE_INL_
 #define INC_LIBQ_CORDIC_HYPERBOLIC_SCALE_INL_
 
+#include "boost/range/irange.hpp"
+#include "boost/foreach.hpp"
+
 namespace libq {
 namespace cordic {
 
@@ -24,7 +27,7 @@ double
     double scale(1.0);
 
     std::size_t repeated(4u);
-    for (std::size_t i = 1; i != _n; ++i) {
+    BOOST_FOREACH(std::size_t i, boost::irange<std::size_t>(1, _n, 1)) {
         scale *= std::sqrt(1.0 - std::pow(2.0, -2.0 * i));
 
         if (i == repeated && i != _n - 1) {

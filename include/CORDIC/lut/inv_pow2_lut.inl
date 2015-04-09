@@ -18,13 +18,13 @@ namespace cordic {
 /*!
 */
 template<std::size_t n, typename Q>
-typename lut<n, Q>
+lut<n, Q>
     lut<n, Q>::inv_pow2()
 {
     base_class table;
 
     for (int i = 1; i != n + 1; ++i) {
-        table[i-1] = Q(1.0 / std::powl(2.0, 1.0 / std::powl(2.0, i)));
+        table[i-1] = Q(1.0 / std::pow(2.0, 1.0 / std::pow(2.0, i)));
     }
 
     return this_class(table);

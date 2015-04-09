@@ -1,42 +1,38 @@
-/// @brief provides CORDIC for arcsinh function
+// asinh.inl
+//
+// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Distributed under the New BSD License. (See accompanying file LICENSE)
 
-#include <boost/type_traits/is_floating_point.hpp>
+/*!
+ \file asinh.inl
 
-#include <boost/integer.hpp>
+ Provides CORDIC for tanh function as a ratio of sinh and tanh
+*/
 
 namespace libq {
-    template<typename T>
-    class asinh_of
-    {
-        BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
-
-    public:
-        typedef T type;
-    };
-
-    template<typename T, size_t n, size_t f, class op, class up>
-    class asinh_of<fixed_point<T, n, f, op, up> >
-    {
-    public:
-        typedef typename fixed_point<T, n, f, op, up>::log_type type;
-    };
-}
+namespace details {
+/*!
+ \brief
+*/
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+class asinh_of
+    :    public log_of<T, n, f, op, up>
+{};
+} // details
+} // libq
 
 namespace std {
+/*!
+ \brief computes arcinh as logarithm
+*/
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+typename libq::details::asinh_of<T, n, f, op, up>::promoted_type
+    asinh(libq::fixed_point<T, n, f, op, up> _val)
+{
+    typedef typename libq::details::asinh_of<T, n, f, op, up>::promoted_type result_type;
 
-    /// @brief computes arcinh as logarithm
-    template<typename T, size_t n, size_t f, class op, class up>
-    typename libq::asinh_of<libq::fixed_point<T, n, f, op, up> >::type asinh(libq::fixed_point<T, n, f, op, up> val)
-    {
-        typedef libq::fixed_point<T, n, f, op, up> fp_type;
-        typedef libq::asinh_of<fp_type>::type result_type;
-
-        return result_type(
-            std::log(
-                libq::s(
-                    std::sqrt(val * val + 1u)
-                ) + val
-            )
-        );
-    }
+    return result_type(
+        std::log(std::sqrt(_val * _val + 1u) + _val)
+    );
 }
+} // std

@@ -1,41 +1,52 @@
-/// @brief provides CORDIC for arcsinh function
+// acosh.inl
+//
+// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Distributed under the New BSD License. (See accompanying file LICENSE)
 
-#include <boost/type_traits/is_floating_point.hpp>
+/*!
+ \file acosh.inl
 
-#include <boost/integer.hpp>
+ Provides CORDIC for tanh function as a ratio of sinh and tanh
+*/
 
 namespace libq {
-    template<typename T>
-    class acosh_of
-    {
-        BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+namespace details {
+/*!
+*/
+template<typename T>
+class acosh_of
+{};
 
-    public:
-        typedef T type;
-    };
-
-    template<typename T, size_t n, size_t f, class op, class up>
-    class acosh_of<fixed_point<T, n, f, op, up> >
-    {
-    public:
-        typedef typename fixed_point<T, n, f, op, up>::log_type::to_unsigned_type type;
-    };
-}
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+class acosh_of<libq::fixed_point<T, n, f, op, up> >
+{
+public:
+    typedef typename
+        log_of<T, n, f, op, up>::promoted_type::to_unsigned_type promoted_type;
+};
+} // details
+} // libq
 
 namespace std {
-    /// @brief computes arccosh as logarithm
-    template<typename T, size_t n, size_t f, class op, class up>
-    typename libq::acosh_of<libq::fixed_point<T, n, f, op, up> >::type acosh(libq::fixed_point<T, n, f, op, up> val)
-    {
-        typedef libq::fixed_point<T, n, f, op, up> fp_type;
-        typedef libq::acosh_of<fp_type>::type result_type;
+/*!
+ \brief computes acosh as logarithm
+*/
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+typename libq::details::acosh_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
+    acosh(libq::fixed_point<T, n, f, op, up> _val)
+{
+    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef typename libq::details::acosh_of<Q>::promoted_type result_type;
 
-        assert(("acosh: illegal argument", val > fp_type(1.0)));
-
-        return result_type(
-            std::log(
-                val + std::sqrt(val * val - 1)
-            )
-        );
+    assert(("[std::acosh] argument is not from [1.0, +inf)", _val > Q(1.0f)));
+    if (_val < Q(1.0f)) {
+        throw std::logic_error("[std::acosh] argument is not from [1.0, +inf)");
     }
+
+    return result_type(
+        std::log(
+            _val + std::sqrt(_val * _val - 1)
+        )
+    );
 }
+} // std

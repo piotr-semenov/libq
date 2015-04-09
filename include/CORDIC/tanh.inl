@@ -1,42 +1,53 @@
-/// @brief provides CORDIC for tanh function
+// tanh.inl
+//
+// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Distributed under the New BSD License. (See accompanying file LICENSE)
 
-#include <boost/type_traits/is_floating_point.hpp>
+/*!
+ \file tanh.inl
 
-#include <boost/integer.hpp>
+ Provides CORDIC for tanh function as a ratio of sinh and tanh
+ \ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
+*/
+
+#ifndef INC_LIBQ_DETAILS_TANH_INL_
+#define INC_LIBQ_DETAILS_TANH_INL_
 
 namespace libq {
-    template<typename T>
-    class tanh_of
-    {
-        BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+namespace details {
+/*!
+*/
+template<typename T>
+class tanh_of
+{
+public:
+    typedef T promoted_type;
+};
 
-    public:
-        typedef T type;
-    };
-
-    template<typename T, size_t n, size_t f, class op, class up>
-    class tanh_of<fixed_point<T, n, f, op, up> >
-    {
-        typedef fixed_point<T, n, f, op, up> fp_type;
-
-    public:
-        typedef typename fixed_point<
-            typename boost::int_t<1u + f>::least,
-            1u + f,
-            f,
-            op,
-            up
-        > type;
-    };
-}
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+class tanh_of<libq::fixed_point<T, n, f, op, up> >
+    :   private libq::fixed_point<T, f, f, op, up>,
+        public type_promotion_base<
+            libq::fixed_point<typename std::make_signed<T>::type, f, f, op, up>,
+            1u,
+            0
+        >
+{};
+} // details
+} // libq
 
 namespace std {
-    /// @brief computes tanh as ratio of sinh and cosh
-    template<typename T, size_t n, size_t f, class op, class up>
-    typename libq::atanh_of<libq::fixed_point<T, n, f, op, up> >::type tanh(libq::fixed_point<T, n, f, op, up> val)
-    {
-        typedef libq::fixed_point<T, n, f, op, up> fp_type;
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+typename libq::details::tanh_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
+    tanh(libq::fixed_point<T, n, f, op, up> _val)
+{
+    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef typename libq::details::tanh_of<Q>::promoted_type tanh_type;
 
-        return libq::tanh_of<fp_type>::type(std::sinh(val) / std::cosh(val));
-    }
+    auto const a = std::sinh(_val);
+    auto const b = std::cosh(_val);
+    return tanh_type(std::sinh(_val) / std::cosh(_val));
 }
+} // std
+
+#endif // INC_LIBQ_DETAILS_TANH_INL_

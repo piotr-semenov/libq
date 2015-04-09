@@ -1,85 +1,97 @@
-/// @brief provides CORDIC for cos function
-/// @ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
+// cos.inl
+//
+// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Distributed under the New BSD License. (See accompanying file LICENSE)
 
-#include <boost/type_traits/is_floating_point.hpp>
+/*!
+ \file cos.inl
 
-#include <boost/integer.hpp>
+ Provides CORDIC for cos function
+ \ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
+*/
+
+#ifndef INC_STD_COS_INL_
+#define INC_STD_COS_INL_
 
 namespace libq {
-    template<typename T>
-    class cos_of
-    {
-        BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+namespace details {
+/*!
+ \brief
+*/
+template<typename T>
+class cos_of
+{
+public:
+    typedef T promoted_type;
+};
 
-    public:
-        typedef T type;
-    };
-
-    template<typename T, size_t n, size_t f, class op, class up>
-    class cos_of<fixed_point<T, n, f, op, up> >
-    {
-    public:
-        typedef typename sin_of<fixed_point<T, n, f, op, up> >::type type;
-    };
-}
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+class cos_of<libq::fixed_point<T, n, f, op, up> >
+    :   public libq::details::sin_of<libq::fixed_point<T, n, f, op, up> >
+{};
+} // details
+} // libq
 
 namespace std {
-    template<typename T, size_t n, size_t f, class op, class up>
-    typename libq::cos_of<libq::fixed_point<T, n, f, op, up> >::type cos(libq::fixed_point<T, n, f, op, up> val)
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+typename libq::details::cos_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
+    cos(libq::fixed_point<T, n, f, op, up> _val)
+{
+    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef typename libq::details::cos_of<Q>::promoted_type cos_type;
+
+    // convergence interval for CORDIC rotations is [-pi/2, pi/2].
+    // So one has to map input angle to that interval
+    Q arg(0);
+    int sign(-1);
+
+    // put argument to [-pi, pi] interval (with change of sign for cos)
     {
-        typedef libq::fixed_point<T, n, f, op, up> fp;
-        BOOST_STATIC_ASSERT(std::numeric_limits<fp>::is_signed);
+        Q const x = Q::CONST_PI - std::fmod(_val, Q::CONST_2PI);
+        if (x < -Q::CONST_PI_2) { // convert to interval [-pi/2, pi/2]
+            arg = x + Q::CONST_PI;
 
-        // convergence interval for CORDIC rotations is [-pi/2, pi/2].
-        // So one has to map input angle to that interval
-        fp arg(0);
-        int sign(-1);
-        {
-            // put argument to [-pi, pi] interval (with change of sign for
-            // cos)
-            fp const x = fp::CONST_PI - std::fmod(val, fp::CONST_2PI);
-            if (x < -fp::CONST_PI_2) {     // convert to interval [-pi/2, pi/2]
-                arg = x + fp::CONST_PI;
-
-                sign = 1;
-            }
-            else if (x > fp::CONST_PI_2) {
-                arg = x - fp::CONST_PI;
-
-                sign = 1;
-            }
-            else {
-                arg = x;
-            }
+            sign = 1;
         }
+        else if (x > Q::CONST_PI_2) {
+            arg = x - Q::CONST_PI;
 
-        typedef libq::cordic::lut<f, fp> lut;
-        static lut const angles = lut::circular();
-
-        // normalization factor: see page 10, table 24.1 and pages 4-5, equations
-        // (5)-(6)
-        // factor converges to the limit 1.64676 very fast: it tooks 8 iterations
-        // only. 8 iterations correpsonds to precision of size 0.007812 for
-        // angle approximation
-        static fp norm_factor(1.0 / lut::circular_scale(f));
-
-        // rotation mode: see page 6
-        // shift sequence is just 0, 1, ... (circular coordinate system)
-        fp x(norm_factor), y(0.0), z(arg);
-        fp x1, y1, z1;
-        BOOST_FOREACH(size_t i, boost::irange<size_t>(0, f, 1))
-        {
-            int const sign = (z > fp(0)) ? 1 : -1;
-            fp const x_scaled = fp::wrap(sign * (x.value() >> i));
-            fp const y_scaled = fp::wrap(sign * (y.value() >> i));
-
-            x1 = fp(x - y_scaled);
-            y1 = fp(y + x_scaled);
-            z1 = fp(z - fp((sign > 0) ? angles[i] : -angles[i]));
-
-            x = x1; y = y1; z = z1;
+            sign = 1;
         }
-
-        return fp::cos_type((sign > 0) ? x : - x);
+        else {
+            arg = x;
+        }
     }
+
+    typedef libq::cordic::lut<f, Q> lut_type;
+    static lut_type const angles = lut_type::circular();
+
+    // normalization factor: see page 10, table 24.1 and pages 4-5, equations
+    // (5)-(6)
+    // factor converges to the limit 1.64676 very fast: it takes 8 iterations
+    // only. 8 iterations corresponds to precision of size 0.007812 for
+    // angle approximation
+    static Q norm_factor(1.0 / lut_type::circular_scale(f));
+
+    // rotation mode: see page 6
+    // shift sequence is just 0, 1, ... (circular coordinate system)
+    Q x(norm_factor), y(0.0), z(arg);
+    Q x1, y1, z1;
+    for (std::size_t i = 0; i != f; ++i) {
+        int const sign = (z > Q(0)) ? 1 : -1;
+
+        Q const x_scaled = Q::make_fixed_point(sign * (x.value() >> i));
+        Q const y_scaled = Q::make_fixed_point(sign * (y.value() >> i));
+
+        x1 = Q(x - y_scaled);
+        y1 = Q(y + x_scaled);
+        z1 = Q(z - Q((sign > 0) ? angles[i] : -angles[i]));
+
+        x = x1; y = y1; z = z1;
+    }
+
+    return cos_type((sign > 0) ? x : - x);
 }
+} // std
+
+#endif // INC_STD_COS_INL_

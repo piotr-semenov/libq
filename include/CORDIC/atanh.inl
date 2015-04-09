@@ -1,40 +1,47 @@
-/// @brief provides CORDIC for arctanh function
+// atanh.inl
+//
+// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Distributed under the New BSD License. (See accompanying file LICENSE)
 
-#include <boost/type_traits/is_floating_point.hpp>
+/*!
+ \file atanh.inl
 
-#include <boost/integer.hpp>
+ Provides CORDIC for atanh function
+*/
 
 namespace libq {
-    template<typename T>
-    class atanh_of
-    {
-        BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+namespace details {
+/*!
+*/
+template<typename T>
+class atanh_of
+{};
 
-    public:
-        typedef T type;
-    };
-
-    template<typename T, size_t n, size_t f, class op, class up>
-    class atanh_of<fixed_point<T, n, f, op, up> >
-    {
-    public:
-        typedef typename diff_of<typename fixed_point<T, n, f, op, up>::log_type>::type type;
-    };
-}
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+class atanh_of<libq::fixed_point<T, n, f, op, up> >
+    :    public libq::details::sum_of<
+            typename libq::details::log_of<T, n, f, op, up>::promoted_type
+         >
+{};
+} // details
+} // libq
 
 namespace std {
-    /// @brief computes arctanh as logarithms
-    template<typename T, size_t n, size_t f, class op, class up>
-    typename libq::atanh_of<libq::fixed_point<T, n, f, op, up> >::type atanh(libq::fixed_point<T, n, f, op, up> val)
-    {
-        typedef libq::fixed_point<T, n, f, op, up> fp_type;
-        typedef libq::atanh_of<fp_type>::type result_type;
+/*!
+ \brief calculates the atanh function as a logarithm
+*/
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+typename libq::details::atanh_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
+    atanh(libq::fixed_point<T, n, f, op, up> _val)
+{
+    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef typename libq::details::atanh_of<Q>::promoted_type result_type;
 
-        assert(("arctanh: argument has to be from range [-1.0, 1.0]", std::fabs(val) <= 1.0));
+    assert(("[std::atanh] argument is not from [-1.0, 1.0]", std::fabs(_val) <= Q(1.0f)));
 
-        result_type x(std::log(val + 1u) - std::log(fp_type(1) - val));
-        libq::as_native(x) >>= 1u;
+    result_type x(std::log(_val + 1u) - std::log(Q(1) - _val));
+    libq::lift(x) >>= 1u;
 
-        return x;
-    }
+    return x;
 }
+} // std

@@ -16,9 +16,10 @@
 namespace libq {
 namespace cordic {
 
-/// @ref page 5, equation 7, m = 1 (circular coordinate system)
-template<size_t n, typename fp>
-typename lut<n, fp> lut<n, fp>::circular()
+// ref page 5, equation 7, m = 1 (circular coordinate system)
+template<std::size_t n, typename Q>
+lut<n, Q>
+    lut<n, Q>::circular()
 {
     base_class table;
 

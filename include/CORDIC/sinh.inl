@@ -1,44 +1,58 @@
-/// @brief provides CORDIC for sinh function
-/// @ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures" and 
-/// J.S. Walther, "A Unified Algorithm for Elementary Functions"
+// sinh.inl
+//
+// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Distributed under the New BSD License. (See accompanying file LICENSE)
 
-#include <boost/type_traits/is_floating_point.hpp>
+/*!
+ \file sinh.inl
+
+ Provides CORDIC for sinh function as a sum of exponents
+
+ \ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures" and
+ J.S. Walther, "A Unified Algorithm for Elementary Functions"
+*/
+
+#ifndef INC_LIBQ_DETAILS_SINH_INL_
+#define INC_LIBQ_DETAILS_SINH_INL_
 
 namespace libq {
-    template<typename T>
-    class sinh_of
-    {
-        BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+namespace details {
+/*!
+*/
+template<typename T>
+class sinh_of
+{
+    typedef T promoted_type;
+};
 
-    public:
-        typedef T type;
-    };
-
-    template<typename T, size_t n, size_t f, class op, class up>
-    class sinh_of<fixed_point<T, n, f, op, up> >
-    {
-    public:
-        typedef fixed_point<
-            boost::intmax_t,
-            std::numeric_limits<boost::intmax_t>::digits,
-            f,
-            op,
-            up
-        > type;
-    };
-}
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+class sinh_of<libq::fixed_point<T, n, f, op, up> >
+{
+public:
+    typedef libq::fixed_point<
+        std::intmax_t,
+        std::numeric_limits<std::intmax_t>::digits,
+        f,
+        op,
+        up
+    > promoted_type;
+};
+} // details
+} // libq
 
 namespace std {
-    /// @brief computes sinh as sum of exponents
-    template<typename T, size_t n, size_t f, class op, class up>
-    typename libq::sinh_of<libq::fixed_point<T, n, f, op, up> >::type sinh(libq::fixed_point<T, n, f, op, up> val)
-    {
-        typedef libq::fixed_point<T, n, f, op, up> fp_type;
-        typedef libq::sinh_of<fp_type>::type result_type;
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+typename libq::details::sinh_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
+    sinh(libq::fixed_point<T, n, f, op, up> _val)
+{
+    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef typename libq::details::sinh_of<Q>::promoted_type sinh_type;
 
-        result_type x = result_type(std::exp(val) - std::exp(-val));
-        libq::as_native(x) >>= 1u;
+    auto x = static_cast<sinh_type>(std::exp(_val)) - static_cast<sinh_type>(std::exp(-_val));
+    libq::lift(x) >>= 1u;
 
-        return x;
-    }
+    return x;
 }
+} // std
+
+#endif // INC_LIBQ_DETAILS_SINH_INL_

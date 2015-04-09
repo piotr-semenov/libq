@@ -1,45 +1,56 @@
-/// @brief provides stuff for std::tan in case of fixed-point numbers
+// tan.inl
+//
+// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Distributed under the New BSD License. (See accompanying file LICENSE)
 
-#include <boost/type_traits/is_floating_point.hpp>
+/*!
+ \file tan.inl
 
-#include <boost/integer.hpp>
+ Provides CORDIC for tan function
+ \ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
+*/
+
+#ifndef INC_STD_TAN_INL_
+#define INC_STD_TAN_INL_
 
 namespace libq {
-    template<typename T>
-    class tan_of
-    {
-        BOOST_STATIC_ASSERT(boost::is_floating_point<T>::value);
+namespace details {
+/*!
+*/
+template<typename T>
+class tan_of
+{
+public:
+    typedef T promoted_type;
+};
 
-    public:
-        typedef T type;
-    };
-
-    template<typename T, size_t n, size_t f, class op, class up>
-    class tan_of<fixed_point<T, n, f, op, up> >
-    {
-        typedef fixed_point<T, n, f, op, up> fp_type;
-
-    public:
-        typedef typename quotient_of<
-            typename sin_of<fp_type>::type,
-            typename cos_of<fp_type>::type
-        >::type type;
-    };
-}
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+class tan_of<libq::fixed_point<T, n, f, op, up> >
+    :   public libq::details::div_of<
+            typename libq::details::sin_of<libq::fixed_point<T, n, f, op, up> >::promoted_type,
+            typename libq::details::cos_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
+        >
+{};
+} // details
+} // libq
 
 namespace std {
-    template<typename T, size_t n, size_t f, class op, class up>
-    typename libq::tan_of<libq::fixed_point<T, n, f, op, up> >::type tan(libq::fixed_point<T, n, f, op, up> val)
-    {
-        typedef libq::fixed_point<T, n, f, op, up> fp;
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+typename libq::details::tan_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
+    tan(libq::fixed_point<T, n, f, op, up> _val)
+{
+    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef typename libq::details::tan_of<Q>::promoted_type tan_type;
 
-        fp::sin_type const sin = std::sin(val);
-        fp::cos_type const cos = std::cos(val);
+    auto const x = std::sin(_val);
+    auto const y = std::cos(_val);
 
-        if (cos == fp::cos_type(0)) {
-            throw std::exception("tan: cos is zero");
-        }
-
-        return fp::tan_type(sin / cos);
+    if (!y) {
+        throw std::logic_error("[std::tan] argument is equal to 0");
     }
+
+    return tan_type(x/y);
 }
+} // std
+
+#endif // INC_STD_SIN_INL_
