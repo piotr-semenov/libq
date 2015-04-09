@@ -36,6 +36,8 @@ T& lift(fixed_point<T, n, f, op, up>& _x){ return _x.m_value; }
  \tparam value_type built-in integral type to represent a fixed-point number.
  \tparam n number of significant bits (except the sign bit).
  \remark note, if storage_type is signed then number of used bits is \f$(n + 1)\f$.
+ \remake note, the supremum of \f$n\f$ is std::numeric_limits<std::uintmax_t>::digits in case of unsigned numbers and
+ std::numeric_limits<std::intmax_t>::digits in case of signed numbers
  \tparam f number of fractional bits.
  \remark note, if \f$f \geq n\f$ then number has fixed pre-scaling factor \f$p = 2^{n - f}\f$.
  \remark note, the number of integer bits is \f$\max(n - f, 0)\f$.
@@ -62,23 +64,34 @@ public:
     typedef value_type storage_type;
 
     enum: std::size_t {
-        bits_for_fractional = f, ///< number of bits to represent the fractional part of fixed-point number
+        bits_for_fractional = f, ///< queried number of bits to represent the fractional part of fixed-point number
         number_of_significant_bits = n, ///< total number of significant bits
 
         is_signed = std::numeric_limits<storage_type>::is_signed ///< checks if this fixed-point number is signed
     };
 
-    static_assert(number_of_significant_bits <= std::numeric_limits<largest_type>::digits, "system has no integer type of such big word size");
-    enum: std::uintmax_t {
-        scale = std::uintmax_t(1) << bits_for_fractional, ///< scaling factor for fixed-point interval
+    /*!
+     \brief gets the scale factor for fixed-point numbers of current format
+    */
+    inline static double scale_factor()
+    {
+        static double const factor = std::exp2(static_cast<double>(this_class::bits_for_fractional));
+        return factor;
+    }
 
+    static_assert(number_of_significant_bits <= std::numeric_limits<largest_type>::digits, "system has no integer type of such big word size");
+    enum : std::uintmax_t {
         // some trick to handle the case n = max possible word size
         integer_bits_mask =
-            (
-                (std::uintmax_t(1) << (number_of_significant_bits - 1u)) -
-                (std::uintmax_t(1) << (bits_for_fractional - 1u))
-            ) << 1u,
-        fractional_bits_mask = (std::uintmax_t(1) << bits_for_fractional) - 1u
+            (this_class::number_of_significant_bits > this_class::bits_for_fractional) ?
+                2u * (
+                    (std::uintmax_t(1) << (number_of_significant_bits - 1u)) -
+                    (std::uintmax_t(1) << (bits_for_fractional - 1u))
+                ) : 0,
+        fractional_bits_mask =
+            (this_class::number_of_significant_bits <= this_class::bits_for_fractional) ?
+                2u * ((std::uintmax_t(1) << (this_class::number_of_significant_bits - 1u)) - 1u) :
+                2u * ((std::uintmax_t(1) << (this_class::bits_for_fractional - 1u)) - 1u)
     };
     // need to avoid the signed/unsigned mismatch in arithmetic safety checks
     enum: typename this_class::largest_type {
@@ -98,7 +111,7 @@ public:
     static double dynamic_range_db(){ return 20.0 * std::log10(static_cast<double>(largest_stored_integer)); }
 
     /// \brief the precision of the fixed-point number
-    static double precision(){ return 1.0 / this_class::scale; }
+    static double precision(){ return 1.0 / this_class::scale_factor(); }
 
     /// \brief signed version of fixed-point number type
     typedef fixed_point<
@@ -375,10 +388,10 @@ private:
     static storage_type calc_stored_integer_from(T const& _x, std::true_type)
     {
         if (_x > T(0)) {
-            return static_cast<storage_type>(std::floor(double(_x) * this_class::scale + 0.5));
+            return static_cast<storage_type>(std::floor(double(_x) * this_class::scale_factor() + 0.5));
         }
 
-        return static_cast<storage_type>(std::ceil(double(_x) * this_class::scale - 0.5));
+        return static_cast<storage_type>(std::ceil(double(_x) * this_class::scale_factor() - 0.5));
     }
 
     // in case of integral types
@@ -471,7 +484,7 @@ private:
     }
 
     // converts fixed-point number to the floating-point number
-    double to_floating_point() const{ return static_cast<double>(value()) / this_class::scale; }
+    double to_floating_point() const{ return static_cast<double>(value()) / this_class::scale_factor(); }
 
     storage_type m_value;
     this_class& set_value(storage_type const _x)
