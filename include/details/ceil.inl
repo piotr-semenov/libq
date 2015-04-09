@@ -23,7 +23,7 @@ libq::fixed_point<T, n, f, op, up>
 {
     typedef libq::fixed_point<T, n, f, op, up> Q;
 
-    Q::storage_type val = _x.value();
+    typename Q::storage_type val = _x.value();
     if (val & Q::fractional_bits_mask) {
         val += Q::storage_type(1u) << Q::bits_for_fractional;
     }
