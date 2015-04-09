@@ -12,10 +12,61 @@
 #ifndef INC_LIBQ_ARITHMETICS_SAFETY_HPP_
 #define INC_LIBQ_ARITHMETICS_SAFETY_HPP_
 
-#include "fixed_point.hpp"
+#include <stdexcept>
 
 namespace libq {
+
+template<typename T, std::size_t n, std::size_t f, class op, class up>
+class fixed_point;
+
+/*!
+*/
+class overflow_exception_policy
+{
+public:
+    enum: bool {
+        does_throw = true
+    };
+
+    static void raise_event(char const* _msg = nullptr)
+    {
+        throw std::overflow_error(_msg);
+    }
+};
+
+/*!
+*/
+class underflow_exception_policy
+{
+public:
+    enum: bool {
+        does_throw = true
+    };
+
+    static void raise_event(char const* _msg = nullptr)
+    {
+        throw std::underflow_error(_msg);
+    }
+};
+
+/*!
+*/
+class ignorance_policy
+{
+public:
+    enum: bool {
+        does_throw = false
+    };
+
+    static void raise_event(char const* _msg = nullptr)
+    {}
+};
+
 namespace details {
+
+template<typename T> class sum_of;
+template<typename T1, typename T2> class mult_of;
+template<typename T1, typename T2> class div_of;
 
 /*!
  \defgroup arithmetics_safety the run-time overflow/underflow safety checks for basic arithmetics operations
@@ -31,9 +82,10 @@ template<typename T, std::size_t n, std::size_t f, typename... Ps>
 bool
     does_addition_overflow(libq::fixed_point<T, n, f, Ps...> const _x, libq::fixed_point<T, n, f, Ps...> const _y)
 {
-    typedef typename libq::fixed_point<T, n, f, Ps...>::sum_type result_type;
+    typedef typename sum_of<fixed_point<T, n, f, Ps...> >::promoted_type result_type;
     auto const a = _x.value();
     auto const b = _y.value();
+    auto const _tmp = result_type::largest_stored_integer;
 
     return
         (b > 0 && a > result_type::largest_stored_integer - b) ||
@@ -47,9 +99,11 @@ template<typename T, std::size_t n, std::size_t f, typename... Ps>
 static bool
     does_subtraction_overflow(fixed_point<T, n, f, Ps...> const _x, fixed_point<T, n, f, Ps...> const _y)
 {
-    typedef typename fixed_point<T, n, f, Ps...>::diff_type result_type;
+    typedef typename sum_of<fixed_point<T, n, f, Ps...> >::promoted_type result_type;
     auto const a = _x.value();
     auto const b = _y.value();
+
+    auto const c = result_type::least_stored_integer;
 
     return
         (b > 0 && a < result_type::least_stored_integer + b) ||
@@ -63,9 +117,15 @@ template<typename T1, std::size_t n1, std::size_t f1, typename T2, std::size_t n
 bool
     does_multiplication_overflow(libq::fixed_point<T1, n1, f1, Ps...> const _x, libq::fixed_point<T2, n2, f2, Ps...> const _y)
 {
-    typedef typename mult_of<libq::fixed_point<T1, n1, f1, Ps...>, libq::fixed_point<T2, n2, f2, Ps...> >::promoted_type result_type;
-    auto const a = _x.value();
-    auto const b = _y.value();
+    typedef libq::fixed_point<T1, n1, f1, Ps...> Q1;
+    typedef libq::fixed_point<T2, n2, f2, Ps...> Q2;
+    typedef typename mult_of<Q1, Q2>::promoted_type result_type;
+
+    typename result_type::storage_type const a = _x.value();
+    typename result_type::storage_type const b = _y.value();
+
+    typename result_type::storage_type const _test_max = result_type::largest_stored_integer;
+    typename result_type::storage_type const _test_min = result_type::least_stored_integer;
 
     return
         (a > 0 && b > 0 && a > result_type::largest_stored_integer / b) ||
