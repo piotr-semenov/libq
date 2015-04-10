@@ -23,7 +23,7 @@ double
 {
     double scale(1.0);
 
-    for (std::size_t i = 0; i != n; ++i) {
+    for (std::size_t i = 0; i != _n; ++i) {
         scale *= std::sqrt(1.0 + std::pow(2.0, -2.0 * i));
     }
 

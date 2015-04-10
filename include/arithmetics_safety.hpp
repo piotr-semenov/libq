@@ -58,8 +58,7 @@ public:
         does_throw = false
     };
 
-    static void raise_event(char const* _msg = nullptr)
-    {}
+    static void raise_event(char const* = nullptr){}
 };
 
 namespace details {
@@ -103,8 +102,6 @@ static bool
     auto const a = _x.value();
     auto const b = _y.value();
 
-    auto const c = result_type::least_stored_integer;
-
     return
         (b > 0 && a < result_type::least_stored_integer + b) ||
         (b < 0 && a > result_type::largest_stored_integer + b);
@@ -121,11 +118,8 @@ bool
     typedef libq::fixed_point<T2, n2, f2, Ps...> Q2;
     typedef typename mult_of<Q1, Q2>::promoted_type result_type;
 
-    typename result_type::storage_type const a = _x.value();
-    typename result_type::storage_type const b = _y.value();
-
-    typename result_type::storage_type const _test_max = result_type::largest_stored_integer;
-    typename result_type::storage_type const _test_min = result_type::least_stored_integer;
+    typename result_type::storage_type const a(_x.value());
+    typename result_type::storage_type const b(_y.value());
 
     return
         (a > 0 && b > 0 && a > result_type::largest_stored_integer / b) ||

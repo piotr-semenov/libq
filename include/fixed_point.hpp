@@ -28,7 +28,7 @@ namespace libq {
 /*!
  \brief provides a proxy class to deal with stored integer behind the fixed-point number
 */
-template<typename T, std::size_t n, std::size_t f, class op, class up>
+template<typename T, std::size_t n, int f, class op, class up>
 T& lift(fixed_point<T, n, f, op, up>& _x){ return _x.m_value; }
 
 /*!
@@ -41,14 +41,14 @@ T& lift(fixed_point<T, n, f, op, up>& _x){ return _x.m_value; }
  std::numeric_limits<std::intmax_t>::digits in case of signed numbers
  \tparam f fixed-point format exponent (it is like a logical number of fractional bits).
  \remark note, if \f$f \geq n\f$ then number has fixed pre-scaling factor \f$p = 2^{n - f}\f$.
- \remark note, the number of integer bits is \f$\max(n - f, 0)\f$.
- \remark so note, \f$n\f$ is a physical entity and \f$f\f$ is a logical one.
+ \remark note, the number of integer bits is \f$\max(n - |f|, 0)\f$.
+ \remark so note, \f$n\f$ is a physical entity and \f$f\f$ is a logical one (can be negative).
  \tparam op class specifying the actions to do if overflow occurred
  \tparam up class specifying the actions to do if underflow occurred
 
  \ref see http://en.wikipedia.org/wiki/Q_(number_format) for details
 */
-template<typename value_type, std::size_t n, std::size_t f, class op, class up>
+template<typename value_type, std::size_t n, int f, class op, class up>
 class fixed_point
 {
     static_assert(std::is_integral<value_type>::value, "value_type must be of the built-in integral type like std::uint8_t");
@@ -68,7 +68,7 @@ public:
         number_of_significant_bits = n, ///< total number of significant bits
         mantissa_length = f, ///< length of mantissa
 
-        bits_for_fractional = (f >= n) ? n : (n - f), ///< queried number of bits to represent the fractional part of fixed-point number
+        bits_for_fractional = (f >= n) ? n : f, ///< queried number of bits to represent the fractional part of fixed-point number
         bits_for_integral = (n >= f) ? (n - f) : 0, ///< number of bits to represent the integer part of fixed-point number
 
         is_signed = std::numeric_limits<storage_type>::is_signed ///< checks if this fixed-point number is signed
@@ -170,7 +170,7 @@ public:
         :   m_value(
                 this_class::normalize(
                     _x,
-                    std::integral_constant<bool, (f1 > this_class::bits_for_fractional)>()
+                    std::integral_constant<bool, (f1 > this_class::mantissa_length)>()
                 )
             ){}
 
@@ -314,6 +314,7 @@ public:
         typedef typename libq::fixed_point<T1, n1, f1, op1, up1> operand_type;
         typedef libq::details::mult_of<this_class, operand_type> promotion_traits;
         typedef typename promotion_traits::promoted_type result_type;
+        typedef typename promotion_traits::promoted_storage_type word_type;
 
         if (details::does_multiplication_overflow(*this, _x)) {
             overflow_policy::raise_event();
@@ -322,21 +323,16 @@ public:
         // do the exact or approximate multiplication of fixed-point numbers
         return result_type::make_fixed_point(
             multiply(*this, _x, std::integral_constant<bool, promotion_traits::is_expandable>())
-            );
+        );
     }
 
     template<typename T1, std::size_t n1, std::size_t f1, typename op1, typename up1>
     this_class operator *=(libq::fixed_point<T1, n1, f1, op1, up1> const& _x)
     {
-        typedef typename libq::fixed_point<T1, n1, f1, op1, up1> operand_type;
-        typedef typename libq::details::mult_of<this_class, operand_type>::promoted_type result_type;
-
         if (details::does_multiplication_overflow(*this, _x)) {
             overflow_policy::raise_event();
         }
-
-        typedef typename result_type::storage_type word_type;
-        return (*this = (*this) * _x);
+        return this->set_value(this_class((*this) * _x).value());
     }
 
     // arithmetics: division
@@ -415,7 +411,7 @@ private:
     static storage_type normalize(fixed_point<T1, n1, f1, Ps...> const& _x, std::false_type)
     {
         return
-            storage_type(_x.value()) << (this_class::bits_for_fractional - f1);
+            storage_type(_x.value()) << (this_class::mantissa_length - f1);
     }
 
     // normalizes the input fixed-point number to one of the current format in case \f$n < n1\f$
@@ -423,7 +419,7 @@ private:
     static storage_type normalize(fixed_point<T1, n1, f1, Ps...> const& _x, std::true_type)
     {
         storage_type const value =
-            static_cast<storage_type>(_x.value() >> (f1 - this_class::bits_for_fractional));
+            static_cast<storage_type>(_x.value() >> (f1 - this_class::mantissa_length));
         if (_x.value() && !value) {
             underflow_policy::raise_event();
         }
@@ -448,29 +444,38 @@ private:
             static_cast<word_type>(_y.value());
     }
     // division of fixed-point numbers: 
-    template<typename T1, std::size_t n1, std::size_t f1, typename T2, std::size_t n2, std::size_t f2, typename... Ps>
+    template<typename T1, std::size_t n1, std::size_t f1, typename T2, std::size_t n2, std::size_t f2, typename opolicy, typename upolicy>
     inline static typename libq::details::div_of<
-        libq::fixed_point<T1, n1, f1, Ps...>,
-        libq::fixed_point<T2, n2, f2, Ps...>
+        libq::fixed_point<T1, n1, f1, opolicy, upolicy>,
+        libq::fixed_point<T2, n2, f2, opolicy, upolicy>
     >::promoted_storage_type
-        divide(libq::fixed_point<T1, n1, f1, Ps...> const& _x, libq::fixed_point<T2, n2, f2, Ps...> const& _y, std::false_type)
+        divide(libq::fixed_point<T1, n1, f1, opolicy, upolicy> const& _x, libq::fixed_point<T2, n2, f2, opolicy, upolicy> const& _y, std::false_type)
     {
-        typedef typename libq::fixed_point<T1, n1, f1, Ps...> operand_type1;
-        typedef typename libq::fixed_point<T2, n2, f2, Ps...> operand_type2;
-        typedef typename libq::details::div_of<operand_type1, operand_type2>::promoted_storage_type word_type;
-
+        typedef typename libq::fixed_point<T1, n1, f1, opolicy, upolicy> operand_type1;
+        typedef typename libq::fixed_point<T2, n2, f2, opolicy, upolicy> operand_type2;
         typedef typename this_class::largest_type max_type;
+
+        typedef typename libq::details::div_of<operand_type1, operand_type2> promotion_traits;
+        typedef typename promotion_traits::promoted_type result_type;
+        typedef typename promotion_traits::promoted_storage_type word_type;
 
         // approximate division algorithm:
         // calc the diff between the available bits to shift and the limit
-        static std::size_t const left_bits = std::numeric_limits<max_type>::digits - std::numeric_limits<operand_type1>::digits;
-        max_type const shifted = max_type(_x.value()) << left_bits;
+        static std::size_t const delta =
+            std::numeric_limits<max_type>::digits - operand_type1::number_of_significant_bits;
+        static std::size_t const promotion_shifts = (delta > operand_type2::mantissa_length) ? operand_type2::mantissa_length : delta;
+        static std::size_t const normalization_shifts = operand_type2::mantissa_length - promotion_shifts;
+
+        std::size_t const _tmp0(normalization_shifts);
+        std::size_t const _tmp1(available_shifts);
+        std::size_t const _tmp2(delta);
+        result_type const _tmp3(0.0);
+
+        max_type const shifted = max_type(_x.value()) << available_shifts; // no overflow can be occurred here
         max_type value = shifted / operand_type1(_y).value();
 
-        static std::size_t const shifts = (left_bits > operand_type1::bits_for_fractional) ?
-            (left_bits - operand_type1::bits_for_fractional) :
-            (operand_type1::bits_for_fractional - left_bits);
-        value = (left_bits > operand_type1::bits_for_fractional) ? (value >> shifts) : (value << shifts);
+        // note, normalization_shifts is always nonnegative
+        value <<= normalization_shifts;
 
         return word_type(value);
     }
@@ -481,7 +486,7 @@ private:
         libq::fixed_point<T1, n1, f1, Ps...>,
         libq::fixed_point<T2, n2, f2, Ps...>
     >::promoted_storage_type
-    multiply(libq::fixed_point<T1, n1, f1, Ps...> const& _x, libq::fixed_point<T2, n2, f2, Ps...> const& _y, std::true_type)
+        multiply(libq::fixed_point<T1, n1, f1, Ps...> const& _x, libq::fixed_point<T2, n2, f2, Ps...> const& _y, std::true_type)
     {
         typedef typename libq::fixed_point<T1, n1, f1, Ps...> operand_type1;
         typedef typename libq::fixed_point<T2, n2, f2, Ps...> operand_type2;
@@ -494,7 +499,7 @@ private:
         libq::fixed_point<T1, n1, f1, Ps...>,
         libq::fixed_point<T2, n2, f2, Ps...>
     >::promoted_storage_type
-    multiply(libq::fixed_point<T1, n1, f1, Ps...> const& _x, libq::fixed_point<T2, n2, f2, Ps...> const& _y, std::false_type)
+        multiply(libq::fixed_point<T1, n1, f1, Ps...> const& _x, libq::fixed_point<T2, n2, f2, Ps...> const& _y, std::false_type)
     {
         typedef typename libq::fixed_point<T1, n1, f1, Ps...> operand_type1;
         typedef typename libq::fixed_point<T2, n2, f2, Ps...> operand_type2;
@@ -503,15 +508,14 @@ private:
         typedef typename this_class::largest_type max_type;
 
         // approximate algorithm idea: we truncate the fractional precision of 2nd operand
-        // static std::size_t const left_bits = (std::numeric_limits<max_type>::digits - std::numeric_limits<operand_type1>::digits) -
-        //     operand_type2::bits_for_integral;
-        // static std::size_t const shifts1 = (left_bits < 0 || left_bits > operand_type2::bits_for_fractional) ?
-        //     0 : static_cast<int>(operand_type2::bits_for_fractional) - left_bits;
-        // static std::size_t const shifts2 = (left_bits > 0 && left_bits <= operand_type2::bits_for_fractional) ?
-        //     left_bits : operand_type2::bits_for_fractional;
-        // 
-        // return word_type(_x.value() * (_y.value() >> shifts1)) >> shifts2;
-        return word_type(_x.value()) * word_type(_y.value());
+        static std::size_t const available_shifts = (std::numeric_limits<max_type>::digits - std::numeric_limits<operand_type1>::digits) -
+            operand_type2::bits_for_integral;
+        static std::size_t const shifts1 = (available_shifts < 0 || available_shifts > operand_type2::bits_for_fractional) ?
+            0 : static_cast<int>(operand_type2::bits_for_fractional) - available_shifts;
+        static std::size_t const shifts2 = (available_shifts > 0 && available_shifts <= operand_type2::bits_for_fractional) ?
+            available_shifts : operand_type2::bits_for_fractional;
+
+        return word_type(_x.value() * (_y.value() >> shifts1)) >> shifts2;
     }
 
     // converts fixed-point number to the floating-point number

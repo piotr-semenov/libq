@@ -42,7 +42,7 @@ class type_promotion_base<libq::fixed_point<_T, _n, _f, _op, _up>, delta_n, delt
         sign_bit = static_cast<std::size_t>(Q::is_signed),
 
         n = Q::number_of_significant_bits,
-        f = Q::bits_for_fractional
+        f = Q::mantissa_length
     };
 
     // simple "type" wrapper for lazy instantiation of its "internal" type
@@ -62,27 +62,22 @@ class type_promotion_base<libq::fixed_point<_T, _n, _f, _op, _up>, delta_n, delt
 public:
 
     enum: bool {
-        is_expandable_sig = (n + delta_n + this_class::sign_bit <= std::numeric_limits<max_type>::digits),
-        is_expandable_frac = (f + delta_f <= std::numeric_limits<max_type>::digits)
+        is_expandable = (n + delta_n + this_class::sign_bit <= std::numeric_limits<max_type>::digits),
     };
 
     /*!
      \brief
     */
     typedef typename boost::mpl::eval_if_c<
-        this_class::is_expandable_sig
+        this_class::is_expandable
         , typename this_class::storage_type_promotion_traits
         , typename this_class::storage_type_default_traits
     >::type promoted_storage_type;
 
     typedef typename std::conditional<
-        this_class::is_expandable_sig
+        this_class::is_expandable
         , libq::fixed_point<promoted_storage_type, n + delta_n, f + delta_f, typename Q::overflow_policy, typename Q::underflow_policy>
-        , typename std::conditional<
-            this_class::is_expandable_frac,
-            libq::fixed_point<promoted_storage_type, n, f + delta_f, typename Q::overflow_policy, typename Q::underflow_policy>,
-            libq::fixed_point<promoted_storage_type, n, f, typename Q::overflow_policy, typename Q::underflow_policy>
-        >::type
+        , libq::fixed_point<promoted_storage_type, n, f, typename Q::overflow_policy, typename Q::underflow_policy>
     >::type promoted_type;
 };
 
