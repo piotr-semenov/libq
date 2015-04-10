@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Debug visualizer for Visual Studio 2013
+ Put this to a folder below:
+ 1. My Documents/Visual Studio 2012/Visualizers/ if you are the only user of that stuff
+ 2. %VSINSTALLDIR%\Common7\Packages\Debugger\Visualizers if all users are wanted
+-->
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="libq::fixed_point&lt;*,*,*,*,*&gt;">
+    <DisplayString Condition="$T3==63">Q{$T2}.{$T3}({m_value}) -> {m_value / 9223372036854775808.0}</DisplayString>
+    <DisplayString Condition="$T3==62">Q{$T2}.{$T3}({m_value}) -> {m_value / 4611686018427387904.0}</DisplayString>
+    <DisplayString Condition="$T3==61">Q{$T2}.{$T3}({m_value}) -> {m_value / 2305843009213693952.0}</DisplayString>
+    <DisplayString Condition="$T3==60">Q{$T2}.{$T3}({m_value}) -> {m_value / 1152921504606846976.0}</DisplayString>
+    <DisplayString Condition="$T3==59">Q{$T2}.{$T3}({m_value}) -> {m_value / 576460752303423488.0}</DisplayString>
+    <DisplayString Condition="$T3==58">Q{$T2}.{$T3}({m_value}) -> {m_value / 288230376151711744.0}</DisplayString>
+    <DisplayString Condition="$T3==57">Q{$T2}.{$T3}({m_value}) -> {m_value / 144115188075855872.0}</DisplayString>
+    <DisplayString Condition="$T3==56">Q{$T2}.{$T3}({m_value}) -> {m_value / 72057594037927936.0}</DisplayString>
+    <DisplayString Condition="$T3==55">Q{$T2}.{$T3}({m_value}) -> {m_value / 36028797018963968.0}</DisplayString>
+    <DisplayString Condition="$T3==54">Q{$T2}.{$T3}({m_value}) -> {m_value / 18014398509481984.0}</DisplayString>
+    <DisplayString Condition="$T3==53">Q{$T2}.{$T3}({m_value}) -> {m_value / 9007199254740992.0}</DisplayString>
+    <DisplayString Condition="$T3==52">Q{$T2}.{$T3}({m_value}) -> {m_value / 4503599627370496.0}</DisplayString>
+    <DisplayString Condition="$T3==51">Q{$T2}.{$T3}({m_value}) -> {m_value / 2251799813685248.0}</DisplayString>
+    <DisplayString Condition="$T3==50">Q{$T2}.{$T3}({m_value}) -> {m_value / 1125899906842624.0}</DisplayString>
+    <DisplayString Condition="$T3==49">Q{$T2}.{$T3}({m_value}) -> {m_value / 562949953421312.0}</DisplayString>
+    <DisplayString Condition="$T3==48">Q{$T2}.{$T3}({m_value}) -> {m_value / 281474976710656.0}</DisplayString>
+    <DisplayString Condition="$T3==47">Q{$T2}.{$T3}({m_value}) -> {m_value / 140737488355328.0}</DisplayString>
+    <DisplayString Condition="$T3==46">Q{$T2}.{$T3}({m_value}) -> {m_value / 70368744177664.0}</DisplayString>
+    <DisplayString Condition="$T3==45">Q{$T2}.{$T3}({m_value}) -> {m_value / 35184372088832.0}</DisplayString>
+    <DisplayString Condition="$T3==44">Q{$T2}.{$T3}({m_value}) -> {m_value / 17592186044416.0}</DisplayString>
+    <DisplayString Condition="$T3==43">Q{$T2}.{$T3}({m_value}) -> {m_value / 8796093022208.0}</DisplayString>
+    <DisplayString Condition="$T3==42">Q{$T2}.{$T3}({m_value}) -> {m_value / 4398046511104.0}</DisplayString>
+    <DisplayString Condition="$T3==41">Q{$T2}.{$T3}({m_value}) -> {m_value / 2199023255552.0}</DisplayString>
+    <DisplayString Condition="$T3==40">Q{$T2}.{$T3}({m_value}) -> {m_value / 1099511627776.0}</DisplayString>
+    <DisplayString Condition="$T3==39">Q{$T2}.{$T3}({m_value}) -> {m_value / 549755813888.0}</DisplayString>
+    <DisplayString Condition="$T3==38">Q{$T2}.{$T3}({m_value}) -> {m_value / 274877906944.0}</DisplayString>
+    <DisplayString Condition="$T3==37">Q{$T2}.{$T3}({m_value}) -> {m_value / 137438953472.0}</DisplayString>
+    <DisplayString Condition="$T3==36">Q{$T2}.{$T3}({m_value}) -> {m_value / 68719476736.0}</DisplayString>
+    <DisplayString Condition="$T3==35">Q{$T2}.{$T3}({m_value}) -> {m_value / 34359738368.0}</DisplayString>
+    <DisplayString Condition="$T3==34">Q{$T2}.{$T3}({m_value}) -> {m_value / 17179869184.0}</DisplayString>
+    <DisplayString Condition="$T3==33">Q{$T2}.{$T3}({m_value}) -> {m_value / 8589934592.0}</DisplayString>
+    <DisplayString Condition="$T3==32">Q{$T2}.{$T3}({m_value}) -> {m_value / 4294967296.0}</DisplayString>
+    <DisplayString Condition="$T3==31">Q{$T2}.{$T3}({m_value}) -> {m_value / 2147483648.0}</DisplayString>
+    <DisplayString Condition="$T3==30">Q{$T2}.{$T3}({m_value}) -> {m_value / 1073741824.0}</DisplayString>
+    <DisplayString Condition="$T3==29">Q{$T2}.{$T3}({m_value}) -> {m_value / 536870912.0}</DisplayString>
+    <DisplayString Condition="$T3==28">Q{$T2}.{$T3}({m_value}) -> {m_value / 268435456.0}</DisplayString>
+    <DisplayString Condition="$T3==27">Q{$T2}.{$T3}({m_value}) -> {m_value / 134217728.0}</DisplayString>
+    <DisplayString Condition="$T3==26">Q{$T2}.{$T3}({m_value}) -> {m_value / 67108864.0}</DisplayString>
+    <DisplayString Condition="$T3==25">Q{$T2}.{$T3}({m_value}) -> {m_value / 33554432.0}</DisplayString>
+    <DisplayString Condition="$T3==24">Q{$T2}.{$T3}({m_value}) -> {m_value / 16777216.0}</DisplayString>
+    <DisplayString Condition="$T3==23">Q{$T2}.{$T3}({m_value}) -> {m_value / 8388608.0}</DisplayString>
+    <DisplayString Condition="$T3==22">Q{$T2}.{$T3}({m_value}) -> {m_value / 4194304.0}</DisplayString>
+    <DisplayString Condition="$T3==21">Q{$T2}.{$T3}({m_value}) -> {m_value / 2097152.0}</DisplayString>
+    <DisplayString Condition="$T3==20">Q{$T2}.{$T3}({m_value}) -> {m_value / 1048576.0}</DisplayString>
+    <DisplayString Condition="$T3==19">Q{$T2}.{$T3}({m_value}) -> {m_value / 524288.0}</DisplayString>
+    <DisplayString Condition="$T3==18">Q{$T2}.{$T3}({m_value}) -> {m_value / 262144.0}</DisplayString>
+    <DisplayString Condition="$T3==17">Q{$T2}.{$T3}({m_value}) -> {m_value / 131072.0}</DisplayString>
+    <DisplayString Condition="$T3==16">Q{$T2}.{$T3}({m_value}) -> {m_value / 65536.0}</DisplayString>
+    <DisplayString Condition="$T3==15">Q{$T2}.{$T3}({m_value}) -> {m_value / 32768.0}</DisplayString>
+    <DisplayString Condition="$T3==14">Q{$T2}.{$T3}({m_value}) -> {m_value / 16384.0}</DisplayString>
+    <DisplayString Condition="$T3==13">Q{$T2}.{$T3}({m_value}) -> {m_value / 8192.0}</DisplayString>
+    <DisplayString Condition="$T3==12">Q{$T2}.{$T3}({m_value}) -> {m_value / 4096.0}</DisplayString>
+    <DisplayString Condition="$T3==11">Q{$T2}.{$T3}({m_value}) -> {m_value / 2048.0}</DisplayString>
+    <DisplayString Condition="$T3==10">Q{$T2}.{$T3}({m_value}) -> {m_value / 1024.0}</DisplayString>
+    <DisplayString Condition="$T3==9">Q{$T2}.{$T3}({m_value}) -> {m_value / 512.0}</DisplayString>
+    <DisplayString Condition="$T3==8">Q{$T2}.{$T3}({m_value}) -> {m_value / 256.0}</DisplayString>
+    <DisplayString Condition="$T3==7">Q{$T2}.{$T3}({m_value}) -> {m_value / 128.0}</DisplayString>
+    <DisplayString Condition="$T3==6">Q{$T2}.{$T3}({m_value}) -> {m_value / 64.0}</DisplayString>
+    <DisplayString Condition="$T3==5">Q{$T2}.{$T3}({m_value}) -> {m_value / 32.0}</DisplayString>
+    <DisplayString Condition="$T3==4">Q{$T2}.{$T3}({m_value}) -> {m_value / 16.0}</DisplayString>
+    <DisplayString Condition="$T3==3">Q{$T2}.{$T3}({m_value}) -> {m_value / 8.0}</DisplayString>
+    <DisplayString Condition="$T3==2">Q{$T2}.{$T3}({m_value}) -> {m_value / 4.0}</DisplayString>
+    <DisplayString Condition="$T3==1">Q{$T2}.{$T3}({m_value}) -> {m_value / 2.0}</DisplayString>
+    <Expand>
+      <Item Name="[stored integer]">m_value</Item>
+      <Item Name="[exact fractional 10-digits]">(unsigned)($T3 * 0.301029995663981195214)</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>
