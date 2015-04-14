@@ -42,7 +42,7 @@ class type_promotion_base<libq::fixed_point<_T, _n, _f, _op, _up>, delta_n, delt
         sign_bit = static_cast<std::size_t>(Q::is_signed),
 
         n = Q::number_of_significant_bits,
-        f = Q::mantissa_length
+        f = Q::exponent
     };
 
     // simple "type" wrapper for lazy instantiation of its "internal" type

@@ -46,6 +46,7 @@ typename libq::details::tanh_of<libq::fixed_point<T, n, f, op, up> >::promoted_t
 
     auto const a = std::sinh(_val);
     auto const b = std::cosh(_val);
+    auto const c = tanh_type(a / b);
     return tanh_type(std::sinh(_val) / std::cosh(_val));
 }
 } // std

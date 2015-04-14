@@ -39,15 +39,31 @@ T& lift(fixed_point<T, n, f, op, up>& _x){ return _x.m_value; }
  \remark note, if storage_type is signed then number of used bits is \f$(n + 1)\f$.
  \remake note, the supremum of \f$n\f$ is std::numeric_limits<std::uintmax_t>::digits in case of unsigned numbers and
  std::numeric_limits<std::intmax_t>::digits in case of signed numbers
- \tparam f fixed-point format exponent (it is like a logical number of fractional bits).
+ \tparam f fixed-point format exponent (it is like a logical number of fractional bits. If positive it leads to the mantissa length).
  \remark note, if \f$f \geq n\f$ then number has fixed pre-scaling factor \f$p = 2^{n - f}\f$.
- \remark note, the number of integer bits is \f$\max(n - |f|, 0)\f$.
- \remark so note, \f$n\f$ is a physical entity and \f$f\f$ is a logical one (can be negative).
+ \remark note, the number of integer bits is \f$(f > 0) ? \max(n - f, 0) : n\f$.
+ \remark so note, \f$n\f$ is a physical entity and \f$f\f$ is a logical one.
  \tparam op class specifying the actions to do if overflow occurred
  \tparam up class specifying the actions to do if underflow occurred
 
+ <B>Usage</B>
+
+ <I>Example 1</I>:
+ \code{.cpp}
+    #include "fixed_point.hpp"
+
+    int main(int, char**)
+    {
+        typedef libq::Q<10, 20> Q1; // represents the dynamic range []
+        typedef libq::Q<20, 15> Q2; // represents the dynamic range []
+        return 0;
+    }
+ \endcode
+
  \ref see http://en.wikipedia.org/wiki/Q_(number_format) for details
 */
+template<typename value_type, std::size_t bits_for_integral, std::size_t bits_for_fractional, int prescale_exponent>
+
 template<typename value_type, std::size_t n, int f, class op, class up>
 class fixed_point
 {
@@ -64,12 +80,12 @@ public:
     /// \brief the integral type behind the fixed-point object
     typedef value_type storage_type;
 
+    enum: int { exponent = f };
     enum: std::size_t {
         number_of_significant_bits = n, ///< total number of significant bits
-        mantissa_length = f, ///< length of mantissa
 
-        bits_for_fractional = (f >= n) ? n : f, ///< queried number of bits to represent the fractional part of fixed-point number
-        bits_for_integral = (n >= f) ? (n - f) : 0, ///< number of bits to represent the integer part of fixed-point number
+        bits_for_fractional = (f < 0) ? 0 : ((f >= n) ? n : f), ///< queried number of bits to represent the fractional part of fixed-point number
+        bits_for_integral = n - bits_for_fractional, ///< number of bits to represent the integer part of fixed-point number
 
         is_signed = std::numeric_limits<storage_type>::is_signed ///< checks if this fixed-point number is signed
     };
@@ -79,8 +95,8 @@ public:
     */
     inline static double scale_factor()
     {
-        //static double const factor = std::exp2(static_cast<double>(this_class::mantissa_length));
-        static double const factor = std::pow(2.0, static_cast<double>(this_class::mantissa_length));
+        //static double const factor = std::exp2(static_cast<double>(this_class::exponent));
+        static double const factor = std::pow(2.0, static_cast<double>(this_class::exponent));
         return factor;
     }
 
@@ -91,9 +107,11 @@ public:
             (this_class::number_of_significant_bits > this_class::bits_for_fractional) ?
                 2u * (
                     (std::uintmax_t(1) << (number_of_significant_bits - 1u)) -
-                    (std::uintmax_t(1) << (bits_for_fractional - 1u))
+                    (this_class::bits_for_fractional > 0 ? (std::uintmax_t(1) << (bits_for_fractional - 1u)) : 0)
                 ) : 0,
-        fractional_bits_mask = 2u * ((std::uintmax_t(1) << (this_class::bits_for_fractional - 1u)) - 1u)
+        fractional_bits_mask =
+            (this_class::bits_for_fractional > 0) ?
+                2u * ((std::uintmax_t(1) << (this_class::bits_for_fractional - 1u)) - 1u) : 0
     };
     // need to avoid the signed/unsigned mismatch in arithmetic safety checks
     enum: typename this_class::largest_type {
@@ -170,7 +188,7 @@ public:
         :   m_value(
                 this_class::normalize(
                     _x,
-                    std::integral_constant<bool, (f1 > this_class::mantissa_length)>()
+                    std::integral_constant<bool, (f1 > this_class::exponent)>()
                 )
             ){}
 
@@ -411,7 +429,7 @@ private:
     static storage_type normalize(fixed_point<T1, n1, f1, Ps...> const& _x, std::false_type)
     {
         return
-            storage_type(_x.value()) << (this_class::mantissa_length - f1);
+            storage_type(_x.value()) << (this_class::exponent - f1);
     }
 
     // normalizes the input fixed-point number to one of the current format in case \f$n < n1\f$
@@ -419,7 +437,7 @@ private:
     static storage_type normalize(fixed_point<T1, n1, f1, Ps...> const& _x, std::true_type)
     {
         storage_type const value =
-            static_cast<storage_type>(_x.value() >> (f1 - this_class::mantissa_length));
+            static_cast<storage_type>(_x.value() >> (f1 - this_class::exponent));
         if (_x.value() && !value) {
             underflow_policy::raise_event();
         }
@@ -456,26 +474,13 @@ private:
         typedef typename this_class::largest_type max_type;
 
         typedef typename libq::details::div_of<operand_type1, operand_type2> promotion_traits;
-        typedef typename promotion_traits::promoted_type result_type;
         typedef typename promotion_traits::promoted_storage_type word_type;
 
-        // approximate division algorithm:
-        // calc the diff between the available bits to shift and the limit
-        static std::size_t const delta =
-            std::numeric_limits<max_type>::digits - operand_type1::number_of_significant_bits;
-        static std::size_t const promotion_shifts = (delta > operand_type2::mantissa_length) ? operand_type2::mantissa_length : delta;
-        static std::size_t const normalization_shifts = operand_type2::mantissa_length - promotion_shifts;
-
-        std::size_t const _tmp0(normalization_shifts);
-        std::size_t const _tmp1(available_shifts);
-        std::size_t const _tmp2(delta);
-        result_type const _tmp3(0.0);
-
-        max_type const shifted = max_type(_x.value()) << available_shifts; // no overflow can be occurred here
+        max_type const shifted = max_type(_x.value()) << operand_type2::exponent; // no overflow can be occurred here
+        if (_x.value() != (shifted >> operand_type2::exponent)) {
+            opolicy::raise_event();
+        }
         max_type value = shifted / operand_type1(_y).value();
-
-        // note, normalization_shifts is always nonnegative
-        value <<= normalization_shifts;
 
         return word_type(value);
     }
