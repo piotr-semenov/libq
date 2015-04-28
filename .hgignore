@@ -1,6 +1,5 @@
 syntax: regexp
 ^Debug/
+^doc/
 syntax: glob
-fixed_point.ncb
-fixed_point.suo
-unit_tests.vcproj.CCR.psemenov.user
+*.sdf
