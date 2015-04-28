@@ -17,7 +17,7 @@ namespace details {
 */
 template<typename T, typename U>
 class div_of:
-    public type_promotion_base<T, 0, 0>
+    public type_promotion_base<T, 0, 0, 0>
 {
     static_assert(std::is_same<T, U>::value, "unexpected use of division_promoted_type_of template");
 };
@@ -31,10 +31,10 @@ class div_of:
  - the maximum value is \f$\frac{2^{-f_x}}{2^{n_y-f_y}} = 2^{-(f_x+(n_y-f_y))} = 2^{-f_z}\f$
  So the quotient has the following fixed-point format \f$(n_x+n_y, f_x+(n_y-f_y))\f$
 */
-template<typename T1, typename T2, std::size_t n1, std::size_t n2, std::size_t f1, std::size_t f2, typename op, typename up>
-class div_of<libq::fixed_point<T1, n1, f1, op, up>, libq::fixed_point<T2, n2, f2, op, up> >:
+template<typename T1, typename T2, std::size_t n1, std::size_t n2, std::size_t f1, std::size_t f2, int e1, int e2, class op, class up>
+class div_of<libq::fixed_point<T1, n1, f1, e1, op, up>, libq::fixed_point<T2, n2, f2, e2, op, up> >:
     public
-        type_promotion_base<libq::fixed_point<T1, n1, f1, op, up>, n2, (n2 >= f2) ? (n2 - f2) : 0>
+        type_promotion_base<libq::fixed_point<T1, n1, f1, e1, op, up>, f2, n2, -e2>
 {};
 
 } // details

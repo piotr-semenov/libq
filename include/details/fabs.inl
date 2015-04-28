@@ -17,11 +17,11 @@ namespace std {
 /*!
  \brief std::fabs in case of fixed-point numbers
 */
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-libq::fixed_point<T, n, f, op, up>
-    fabs(libq::fixed_point<T, n, f, op, up> const& _x)
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+libq::fixed_point<T, n, f, e, op, up>
+    fabs(libq::fixed_point<T, n, f, e, op, up> const& _x)
 {
-    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef libq::fixed_point<T, n, f, e, op, up> Q;
 
     return (std::signbit(_x)) ? -_x : _x;
 }

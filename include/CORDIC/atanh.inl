@@ -17,10 +17,10 @@ template<typename T>
 class atanh_of
 {};
 
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-class atanh_of<libq::fixed_point<T, n, f, op, up> >
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+class atanh_of<libq::fixed_point<T, n, f, e, op, up> >
     :    public libq::details::sum_of<
-            typename libq::details::log_of<T, n, f, op, up>::promoted_type
+            typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
          >
 {};
 } // details
@@ -30,11 +30,11 @@ namespace std {
 /*!
  \brief calculates the atanh function as a logarithm
 */
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-typename libq::details::atanh_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
-    atanh(libq::fixed_point<T, n, f, op, up> _val)
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+typename libq::details::atanh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
+    atanh(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef libq::fixed_point<T, n, f, e, op, up> Q;
     typedef typename libq::details::atanh_of<Q>::promoted_type result_type;
 
     assert(("[std::atanh] argument is not from [-1.0, 1.0]", std::fabs(_val) <= Q(1.0f)));

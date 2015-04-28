@@ -17,11 +17,11 @@ namespace std {
 /*!
  \brief std::floor in case of fixed-point numbers
 */
-template<typename T, size_t n, size_t f, class op, class up>
-libq::fixed_point<T, n, f, op, up>
-    floor(libq::fixed_point<T, n, f, op, up> const& _x)
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+libq::fixed_point<T, n, f, e, op, up>
+    floor(libq::fixed_point<T, n, f, e, op, up> const& _x)
 {
-    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef libq::fixed_point<T, n, f, e, op, up> Q;
 
     return Q::make_fixed_point(_x.value() & Q::integer_bits_mask);
 }

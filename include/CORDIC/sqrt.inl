@@ -16,22 +16,27 @@
 namespace libq {
 namespace details {
 
-template<typename T, size_t n, size_t f, class op, class up>
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class sqrt_of
 {
     enum: std::size_t {
-        integer_part_length = ((n-f) & 1u) ? ((n-f) / 2u) + 1u : (n-f) / 2u,
-        fractional_part_length = (f & 1u) ? (f / 2u) + 1u : (f / 2u),
+        bits_for_integral = (n & 1u) ? (n / 2u + 1u) : (n / 2u),
+        bits_for_fractional = (f & 1u) ? (f / 2u + 1u) : (f / 2u),
 
-        significant_bits = integer_part_length + fractional_part_length
+        number_of_significant_bits = bits_for_integral + bits_for_fractional
+    };
+
+    enum: int {
+        scaling_factor_exponent = (e & 1u) ? (e / 2u + 1u) : (e / 2u)
     };
 
 public:
-    typedef typename boost::uint_t<significant_bits>::least promoted_storage_type;
+    typedef typename boost::uint_t<number_of_significant_bits>::least promoted_storage_type;
     typedef libq::fixed_point<
         promoted_storage_type,
-        significant_bits,
-        fractional_part_length,
+        bits_for_integral,
+        bits_for_fractional,
+        scaling_factor_exponent,
         op,
         up
     > promoted_type;
@@ -45,12 +50,12 @@ namespace std {
  \brief computes square root by CORDIC-algorithm
  \ref page 11
 */
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-typename libq::details::sqrt_of<T, n, f, op, up>::promoted_type
-    sqrt(libq::fixed_point<T, n, f, op, up> const& _val)
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+typename libq::details::sqrt_of<T, n, f, e, op, up>::promoted_type
+    sqrt(libq::fixed_point<T, n, f, e, op, up> const& _val)
 {
-    typedef libq::fixed_point<T, n, f, op, up> Q;
-    typedef typename libq::details::sqrt_of<T, n, f, op, up>::promoted_type sqrt_type;
+    typedef libq::fixed_point<T, n, f, e, op, up> Q;
+    typedef typename libq::details::sqrt_of<T, n, f, e, op, up>::promoted_type sqrt_type;
 
     assert(("[std::sqrt] argument is negative", _val >= Q(0)));
     if (_val < Q(0)) {
@@ -67,11 +72,11 @@ typename libq::details::sqrt_of<T, n, f, op, up>::promoted_type
     // Work fixed-point format must have several bits to represent
     // lut. Also format must enable argument translating to interval [1.0, 2.0].
     // So format must reserve two bits at least for integer part.
-    typedef libq::Q<f+2u, f, op, up> work_type;
+    typedef libq::Q<f + 2u, f, e, op, up> work_type;
     typedef libq::cordic::lut<f, work_type> lut_type;
 
     typedef typename std::conditional<
-        Q::number_of_significant_bits - Q::bits_for_fractional >= 2,
+        Q::bits_for_integral >= 2,
         Q,
         work_type
     >::type reduced_type;
@@ -79,18 +84,18 @@ typename libq::details::sqrt_of<T, n, f, op, up>::promoted_type
     int power(0);
     reduced_type arg(_val);
 
-    while (arg >= work_type(2.0)) {
+    while (arg >= reduced_type(2.0)) {
         libq::lift(arg) >>= 1u;
         power--;
     }
-    while (arg < work_type(1.0)) {
+    while (arg < reduced_type(1.0)) {
         libq::lift(arg) <<= 1u;
         power++;
     }
 
     // CORDIC vectoring mode:
     lut_type const angles = lut_type::hyperbolic_wo_repeated_iterations();
-    typename libq::UQ<f, f, op, up> const norm(lut_type::hyperbolic_scale_with_repeated_iterations(n));
+    typename libq::UQ<f, f, e, op, up> const norm(lut_type::hyperbolic_scale_with_repeated_iterations(f));
     work_type x(work_type(arg) + 0.25), y(work_type(arg) - 0.25), z(arg);
     {
         std::size_t repeated(4u);

@@ -24,25 +24,26 @@ namespace details {
  \tparam delta_n
  \tparam delta_f
 */
-template<typename T, std::size_t delta_n, std::size_t delta_f>
+template<typename T, std::size_t delta_n, std::size_t delta_f, int delte_e>
 class type_promotion_base
 {
 public:
     typedef T promoted_type;
 };
 
-template<typename _T, std::size_t _n, std::size_t _f, class _op, class _up, std::size_t delta_n, std::size_t delta_f>
-class type_promotion_base<libq::fixed_point<_T, _n, _f, _op, _up>, delta_n, delta_f>
+template<typename _T, std::size_t _n, std::size_t _f, int _e, class _op, class _up, std::size_t delta_n, std::size_t delta_f, int delta_e>
+class type_promotion_base<libq::fixed_point<_T, _n, _f, _e, _op, _up>, delta_n, delta_f, delta_e>
 {
-    typedef libq::fixed_point<_T, _n, _f, _op, _up> Q;
-    typedef type_promotion_base<Q, delta_n, delta_f> this_class;
+    typedef libq::fixed_point<_T, _n, _f, _e, _op, _up> Q;
+    typedef type_promotion_base<Q, delta_n, delta_f, delta_e> this_class;
 
     typedef typename std::conditional<Q::is_signed, std::intmax_t, std::uintmax_t>::type max_type;
     enum: std::size_t {
         sign_bit = static_cast<std::size_t>(Q::is_signed),
 
-        n = Q::number_of_significant_bits,
-        f = Q::exponent
+        n = Q::bits_for_integral,
+        f = Q::bits_for_fractional,
+        e = Q::scaling_factor_exponent
     };
 
     // simple "type" wrapper for lazy instantiation of its "internal" type
@@ -50,8 +51,8 @@ class type_promotion_base<libq::fixed_point<_T, _n, _f, _op, _up>, delta_n, delt
     {
         typedef typename std::conditional<
             Q::is_signed
-            , typename boost::int_t<n + delta_n + this_class::sign_bit>::least // boost::int_t takes a sign bit into account
-            , typename boost::uint_t<n + delta_n>::least
+            , typename boost::int_t<(n + delta_n) + (f + delta_f) + this_class::sign_bit>::least // boost::int_t takes a sign bit into account
+            , typename boost::uint_t<(n + delta_n) + (f + delta_f)>::least
         >::type type;
     };
     struct storage_type_default_traits
@@ -62,7 +63,7 @@ class type_promotion_base<libq::fixed_point<_T, _n, _f, _op, _up>, delta_n, delt
 public:
 
     enum: bool {
-        is_expandable = (n + delta_n + this_class::sign_bit <= std::numeric_limits<max_type>::digits),
+        is_expandable = ((n + delta_n) + (f + delta_f) + this_class::sign_bit <= std::numeric_limits<max_type>::digits),
     };
 
     /*!
@@ -76,8 +77,8 @@ public:
 
     typedef typename std::conditional<
         this_class::is_expandable
-        , libq::fixed_point<promoted_storage_type, n + delta_n, f + delta_f, typename Q::overflow_policy, typename Q::underflow_policy>
-        , libq::fixed_point<promoted_storage_type, n, f, typename Q::overflow_policy, typename Q::underflow_policy>
+        , libq::fixed_point<promoted_storage_type, n + delta_n, f + delta_f, e + delta_e, typename Q::overflow_policy, typename Q::underflow_policy>
+        , libq::fixed_point<promoted_storage_type, n, f, e, typename Q::overflow_policy, typename Q::underflow_policy>
     >::type promoted_type;
 };
 

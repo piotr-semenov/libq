@@ -16,10 +16,10 @@
 
 namespace std {
 
-template<typename T, std::size_t n, std::size_t f, typename op, typename up>
-class numeric_limits<libq::fixed_point<T, n, f, op, up> >
+template<typename T, std::size_t n, std::size_t f, int e, typename op, typename up>
+class numeric_limits<libq::fixed_point<T, n, f, e, op, up> >
 {
-    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef libq::fixed_point<T, n, f, e, op, up> Q;
 
 public:
     static std::float_denorm_style const has_denorm = std::denorm_absent;
@@ -47,7 +47,7 @@ public:
     static int const digits = Q::number_of_significant_bits;
     static int const digits10 = static_cast<int>(Q::number_of_significant_bits * M_LOG10_2);
 
-    static int const max_exponent = int(n)-int(f);
+    static int const max_exponent = int(n);
     static int const max_exponent10 = static_cast<int>(max_exponent * M_LOG10_2);
     static int const min_exponent = -int(f);
     static int const min_exponent10 = static_cast<int>(min_exponent * M_LOG10_2);

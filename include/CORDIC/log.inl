@@ -23,12 +23,14 @@ namespace libq {
 namespace details {
 /*!
  \brief
+ \note 
 */
-template<typename T, std::size_t n, std::size_t f, typename op, typename up>
+template<typename T, std::size_t n, std::size_t f, int e, typename op, typename up>
 class log_of:
     public type_promotion_base<
-        fixed_point<typename std::make_signed<T>::type, n, f, op, up>
-        , boost::static_unsigned_max<boost::static_log2<f>::value + 1u, n + boost::static_log2<n>::value + 1u>::value
+        fixed_point<typename std::make_signed<T>::type, n, f, e, op, up>
+        , boost::static_log2<f>::value + 1u
+        , 0
         , 0
     >
 {};
@@ -36,12 +38,12 @@ class log_of:
 } // libq
 
 namespace std {
-template<typename T, std::size_t n, std::size_t f, typename op, typename up>
-typename libq::details::log_of<T, n, f, op, up>::promoted_type
-    log(libq::fixed_point<T, n, f, op, up> _val)
+template<typename T, std::size_t n, std::size_t f, int e, typename op, typename up>
+typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
+    log(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, op, up> Q;
-    typedef typename libq::details::log_of<T, n, f, op, up>::promoted_type log_type;
+    typedef libq::fixed_point<T, n, f, e, op, up> Q;
+    typedef typename libq::details::log_of<T, n, f, e, op, up>::promoted_type log_type;
     typedef libq::cordic::lut<f, Q> lut;
 
     assert(("[std::log] argument is negaitve", _val >= Q(0)));
@@ -50,7 +52,7 @@ typename libq::details::log_of<T, n, f, op, up>::promoted_type
     }
 
     // one need 1 bit to represent integer part of reals from [1.0, 2.0]
-    typedef libq::fixed_point<typename boost::uint_t<n + 1u>::least, f + 1u, f, op, up> work_type;
+    typedef libq::UQ<f + 1u, f, 0, op, up> work_type;
 
     // reduces argument to interval [1.0, 2.0]
     int power(0);
@@ -72,6 +74,8 @@ typename libq::details::log_of<T, n, f, op, up>::promoted_type
 
     work_type result(0);
     for (std::size_t i = 0; i != f; ++i) {
+        auto const _tmp0 = arg * inv_pow2_lut[i];
+        work_type const _tmp1 = work_type(arg * inv_pow2_lut[i]);
         if (work_type(arg * inv_pow2_lut[i]) >= work_type(1.0)) {
             arg = work_type(arg * inv_pow2_lut[i]);
 

@@ -28,21 +28,18 @@ namespace libq {
 /*!
  \brief provides a proxy class to deal with stored integer behind the fixed-point number
 */
-template<typename T, std::size_t n, int f, class op, class up>
-T& lift(fixed_point<T, n, f, op, up>& _x){ return _x.m_value; }
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+T& lift(fixed_point<T, n, f, e, op, up>& _x){ return _x.m_value; }
 
 /*!
- \brief fixed-point number and its arithmetics. It extends the formats like UQm.f, Qm.f with fixed pre-scaling factor p,
- where \f$p = 2^{min(0, n - f)}\f$, \f$m = f + max(n - f, 0)\f$.
+ \brief fixed-point number and its arithmetics. It extends the formats like UQn.f, Qn.f with fixed pre-scaling factor \f$2^e\f$.
  \tparam value_type built-in integral type to represent a fixed-point number.
- \tparam n number of significant bits (total, it includes the integral and fractional parts except the sign bit).
- \remark note, if storage_type is signed then number of used bits is \f$(n + 1)\f$.
- \remake note, the supremum of \f$n\f$ is std::numeric_limits<std::uintmax_t>::digits in case of unsigned numbers and
- std::numeric_limits<std::intmax_t>::digits in case of signed numbers
- \tparam f fixed-point format exponent (it is like a logical number of fractional bits. If positive it leads to the mantissa length).
- \remark note, if \f$f \geq n\f$ then number has fixed pre-scaling factor \f$p = 2^{n - f}\f$.
- \remark note, the number of integer bits is \f$(f > 0) ? \max(n - f, 0) : n\f$.
- \remark so note, \f$n\f$ is a physical entity and \f$f\f$ is a logical one.
+ \tparam n number of integral bits. So \f$n \leq 0\f$.
+ \tparam f number of fractional bits. So \f$f \leq 0\f$.
+ \remark note, \f$n\f$ and \f$f\f$ exclude the sign bit. So if storage_type is signed then total number of bits is \f$(n + f + 1)\f$.
+ \remake note, the supremum of \f$(n + f)\f$ is std::numeric_limits<std::uintmax_t>::digits in case of unsigned numbers and
+ std::numeric_limits<std::intmax_t>::digits in case of signed numbers.
+ \tparam e exponent of the pre-scaling factor \f2^e\f$.
  \tparam op class specifying the actions to do if overflow occurred
  \tparam up class specifying the actions to do if underflow occurred
 
@@ -62,14 +59,12 @@ T& lift(fixed_point<T, n, f, op, up>& _x){ return _x.m_value; }
 
  \ref see http://en.wikipedia.org/wiki/Q_(number_format) for details
 */
-template<typename value_type, std::size_t bits_for_integral, std::size_t bits_for_fractional, int prescale_exponent>
-
-template<typename value_type, std::size_t n, int f, class op, class up>
+template<typename value_type, std::size_t n, std::size_t f, int e, class op, class up>
 class fixed_point
 {
     static_assert(std::is_integral<value_type>::value, "value_type must be of the built-in integral type like std::uint8_t");
 
-    typedef fixed_point<value_type, n, f, op, up> this_class;
+    typedef fixed_point<value_type, n, f, e, op, up> this_class;
     typedef typename std::conditional<std::numeric_limits<value_type>::is_signed, std::intmax_t, std::uintmax_t>::type largest_type;
 
 public:
@@ -80,39 +75,43 @@ public:
     /// \brief the integral type behind the fixed-point object
     typedef value_type storage_type;
 
-    enum: int { exponent = f };
+    enum: int { scaling_factor_exponent = e };
     enum: std::size_t {
-        number_of_significant_bits = n, ///< total number of significant bits
+        number_of_significant_bits = n + f, ///< total number of significant bits
 
-        bits_for_fractional = (f < 0) ? 0 : ((f >= n) ? n : f), ///< queried number of bits to represent the fractional part of fixed-point number
-        bits_for_integral = n - bits_for_fractional, ///< number of bits to represent the integer part of fixed-point number
+        bits_for_fractional = f, ///< queried number of bits to represent the fractional part of fixed-point number
+        bits_for_integral = n, ///< number of bits to represent the integer part of fixed-point number
 
         is_signed = std::numeric_limits<storage_type>::is_signed ///< checks if this fixed-point number is signed
     };
 
-    /*!
-     \brief gets the scale factor for fixed-point numbers of current format
-    */
-    inline static double scale_factor()
+    /// \brief gets the scaling factor
+    inline static double scaling_factor()
     {
-        //static double const factor = std::exp2(static_cast<double>(this_class::exponent));
-        static double const factor = std::pow(2.0, static_cast<double>(this_class::exponent));
+        //static double const factor = std::exp2(static_cast<double>(this_class::scaling_factor_exponent));
+        static double const factor = std::pow(2.0, static_cast<double>(this_class::scaling_factor_exponent));
         return factor;
     }
 
-    static_assert(number_of_significant_bits <= std::numeric_limits<largest_type>::digits, "system has no integer type of such big word size");
+    static_assert(this_class::number_of_significant_bits <= std::numeric_limits<largest_type>::digits, "too big word size is required");
     enum : std::uintmax_t {
-        // some trick to handle the case n = max possible word size
+        scale = std::uintmax_t(1u) << this_class::bits_for_fractional, ///< scale factor for fixed-point of current number
+
+        // some trick to handle the case n + f = max possible word size
+        /// \brief binary mask to extract the integral bits from the stored integer
         integer_bits_mask =
-            (this_class::number_of_significant_bits > this_class::bits_for_fractional) ?
+            (this_class::bits_for_integral > 0) ?
                 2u * (
-                    (std::uintmax_t(1) << (number_of_significant_bits - 1u)) -
-                    (this_class::bits_for_fractional > 0 ? (std::uintmax_t(1) << (bits_for_fractional - 1u)) : 0)
+                    (std::uintmax_t(1) << (this_class::bits_for_fractional + this_class::bits_for_integral - 1u)) -
+                    ((this_class::bits_for_fractional > 0) ? (std::uintmax_t(1) << (this_class::bits_for_fractional - 1u)) : 0)
                 ) : 0,
+
+        /// \brief binary mask to extract the fractional bits from the stored integer
         fractional_bits_mask =
             (this_class::bits_for_fractional > 0) ?
-                2u * ((std::uintmax_t(1) << (this_class::bits_for_fractional - 1u)) - 1u) : 0
+                2u * ((std::uintmax_t(1) << (this_class::bits_for_fractional - 1u)) - 1u) + 1 : 0
     };
+
     // need to avoid the signed/unsigned mismatch in arithmetic safety checks
     enum: typename this_class::largest_type {
         /// \brief the value of underlying integer behind the fixed-point maximum number
@@ -128,27 +127,29 @@ public:
     static this_class least(){ return this_class::make_fixed_point(this_class::least_stored_integer); }
 
     /// \brief the value of underlying integer behind the fixed-point minimum number
-    static std::intmax_t const least_stored_integer = is_signed*(-static_cast<std::intmax_t>(largest_stored_integer)-1);
+    static std::intmax_t const least_stored_integer = is_signed*(-static_cast<std::intmax_t>(this_class::largest_stored_integer)-1);
 
     /// \brief the dynamic range (dB) of fixed-point number
-    static double dynamic_range_db(){ return 20.0 * std::log10(static_cast<double>(largest_stored_integer)); }
+    static double dynamic_range_db(){ return 20.0 * std::log10(static_cast<double>(this_class::largest_stored_integer)); }
 
     /// \brief the precision of the fixed-point number
-    static double precision(){ return 1.0 / this_class::scale_factor(); }
+    static double precision(){ return 1.0 / this_class::scale; }
 
     /// \brief signed version of fixed-point number type
     typedef fixed_point<
         typename std::make_signed<storage_type>::type,
-        this_class::number_of_significant_bits,
+        this_class::bits_for_integral,
         this_class::bits_for_fractional,
+        this_class::scaling_factor_exponent,
         overflow_policy, underflow_policy
     > to_signed_type;
 
     /// \brief unsigned version of fixed-point number type
     typedef fixed_point<
         typename std::make_unsigned<storage_type>::type,
-        this_class::number_of_significant_bits,
+        this_class::bits_for_integral,
         this_class::bits_for_fractional,
+        this_class::scaling_factor_exponent,
         overflow_policy,
         underflow_policy
     > to_unsigned_type;
@@ -183,12 +184,12 @@ public:
         :   m_value(_x.value()){}
 
     /// \brief normalizes the input fixed-point number to the current format
-    template<typename T1, std::size_t n1, std::size_t f1, typename op1, typename up1>
-    fixed_point(fixed_point<T1, n1, f1, op1, up1> const& _x)
+    template<typename T1, std::size_t n1, std::size_t f1, int e1, typename op1, typename up1>
+    fixed_point(fixed_point<T1, n1, f1, e1, op1, up1> const& _x)
         :   m_value(
                 this_class::normalize(
                     _x,
-                    std::integral_constant<bool, (f1 > this_class::exponent)>()
+                    std::integral_constant<bool, (int(f1) + e1 - int(this_class::bits_for_fractional) - this_class::scaling_factor_exponent > 0)>()
                 )
             ){}
 
@@ -211,12 +212,13 @@ public:
     }
 
     /// \brief assign operator in case of rvalue being of different fixed-point format
-    template<typename T1, std::size_t n1, std::size_t f1, typename op1, typename up1>
-    this_class& operator =(fixed_point<T1, n1, f1, op1, up1> const& _x)
+    template<typename T1, std::size_t n1, std::size_t f1, int e1, typename op1, typename up1>
+    this_class& operator =(fixed_point<T1, n1, f1, e1, op1, up1> const& _x)
     {
         return
-            this->set_value(
-                this_class::normalize(_x, std::integral_constant<bool, (f1 > this_class::bits_for_fractional)>())
+            this->set_value_to(
+            this_class::normalize(_x, std::integral_constant<bool,
+                (int(f1) + e1 - int(this_class::bits_for_fractional) - this_class::scaling_factor_exponent > 0)>())
             );
     }
 
@@ -284,11 +286,9 @@ public:
     template<typename T>
     inline this_class& operator +=(T const& _x)
     {
-        typedef typename libq::details::sum_of<this_class>::promoted_type sum_type;
+        this_class const result(*this + _x);
 
-        sum_type const result = *this + _x;
-        return (*this = this_class::make_fixed_point(result.value()));
-        //return this->set_value(result.value());
+        return this->set_value_to(result.value());
     }
 
     // arithmetics: subtraction
@@ -311,12 +311,9 @@ public:
     template<typename T>
     this_class operator -=(T const& _x)
     {
-        this_class const converted(_x);
-        if (details::does_subtraction_overflow(*this, converted)) {
-            overflow_policy::raise_event();
-        }
+        this_class const result(*this - _x);
 
-        return this->set_value(this->value() - converted.value());
+        return this->set_value_to(result.value());
     }
 
     // arithmetics: multiplication
@@ -325,11 +322,11 @@ public:
      If no extra significant bits is available for the promoted type then operands are .
      In other words, std::common_type<L, R>::type is always equal to L
     */
-    template<typename T1, std::size_t n1, std::size_t f1, typename op1, typename up1>
-    typename libq::details::mult_of<this_class, libq::fixed_point<T1, n1, f1, op1, up1> >::promoted_type
-        operator *(libq::fixed_point<T1, n1, f1, op1, up1> const& _x) const
+    template<typename T1, std::size_t n1, std::size_t f1, int e1, class op1, class up1>
+    typename libq::details::mult_of<this_class, libq::fixed_point<T1, n1, f1, e1, op1, up1> >::promoted_type
+        operator *(libq::fixed_point<T1, n1, f1, e1, op1, up1> const& _x) const
     {
-        typedef typename libq::fixed_point<T1, n1, f1, op1, up1> operand_type;
+        typedef typename libq::fixed_point<T1, n1, f1, e1, op1, up1> operand_type;
         typedef libq::details::mult_of<this_class, operand_type> promotion_traits;
         typedef typename promotion_traits::promoted_type result_type;
         typedef typename promotion_traits::promoted_storage_type word_type;
@@ -338,55 +335,52 @@ public:
             overflow_policy::raise_event();
         }
 
-        // do the exact or approximate multiplication of fixed-point numbers
+        // do the exact/approximate multiplication of fixed-point numbers
         return result_type::make_fixed_point(
-            multiply(*this, _x, std::integral_constant<bool, promotion_traits::is_expandable>())
+            (static_cast<word_type>(this->value()) * static_cast<word_type>(_x.value()))
+                >> (promotion_traits::is_expandable ? 0 : operand_type::bits_for_fractional)
         );
     }
 
-    template<typename T1, std::size_t n1, std::size_t f1, typename op1, typename up1>
-    this_class operator *=(libq::fixed_point<T1, n1, f1, op1, up1> const& _x)
+    template<typename T1, std::size_t n1, std::size_t f1, int e1, class op1, class up1>
+    this_class operator *=(libq::fixed_point<T1, n1, f1, e1, op1, up1> const& _x)
     {
-        if (details::does_multiplication_overflow(*this, _x)) {
-            overflow_policy::raise_event();
-        }
-        return this->set_value(this_class((*this) * _x).value());
+        this_class const result(*this * _x);
+
+        return this->set_value_to(result.value());
     }
 
     // arithmetics: division
-    template<typename T1, std::size_t n1, std::size_t f1, typename... Ps>
-    typename libq::details::div_of<this_class, libq::fixed_point<T1, n1, f1, Ps...> >::promoted_type
-        operator /(libq::fixed_point<T1, n1, f1, Ps...> const& _x) const
+    template<typename T1, std::size_t n1, std::size_t f1, int e1, typename... Ps>
+    typename libq::details::div_of<this_class, libq::fixed_point<T1, n1, f1, e1, Ps...> >::promoted_type
+        operator /(libq::fixed_point<T1, n1, f1, e1, Ps...> const& _x) const
     {
-        typedef typename libq::fixed_point<T1, n1, f1, Ps...> operand_type;
+        typedef typename libq::fixed_point<T1, n1, f1, e1, Ps...> operand_type;
         typedef libq::details::div_of<this_class, operand_type> promotion_traits;
         typedef typename promotion_traits::promoted_type result_type;
+        typedef typename promotion_traits::promoted_storage_type word_type;
 
         if (details::does_division_overflow(*this, _x)) {
             overflow_policy::raise_event();
         }
 
-        // do the exact or approximate division of fixed-point numbers
-        return result_type::make_fixed_point(
-                divide(*this, _x, std::integral_constant<bool, promotion_traits::is_expandable>())
-            );
-    }
-
-    template<typename T1, std::size_t n1, std::size_t f1, typename... Ps>
-    this_class operator /=(libq::fixed_point<T1, n1, f1, Ps...> const& _x)
-    {
-        typedef typename libq::fixed_point<T1, n1, f1, Ps...> operand_type;
-        typedef typename libq::details::div_of<this_class, operand_type>::promoted_type result_type;
-
-        this_class const converted(_x);
-        if (details::does_division_overflow(*this, converted)) {
+        bool const _tmp1 = promotion_traits::is_expandable;
+        std::size_t const _tmp2 = operand_type::number_of_significant_bits;
+        word_type const shifted = static_cast<word_type>(this->value()) << operand_type::number_of_significant_bits;
+        if (!promotion_traits::is_expandable && _x.value() != (shifted >> operand_type::number_of_significant_bits)) {
             overflow_policy::raise_event();
         }
 
-        typedef typename result_type::storage_type word_type;
-        return this->set_value(
-            (*this / converted).value()
-        );
+        return
+            result_type::make_fixed_point(shifted / static_cast<word_type>(_x.value()));
+    }
+
+    template<typename T1, std::size_t n1, std::size_t f1, int e1, typename... Ps>
+    this_class operator /=(libq::fixed_point<T1, n1, f1, e1, Ps...> const& _x)
+    {
+        this_class const result(*this / _x);
+
+        return this->set_value_to(result.value());
     }
 
     // unary operator
@@ -410,124 +404,67 @@ private:
     template<typename T>
     static storage_type calc_stored_integer_from(T const& _x, std::true_type)
     {
+        // double const value = double(_x) / std::exp2(static_cast<double>(this_class::scaling_factor_exponent));
+        double const value = double(_x) * std::pow(2.0, static_cast<double>(this_class::scaling_factor_exponent));
         if (_x > T(0)) {
-            return static_cast<storage_type>(std::floor(double(_x) * this_class::scale_factor() + 0.5));
+            storage_type const converted = static_cast<storage_type>(std::floor(value * this_class::scale + 0.5));
+            if (converted < 0) {
+                overflow_policy::raise_event();
+            }
+
+            return static_cast<storage_type>(std::floor(value * this_class::scale + 0.5));
         }
 
-        return static_cast<storage_type>(std::ceil(double(_x) * this_class::scale_factor() - 0.5));
+        return static_cast<storage_type>(std::ceil(value * this_class::scale - 0.5));
     }
 
     // in case of integral types
     template<typename T>
     static storage_type calc_stored_integer_from(T const& _x, std::false_type)
     {
-        return storage_type(_x) << this_class::bits_for_fractional;
+        // double const value = double(_x) / std::exp2(static_cast<double>(this_class::scaling_factor_exponent));
+        double const value = double(_x) * std::pow(2.0, static_cast<double>(this_class::scaling_factor_exponent));
+        return storage_type(value) << this_class::bits_for_fractional;
     }
 
-    // normalizes the input fixed-point number to one of the current format in case \f$n > n1\f$
-    template<typename T1, std::size_t n1, std::size_t f1, typename... Ps>
-    static storage_type normalize(fixed_point<T1, n1, f1, Ps...> const& _x, std::false_type)
+    // normalizes the input fixed-point number to one of the current format in case \f$f + e - f1 - e1 > 0\f$
+    template<typename T1, std::size_t n1, std::size_t f1, int e1, typename... Ps>
+    static storage_type normalize(fixed_point<T1, n1, f1, e1, Ps...> const& _x, std::false_type)
     {
-        return
-            storage_type(_x.value()) << (this_class::exponent - f1);
+        static std::size_t const shifts =
+            (int(this_class::bits_for_fractional) + this_class::scaling_factor_exponent) - (int(e1) + f1);
+        storage_type const normalized = storage_type(_x.value()) << shifts;
+        
+        if (_x.value() != (normalized >> shifts)) {
+            overflow_policy::raise_event();
+        }
+        return normalized;
     }
 
-    // normalizes the input fixed-point number to one of the current format in case \f$n < n1\f$
-    template<typename T1, std::size_t n1, std::size_t f1, typename... Ps>
-    static storage_type normalize(fixed_point<T1, n1, f1, Ps...> const& _x, std::true_type)
+    // normalizes the input fixed-point number to one of the current format in case \f$f + e - f1 - e1 < 0\f$
+    template<typename T1, std::size_t n1, std::size_t f1, int e1, typename... Ps>
+    static storage_type normalize(fixed_point<T1, n1, f1, e1, Ps...> const& _x, std::true_type)
     {
-        storage_type const value =
-            static_cast<storage_type>(_x.value() >> (f1 - this_class::exponent));
-        if (_x.value() && !value) {
+        static std::size_t const shifts =
+            (int(e1) + f1) - (int(this_class::bits_for_fractional) + this_class::scaling_factor_exponent);
+        storage_type const normalized =
+            static_cast<storage_type>(_x.value() >> shifts);
+
+        if (_x.value() && !normalized) {
             underflow_policy::raise_event();
         }
-
-        return value;
-    }
-
-    // division of fixed-point numbers: do the exact division of fixed-point numbers
-    template<typename T1, std::size_t n1, std::size_t f1, typename T2, std::size_t n2, std::size_t f2, typename... Ps>
-    inline static typename libq::details::div_of<
-        libq::fixed_point<T1, n1, f1, Ps...>,
-        libq::fixed_point<T2, n2, f2, Ps...>
-    >::promoted_storage_type
-        divide(libq::fixed_point<T1, n1, f1, Ps...> const& _x, libq::fixed_point<T2, n2, f2, Ps...> const& _y, std::true_type)
-    {
-        typedef typename libq::fixed_point<T1, n1, f1, Ps...> operand_type1;
-        typedef typename libq::fixed_point<T2, n2, f2, Ps...> operand_type2;
-        typedef typename libq::details::div_of<operand_type1, operand_type2>::promoted_storage_type word_type;
-
-        return
-            (static_cast<word_type>(_x.value()) << operand_type2::number_of_significant_bits) /
-            static_cast<word_type>(_y.value());
-    }
-    // division of fixed-point numbers: 
-    template<typename T1, std::size_t n1, std::size_t f1, typename T2, std::size_t n2, std::size_t f2, typename opolicy, typename upolicy>
-    inline static typename libq::details::div_of<
-        libq::fixed_point<T1, n1, f1, opolicy, upolicy>,
-        libq::fixed_point<T2, n2, f2, opolicy, upolicy>
-    >::promoted_storage_type
-        divide(libq::fixed_point<T1, n1, f1, opolicy, upolicy> const& _x, libq::fixed_point<T2, n2, f2, opolicy, upolicy> const& _y, std::false_type)
-    {
-        typedef typename libq::fixed_point<T1, n1, f1, opolicy, upolicy> operand_type1;
-        typedef typename libq::fixed_point<T2, n2, f2, opolicy, upolicy> operand_type2;
-        typedef typename this_class::largest_type max_type;
-
-        typedef typename libq::details::div_of<operand_type1, operand_type2> promotion_traits;
-        typedef typename promotion_traits::promoted_storage_type word_type;
-
-        max_type const shifted = max_type(_x.value()) << operand_type2::exponent; // no overflow can be occurred here
-        if (_x.value() != (shifted >> operand_type2::exponent)) {
-            opolicy::raise_event();
-        }
-        max_type value = shifted / operand_type1(_y).value();
-
-        return word_type(value);
-    }
-
-    // does the exact multiplication of fixed-point numbers
-    template<typename T1, std::size_t n1, std::size_t f1, typename T2, std::size_t n2, std::size_t f2, typename... Ps>
-    inline static typename libq::details::mult_of<
-        libq::fixed_point<T1, n1, f1, Ps...>,
-        libq::fixed_point<T2, n2, f2, Ps...>
-    >::promoted_storage_type
-        multiply(libq::fixed_point<T1, n1, f1, Ps...> const& _x, libq::fixed_point<T2, n2, f2, Ps...> const& _y, std::true_type)
-    {
-        typedef typename libq::fixed_point<T1, n1, f1, Ps...> operand_type1;
-        typedef typename libq::fixed_point<T2, n2, f2, Ps...> operand_type2;
-        typedef typename libq::details::mult_of<operand_type1, operand_type2>::promoted_storage_type word_type;
-
-        return static_cast<word_type>(_x.value()) * static_cast<word_type>(_y.value());
-    }
-    template<typename T1, std::size_t n1, std::size_t f1, typename T2, std::size_t n2, std::size_t f2, typename... Ps>
-    inline static typename libq::details::mult_of<
-        libq::fixed_point<T1, n1, f1, Ps...>,
-        libq::fixed_point<T2, n2, f2, Ps...>
-    >::promoted_storage_type
-        multiply(libq::fixed_point<T1, n1, f1, Ps...> const& _x, libq::fixed_point<T2, n2, f2, Ps...> const& _y, std::false_type)
-    {
-        typedef typename libq::fixed_point<T1, n1, f1, Ps...> operand_type1;
-        typedef typename libq::fixed_point<T2, n2, f2, Ps...> operand_type2;
-        typedef typename libq::details::mult_of<operand_type1, operand_type2>::promoted_storage_type word_type;
-
-        typedef typename this_class::largest_type max_type;
-
-        // approximate algorithm idea: we truncate the fractional precision of 2nd operand
-        static std::size_t const available_shifts = (std::numeric_limits<max_type>::digits - std::numeric_limits<operand_type1>::digits) -
-            operand_type2::bits_for_integral;
-        static std::size_t const shifts1 = (available_shifts < 0 || available_shifts > operand_type2::bits_for_fractional) ?
-            0 : static_cast<int>(operand_type2::bits_for_fractional) - available_shifts;
-        static std::size_t const shifts2 = (available_shifts > 0 && available_shifts <= operand_type2::bits_for_fractional) ?
-            available_shifts : operand_type2::bits_for_fractional;
-
-        return word_type(_x.value() * (_y.value() >> shifts1)) >> shifts2;
+        return normalized;
     }
 
     // converts fixed-point number to the floating-point number
-    double to_floating_point() const{ return static_cast<double>(value()) / this_class::scale_factor(); }
+    double to_floating_point() const
+    {
+        return
+            this->scaling_factor() * static_cast<double>(value()) / this_class::scale;
+    }
 
     storage_type m_value;
-    this_class& set_value(storage_type const _x)
+    this_class& set_value_to(storage_type const _x)
     {
         if (_x < this_class::least_stored_integer || _x > this_class::largest_stored_integer) {
             overflow_policy::raise_event();
@@ -537,23 +474,23 @@ private:
         return *this;
     }
 
-    friend storage_type& lift<value_type, n, f, overflow_policy, underflow_policy>(this_class&);
+    friend storage_type& lift<value_type, n, f, e, overflow_policy, underflow_policy>(this_class&);
 };
 
 /*!
 */
-template<std::size_t n, std::size_t f, class op = libq::ignorance_policy, class up = libq::ignorance_policy>
-using Q = libq::fixed_point<typename boost::int_t<n+1>::least, n, f, op, up>;
+template<std::size_t n, std::size_t f, int e = 0, class op = libq::overflow_exception_policy, class up = libq::underflow_exception_policy>
+using Q = libq::fixed_point<typename boost::int_t<n+1>::least, n-f, f, e, op, up>;
 
-template<std::size_t n, std::size_t f, class op = libq::ignorance_policy, class up = libq::ignorance_policy>
-using UQ = libq::fixed_point<typename boost::uint_t<n>::least, n, f, op, up>;
+template<std::size_t n, std::size_t f, int e = 0, class op = libq::overflow_exception_policy, class up = libq::underflow_exception_policy>
+using UQ = libq::fixed_point<typename boost::uint_t<n>::least, n-f, f, e, op, up>;
 
 } // libq
 
 // constant implementation
 #define LIBQ_FIXED_POINT_CONSTANT(name, value) \
-    template<typename T, std::size_t n, std::size_t f, class op, class up> \
-    libq::fixed_point<T, n, f, op, up> const libq::fixed_point<T, n, f, op, up>::name(value);
+    template<typename T, std::size_t n, std::size_t f, int e, class op, class up> \
+    libq::fixed_point<T, n, f, e, op, up> const libq::fixed_point<T, n, f, e, op, up>::name(value);
 
 LIBQ_FIXED_POINT_CONSTANT(CONST_E, 2.71828182845904523536)
 LIBQ_FIXED_POINT_CONSTANT(CONST_1_LOG2E, 0.6931471805599453)

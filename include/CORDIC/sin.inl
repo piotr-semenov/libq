@@ -27,12 +27,13 @@ public:
 
 // trick: an extra base class is required to make the compiler to
 // instantiate the class representing the fixed-point number of a new format
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-class sin_of<libq::fixed_point<T, n, f, op, up> >
-    :   private libq::fixed_point<T, f, f, op, up>,
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+class sin_of<libq::fixed_point<T, n, f, e, op, up> >
+    :   private libq::fixed_point<T, 0, f, e, op, up>,
         public type_promotion_base<
-            libq::fixed_point<T, f, f, op, up>
+            libq::fixed_point<T, 0, f, e, op, up>
             , 1u
+            , 0
             , 0
         >
 {};
@@ -40,14 +41,14 @@ class sin_of<libq::fixed_point<T, n, f, op, up> >
 } // libq
 
 namespace std {
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-typename libq::details::sin_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
-    sin(libq::fixed_point<T, n, f, op, up> _val)
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
+    sin(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef typename libq::details::sin_of<libq::fixed_point<T, n, f, op, up> >::promoted_type sin_type;
+    typedef typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type sin_type;
 
     // gap in 3 bits is needed for CONST_PI existence
-    typedef libq::Q<f + 3u, f, op, up> work_type;
+    typedef libq::Q<f + 3u, f, e, op, up> work_type;
 
     // convergence interval for CORDIC rotations is [-pi/2, pi/2].
     // So anyone must map the input angle to that interval

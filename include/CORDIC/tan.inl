@@ -24,22 +24,22 @@ public:
     typedef T promoted_type;
 };
 
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-class tan_of<libq::fixed_point<T, n, f, op, up> >
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+class tan_of<libq::fixed_point<T, n, f, e, op, up> >
     :   public libq::details::div_of<
-            typename libq::details::sin_of<libq::fixed_point<T, n, f, op, up> >::promoted_type,
-            typename libq::details::cos_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
+            typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type,
+            typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
         >
 {};
 } // details
 } // libq
 
 namespace std {
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-typename libq::details::tan_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
-    tan(libq::fixed_point<T, n, f, op, up> _val)
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+typename libq::details::tan_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
+    tan(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef libq::fixed_point<T, n, f, e, op, up> Q;
     typedef typename libq::details::tan_of<Q>::promoted_type tan_type;
 
     auto const x = std::sin(_val);

@@ -25,12 +25,13 @@ public:
     typedef T promoted_type;
 };
 
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-class acos_of<libq::fixed_point<T, n, f, op, up> >
-    :   private libq::fixed_point<T, f, f, op, up>,
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+class acos_of<libq::fixed_point<T, n, f, e, op, up> >
+    :   private libq::fixed_point<T, 0, f, e, op, up>,
         public type_promotion_base<
-            libq::fixed_point<T, f, f, op, up>
+            libq::fixed_point<T, 0, f, e, op, up>
             , 3u
+            , 0
             , 0
         >
 {};
@@ -38,11 +39,11 @@ class acos_of<libq::fixed_point<T, n, f, op, up> >
 } // libq
 
 namespace std {
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-typename libq::details::acos_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
-    acos(libq::fixed_point<T, n, f, op, up> _val)
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+typename libq::details::acos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
+    acos(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef libq::fixed_point<T, n, f, e, op, up> Q;
     typedef typename libq::details::acos_of<Q>::promoted_type result_type;
     typedef libq::cordic::lut<f, Q> lut_type;
 

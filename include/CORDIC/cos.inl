@@ -25,19 +25,19 @@ public:
     typedef T promoted_type;
 };
 
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-class cos_of<libq::fixed_point<T, n, f, op, up> >
-    :   public libq::details::sin_of<libq::fixed_point<T, n, f, op, up> >
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+class cos_of<libq::fixed_point<T, n, f, e, op, up> >
+    :   public libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >
 {};
 } // details
 } // libq
 
 namespace std {
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-typename libq::details::cos_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
-    cos(libq::fixed_point<T, n, f, op, up> _val)
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
+    cos(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef libq::fixed_point<T, n, f, e, op, up> Q;
     typedef typename libq::details::cos_of<Q>::promoted_type cos_type;
 
     // convergence interval for CORDIC rotations is [-pi/2, pi/2].

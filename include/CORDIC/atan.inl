@@ -22,20 +22,20 @@ public:
     typedef T promoted_type;
 };
 
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-class atan_of<libq::fixed_point<T, n, f, op, up> >
-    :    public asin_of<libq::fixed_point<T, n, f, op, up> >
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+class atan_of<libq::fixed_point<T, n, f, e, op, up> >
+    :    public asin_of<libq::fixed_point<T, n, f, e, op, up> >
 {};
 } // details
 } // libq
 
 namespace std {
-template<typename T, std::size_t n, std::size_t f, class op, class up>
-typename libq::details::atan_of<libq::fixed_point<T, n, f, op, up> >::promoted_type
-    atan(libq::fixed_point<T, n, f, op, up> _val)
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
+    atan(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, op, up> Q;
-    typedef typename libq::details::atan_of<libq::fixed_point<T, n, f, op, up> >::promoted_type result_type;
+    typedef libq::fixed_point<T, n, f, e, op, up> Q;
+    typedef typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type result_type;
     typedef libq::cordic::lut<f, Q> lut_type;
 
     static lut_type const angles = lut_type::circular();

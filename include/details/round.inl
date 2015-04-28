@@ -17,11 +17,11 @@ namespace std {
 /*!
  \brief std::round in case of fixed-point number
 */
-template<typename T, size_t n, size_t f, class op, class up>
-libq::fixed_point<T, n, f, op, up>
-    round(libq::fixed_point<T, n, f, op, up> const& _x)
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+libq::fixed_point<T, n, f, e, op, up>
+    round(libq::fixed_point<T, n, f, e, op, up> const& _x)
 {
-    typedef libq::fixed_point<T, n, f, op, up> Q;
+    typedef libq::fixed_point<T, n, f, e, op, up> Q;
 
     typename Q::storage_type const extra = Q(0.5f).value();
     typename Q::storage_type const val = _x.value() + (std::signbit(_x) ? -extra : +extra);

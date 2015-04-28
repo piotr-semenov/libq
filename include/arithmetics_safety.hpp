@@ -16,7 +16,7 @@
 
 namespace libq {
 
-template<typename T, std::size_t n, std::size_t f, class op, class up>
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class fixed_point;
 
 /*!
@@ -77,11 +77,11 @@ template<typename T1, typename T2> class div_of;
 /*!
  \brief checks if the addition operation overflows
 */
-template<typename T, std::size_t n, std::size_t f, typename... Ps>
+template<typename T, std::size_t n, std::size_t f, int e, typename... Ps>
 bool
-    does_addition_overflow(libq::fixed_point<T, n, f, Ps...> const _x, libq::fixed_point<T, n, f, Ps...> const _y)
+    does_addition_overflow(libq::fixed_point<T, n, f, e, Ps...> const _x, libq::fixed_point<T, n, f, e, Ps...> const _y)
 {
-    typedef typename sum_of<fixed_point<T, n, f, Ps...> >::promoted_type result_type;
+    typedef typename sum_of<fixed_point<T, n, f, e, Ps...> >::promoted_type result_type;
     auto const a = _x.value();
     auto const b = _y.value();
     auto const _tmp = result_type::largest_stored_integer;
@@ -94,11 +94,11 @@ bool
 /*!
  \brief checks if the subtraction operation overflows
 */
-template<typename T, std::size_t n, std::size_t f, typename... Ps>
+template<typename T, std::size_t n, std::size_t f, int e, typename... Ps>
 static bool
-    does_subtraction_overflow(fixed_point<T, n, f, Ps...> const _x, fixed_point<T, n, f, Ps...> const _y)
+    does_subtraction_overflow(fixed_point<T, n, f, e, Ps...> const _x, fixed_point<T, n, f, e, Ps...> const _y)
 {
-    typedef typename sum_of<fixed_point<T, n, f, Ps...> >::promoted_type result_type;
+    typedef typename sum_of<fixed_point<T, n, f, e, Ps...> >::promoted_type result_type;
     auto const a = _x.value();
     auto const b = _y.value();
 
@@ -110,16 +110,18 @@ static bool
 /*!
  \brief checks if the multiplication operation overflows
  */
-template<typename T1, std::size_t n1, std::size_t f1, typename T2, std::size_t n2, std::size_t f2, typename... Ps>
+template<typename T1, std::size_t n1, std::size_t f1, typename T2, int e1, std::size_t n2, std::size_t f2, int e2, typename... Ps>
 bool
-    does_multiplication_overflow(libq::fixed_point<T1, n1, f1, Ps...> const _x, libq::fixed_point<T2, n2, f2, Ps...> const _y)
+    does_multiplication_overflow(libq::fixed_point<T1, n1, f1, e1, Ps...> const _x, libq::fixed_point<T2, n2, f2, e2, Ps...> const _y)
 {
-    typedef libq::fixed_point<T1, n1, f1, Ps...> Q1;
-    typedef libq::fixed_point<T2, n2, f2, Ps...> Q2;
+    typedef libq::fixed_point<T1, n1, f1, e1, Ps...> Q1;
+    typedef libq::fixed_point<T2, n2, f2, e2, Ps...> Q2;
+    
     typedef typename mult_of<Q1, Q2>::promoted_type result_type;
+    typedef typename result_type::storage_type promoted_storage_type;
 
-    typename result_type::storage_type const a(_x.value());
-    typename result_type::storage_type const b(_y.value());
+    promoted_storage_type const a = static_cast<promoted_storage_type>(_x.value());
+    promoted_storage_type const b = static_cast<promoted_storage_type>(_y.value());
 
     return
         (a > 0 && b > 0 && a > result_type::largest_stored_integer / b) ||
@@ -131,11 +133,11 @@ bool
 /*!
  \brief checks if the division operation overflows
 */
-template<typename T1, std::size_t n1, std::size_t f1, typename T2, std::size_t n2, std::size_t f2, typename... Ps>
+template<typename T1, std::size_t n1, std::size_t f1, int e1, typename T2, std::size_t n2, std::size_t f2, int e2, typename... Ps>
 bool
-    does_division_overflow(libq::fixed_point<T1, n1, f1, Ps...> const _x, libq::fixed_point<T2, n2, f2, Ps...> const _y)
+    does_division_overflow(libq::fixed_point<T1, n1, f1, e1, Ps...> const _x, libq::fixed_point<T2, n2, f2, e2, Ps...> const _y)
 {
-    typedef typename div_of<libq::fixed_point<T1, n1, f1, Ps...>, libq::fixed_point<T2, n2, f2, Ps...> >::promoted_type result_type;
+    typedef typename div_of<libq::fixed_point<T1, n1, f1, e1, Ps...>, libq::fixed_point<T2, n2, f2, e2, Ps...> >::promoted_type result_type;
     auto const a = _x.value();
     auto const b = _y.value();
 
@@ -143,11 +145,11 @@ bool
         (b == 0) || result_type::is_signed * (a == result_type::least_stored_integer && b == -1);
 }
 
-template<typename T, std::size_t n, std::size_t f, typename... Ps>
+template<typename T, std::size_t n, std::size_t f, int e, typename... Ps>
 bool
-    does_unary_negation_overflow(fixed_point<T, n, f, Ps...> const _x)
+    does_unary_negation_overflow(fixed_point<T, n, f, e, Ps...> const _x)
 {
-    typedef fixed_point<T, n, f, Ps...> result_type;
+    typedef fixed_point<T, n, f, e, Ps...> result_type;
     auto const a = _x.value();
 
     return
