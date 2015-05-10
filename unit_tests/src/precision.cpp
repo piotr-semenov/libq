@@ -29,37 +29,19 @@ namespace sinks = boost::log::sinks;
 namespace keywords = boost::log::keywords;
 
 class logger
-    :    private boost::noncopyable,
-         public src::severity_logger<logging::trivial::severity_level>
+    :    public src::severity_logger<logging::trivial::severity_level>
 {
-    bool m_is_initialized;
-
-    logger()
-        : m_is_initialized(false){}
-
 public:
-    static void init(void)
+    logger(std::string const& _log_filename)
     {
         logging::add_file_log(
-            keywords::file_name = "precision.log",
+            keywords::file_name = _log_filename,
             keywords::format = "[%TimeStamp%]: %Message%"
         );
         logging::core::get()->set_filter(
             logging::trivial::severity >= logging::trivial::info
         );
         logging::add_common_attributes();
-    }
-
-    static logger& instance()
-    {
-        static logger precision_logger;
-        if (!precision_logger.m_is_initialized) {
-            init();
-
-            precision_logger.m_is_initialized = true;
-        }
-
-        return precision_logger;
     }
 };
 
