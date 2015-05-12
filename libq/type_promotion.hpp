@@ -63,7 +63,7 @@ class type_promotion_base<libq::fixed_point<_T, _n, _f, _e, _op, _up>, delta_n, 
 public:
 
     enum: bool {
-        is_expandable = ((n + delta_n) + (f + delta_f) + this_class::sign_bit <= std::numeric_limits<max_type>::digits),
+        is_expandable = ((n + delta_n) + (f + delta_f) <= std::numeric_limits<max_type>::digits),
     };
 
     /*!
