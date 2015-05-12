@@ -6,7 +6,7 @@
 
 #include "boost/test/unit_test.hpp"
 
-#include "fixed_point.hpp"
+#include "libq/fixed_point.hpp"
 
 namespace libq {
 namespace unit_tests {
