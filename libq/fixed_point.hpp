@@ -366,8 +366,6 @@ public:
             overflow_policy::raise_event();
         }
 
-        bool const _tmp1 = promotion_traits::is_expandable;
-        std::size_t const _tmp2 = operand_type::number_of_significant_bits;
         word_type const shifted = static_cast<word_type>(this->value()) << operand_type::number_of_significant_bits;
         if (!promotion_traits::is_expandable && _x.value() != (shifted >> operand_type::number_of_significant_bits)) {
             overflow_policy::raise_event();
