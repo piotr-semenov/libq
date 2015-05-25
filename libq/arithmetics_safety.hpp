@@ -63,7 +63,7 @@ public:
 
 namespace details {
 
-template<typename T> class sum_of;
+template<typename T> class sum_traits;
 template<typename T1, typename T2> class mult_of;
 template<typename T1, typename T2> class div_of;
 
@@ -81,10 +81,9 @@ template<typename T, std::size_t n, std::size_t f, int e, typename... Ps>
 bool
     does_addition_overflow(libq::fixed_point<T, n, f, e, Ps...> const _x, libq::fixed_point<T, n, f, e, Ps...> const _y)
 {
-    typedef typename sum_of<fixed_point<T, n, f, e, Ps...> >::promoted_type result_type;
+    typedef typename sum_traits<fixed_point<T, n, f, e, Ps...> >::promoted_type result_type;
     auto const a = _x.value();
     auto const b = _y.value();
-    auto const _tmp = result_type::largest_stored_integer;
 
     return
         (b > 0 && a > result_type::largest_stored_integer - b) ||
@@ -98,7 +97,7 @@ template<typename T, std::size_t n, std::size_t f, int e, typename... Ps>
 static bool
     does_subtraction_overflow(fixed_point<T, n, f, e, Ps...> const _x, fixed_point<T, n, f, e, Ps...> const _y)
 {
-    typedef typename sum_of<fixed_point<T, n, f, e, Ps...> >::promoted_type result_type;
+    typedef typename sum_traits<fixed_point<T, n, f, e, Ps...> >::promoted_type result_type;
     auto const a = _x.value();
     auto const b = _y.value();
 

@@ -268,10 +268,10 @@ public:
 
     // arithmetics: summation
     template<typename T>
-    inline typename libq::details::sum_of<this_class>::promoted_type
+    inline typename libq::details::sum_traits<this_class>::promoted_type
         operator +(T const& _x) const
     {
-        typedef typename libq::details::sum_of<this_class>::promoted_type sum_type;
+        typedef typename libq::details::sum_traits<this_class>::promoted_type sum_type;
         typedef typename sum_type::storage_type word_type;
 
         this_class const converted(_x); // note, *this and converted have the same storage_type
@@ -293,10 +293,10 @@ public:
 
     // arithmetics: subtraction
     template<typename T>
-    typename libq::details::sum_of<this_class>::promoted_type
+    typename libq::details::sum_traits<this_class>::promoted_type
         operator -(T const& _x) const
     {
-        typedef typename libq::details::sum_of<this_class>::promoted_type diff_type;
+        typedef typename libq::details::sum_traits<this_class>::promoted_type diff_type;
         typedef typename diff_type::storage_type word_type;
 
         this_class const converted(_x); // note, *this and converted have the same storage_type
@@ -512,7 +512,7 @@ LIBQ_FIXED_POINT_CONSTANT(CONST_2SQRT2, 2.82842712474619009760)
 
 #undef LIBQ_FIXED_POINT_CONSTANT
 
-#include "details/sum_of.inl"
+#include "details/sum_traits.inl"
 #include "details/mult_of.inl"
 #include "details/div_of.inl"
 

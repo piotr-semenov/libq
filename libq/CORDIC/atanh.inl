@@ -19,7 +19,7 @@ class atanh_of
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class atanh_of<libq::fixed_point<T, n, f, e, op, up> >
-    :    public libq::details::sum_of<
+    :    public libq::details::sum_traits<
             typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
          >
 {};
