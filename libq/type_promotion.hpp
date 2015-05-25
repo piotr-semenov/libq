@@ -42,7 +42,9 @@ class type_promotion_base<libq::fixed_point<_T, _n, _f, _e, _op, _up>, delta_n, 
         sign_bit = static_cast<std::size_t>(Q::is_signed),
 
         n = Q::bits_for_integral,
-        f = Q::bits_for_fractional,
+        f = Q::bits_for_fractional
+    };
+    enum: int {
         e = Q::scaling_factor_exponent
     };
 
