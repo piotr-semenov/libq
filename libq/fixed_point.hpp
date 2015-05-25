@@ -89,7 +89,7 @@ public:
     inline static double scaling_factor()
     {
         //static double const factor = std::exp2(static_cast<double>(this_class::scaling_factor_exponent));
-        static double const factor = std::pow(2.0, static_cast<double>(this_class::scaling_factor_exponent));
+        static double const factor = std::pow(2.0, -static_cast<double>(this_class::scaling_factor_exponent));
         return factor;
     }
 
