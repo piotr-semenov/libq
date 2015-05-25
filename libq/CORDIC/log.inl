@@ -29,7 +29,10 @@ template<typename T, std::size_t n, std::size_t f, int e, typename op, typename 
 class log_of:
     public type_promotion_base<
         fixed_point<typename std::make_signed<T>::type, n, f, e, op, up>
-        , boost::static_log2<f>::value + 1u
+        , boost::static_unsigned_max<
+            (f > 0) ? (boost::static_log2<f>::value) : 0,
+            (n > 0) ? (boost::static_log2<n>::value) : 0
+        >::value + 1u
         , 0
         , 0
     >
@@ -74,8 +77,6 @@ typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
 
     work_type result(0);
     for (std::size_t i = 0; i != f; ++i) {
-        auto const _tmp0 = arg * inv_pow2_lut[i];
-        work_type const _tmp1 = work_type(arg * inv_pow2_lut[i]);
         if (work_type(arg * inv_pow2_lut[i]) >= work_type(1.0)) {
             arg = work_type(arg * inv_pow2_lut[i]);
 
