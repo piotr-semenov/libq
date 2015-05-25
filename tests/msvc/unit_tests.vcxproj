@@ -25,8 +25,50 @@
     </ClCompile>
     <ClCompile Include="..\src\range.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libq\arithmetics_safety.hpp" />
+    <ClInclude Include="..\..\libq\CORDIC\lut\lut.hpp" />
+    <ClInclude Include="..\..\libq\fixed_point.hpp" />
+    <ClInclude Include="..\..\libq\loop_unroller.hpp" />
+    <ClInclude Include="..\..\libq\type_promotion.hpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\libq\CORDIC\acos.inl" />
+    <None Include="..\..\libq\CORDIC\acosh.inl" />
+    <None Include="..\..\libq\CORDIC\asin.inl" />
+    <None Include="..\..\libq\CORDIC\asinh.inl" />
+    <None Include="..\..\libq\CORDIC\atan.inl" />
+    <None Include="..\..\libq\CORDIC\atanh.inl" />
+    <None Include="..\..\libq\CORDIC\cos.inl" />
+    <None Include="..\..\libq\CORDIC\cosh.inl" />
+    <None Include="..\..\libq\CORDIC\exp.inl" />
+    <None Include="..\..\libq\CORDIC\log.inl" />
+    <None Include="..\..\libq\CORDIC\lut\arctanh_lut.inl" />
+    <None Include="..\..\libq\CORDIC\lut\arctan_lut.inl" />
+    <None Include="..\..\libq\CORDIC\lut\circular_scales.inl" />
+    <None Include="..\..\libq\CORDIC\lut\hyperbolic_scale.inl" />
+    <None Include="..\..\libq\CORDIC\lut\inv_pow2_lut.inl" />
+    <None Include="..\..\libq\CORDIC\lut\pow2_lut.inl" />
+    <None Include="..\..\libq\CORDIC\sin.inl" />
+    <None Include="..\..\libq\CORDIC\sinh.inl" />
+    <None Include="..\..\libq\CORDIC\sqrt.inl" />
+    <None Include="..\..\libq\CORDIC\tan.inl" />
+    <None Include="..\..\libq\CORDIC\tanh.inl" />
+    <None Include="..\..\libq\details\ceil.inl" />
+    <None Include="..\..\libq\details\div_of.inl" />
+    <None Include="..\..\libq\details\fabs.inl" />
+    <None Include="..\..\libq\details\floor.inl" />
+    <None Include="..\..\libq\details\fmod.inl" />
+    <None Include="..\..\libq\details\mult_of.inl" />
+    <None Include="..\..\libq\details\numeric_limits.inl" />
+    <None Include="..\..\libq\details\remainder.inl" />
+    <None Include="..\..\libq\details\round.inl" />
+    <None Include="..\..\libq\details\sign.inl" />
+    <None Include="..\..\libq\details\sum_traits.inl" />
+    <None Include="..\..\libq\details\type_traits.inl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
-    <ProjectName>Unit-tests</ProjectName>
+    <ProjectName>unit_tests</ProjectName>
     <ProjectGuid>{66D57F85-F10F-4EAF-873F-18F05ABE1B0E}</ProjectGuid>
     <RootNamespace>Unittests</RootNamespace>
     <Keyword>Win32Proj</Keyword>
@@ -59,19 +101,23 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="boost.props" />
+    <Import Project="props\bin.props" />
+    <Import Project="props\boost.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="boost.props" />
+    <Import Project="props\bin.props" />
+    <Import Project="props\boost.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="boost.props" />
+    <Import Project="props\bin.props" />
+    <Import Project="props\boost.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-    <Import Project="boost.props" />
+    <Import Project="props\bin.props" />
+    <Import Project="props\boost.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
@@ -114,7 +160,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
-      <AdditionalIncludeDirectories>.\..\..\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>./../..;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -138,6 +184,7 @@
       </PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>

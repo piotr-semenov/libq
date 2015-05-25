@@ -9,6 +9,15 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\CORDIC">
+      <UniqueIdentifier>{ad7aace2-9401-4495-bd70-4780e99e4bb9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\CORDIC\lut">
+      <UniqueIdentifier>{62e29964-0271-48e0-9290-9927c57ff79b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\details">
+      <UniqueIdentifier>{e38d864f-8111-415a-a1d6-a872d6de0b08}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\range.cpp">
@@ -20,5 +29,123 @@
     <ClCompile Include="..\src\precision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\libq\arithmetics_safety.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libq\fixed_point.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libq\loop_unroller.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libq\type_promotion.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\libq\CORDIC\lut\lut.hpp">
+      <Filter>Header Files\CORDIC\lut</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\libq\CORDIC\lut\arctan_lut.inl">
+      <Filter>Header Files\CORDIC\lut</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\lut\arctanh_lut.inl">
+      <Filter>Header Files\CORDIC\lut</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\lut\circular_scales.inl">
+      <Filter>Header Files\CORDIC\lut</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\lut\hyperbolic_scale.inl">
+      <Filter>Header Files\CORDIC\lut</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\lut\inv_pow2_lut.inl">
+      <Filter>Header Files\CORDIC\lut</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\lut\pow2_lut.inl">
+      <Filter>Header Files\CORDIC\lut</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\acos.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\acosh.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\asin.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\asinh.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\atan.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\atanh.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\cos.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\cosh.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\exp.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\log.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\sin.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\sinh.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\sqrt.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\tan.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\CORDIC\tanh.inl">
+      <Filter>Header Files\CORDIC</Filter>
+    </None>
+    <None Include="..\..\libq\details\ceil.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
+    <None Include="..\..\libq\details\div_of.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
+    <None Include="..\..\libq\details\fabs.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
+    <None Include="..\..\libq\details\floor.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
+    <None Include="..\..\libq\details\fmod.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
+    <None Include="..\..\libq\details\mult_of.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
+    <None Include="..\..\libq\details\numeric_limits.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
+    <None Include="..\..\libq\details\remainder.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
+    <None Include="..\..\libq\details\round.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
+    <None Include="..\..\libq\details\sign.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
+    <None Include="..\..\libq\details\type_traits.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
+    <None Include="..\..\libq\details\sum_traits.inl">
+      <Filter>Header Files\details</Filter>
+    </None>
   </ItemGroup>
 </Project>
