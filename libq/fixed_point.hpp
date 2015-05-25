@@ -172,6 +172,8 @@ public:
 
         return x;
     }
+    template<> static this_class make_fixed_point(float const&) = delete;
+    template<> static this_class make_fixed_point(double const&) = delete;
 
     /// \brief creates the zero being of the current fixed-point format
     explicit fixed_point()
