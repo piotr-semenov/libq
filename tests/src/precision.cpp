@@ -10,7 +10,7 @@
 
 #include "boost/noncopyable.hpp"
 
-#include "fixed_point.hpp"
+#include "libq/fixed_point.hpp"
 
 #include <ctime>
 
@@ -61,10 +61,40 @@ double uniform_distribution_sample(void)
     return low + uniform() * (high - low);
 }
 
+/// \brief stringify the type
+template<typename Q_type>
+class Q_stringifier
+{
+public:
+    static std::string name()
+    {
+        static std::string type_label;
+        if (type_label.empty()) {
+            std::stringstream stream;
+            if (Q_type::is_signed) {
+                stream << "Q";
+            }
+            else {
+                stream << "UQ";
+            }
+
+            stream
+                << Q_type::number_of_significant_bits << "." << Q_type::bits_for_fractional;
+            if (Q_type::scaling_factor_exponent > 0) {
+                stream << "." << Q_type::scaling_factor_exponent;
+            }
+
+            type_label = stream.str();
+        }
+
+        return type_label;
+    }
+};
+
 /*!
  \brief 
 */
-template<typename Q_type1, typename Q_type2, typename Operation, typename Error, std::size_t iterations = 100u>
+template<typename Q_type1, typename Q_type2, typename Operation, typename Error, std::size_t iterations = 1000u>
 void test_the_precision_of(Operation _op, Error _limit, logger& _log)
 {
     for (std::size_t it = 0; it != iterations; ++it) {
@@ -79,32 +109,43 @@ void test_the_precision_of(Operation _op, Error _limit, logger& _log)
         Q_type1 const a(u1);
         Q_type2 const b(u2);
 
+        std::stringstream stream;
+        stream
+            << Q_stringifier<Q_type1>::name() << "\t"
+            << Q_stringifier<Q_type2>::name() << "\t"
+            << std::setprecision(20)
+            << u1 << "\t" << u2 << "\t";
         try {
             double const abs_diff = std::fabs(_op(a, b) - _op(u1, u2));
 
-            std::stringstream stream;
-            stream
-                << std::setprecision(20)
-                << "Q" << Q_type1::number_of_significant_bits << "." << Q_type1::bits_for_fractional << "\t"
-                << "Q" << Q_type2::number_of_significant_bits << "." << Q_type2::bits_for_fractional << "\t"
-                << u1 << "\t" << u2 << "\t"
-                << abs_diff;
+            stream << abs_diff;
             std::string const message = stream.str();
-            BOOST_LOG_SEV(_log, logging::trivial::info) << "[Info]\t" << message;
 
             if (abs_diff > _limit(u1, u2, static_cast<double>(a), static_cast<double>(b))) {
                 BOOST_LOG_SEV(_log, logging::trivial::error) << "[Error]\t" << message;
                 BOOST_CHECK_MESSAGE(false, message);
             }
+            else {
+                BOOST_LOG_SEV(_log, logging::trivial::info) << "[Info]\t" << message;
+            }
         }
-        catch (std::exception) {
-            BOOST_CHECK_MESSAGE(false, "");
+        catch (std::exception const& _e) {
+            stream << _e.what();
+            std::string const message = stream.str();
+            BOOST_LOG_SEV(_log, logging::trivial::error) << "[Error]\t" << message;
+            BOOST_CHECK_MESSAGE(false, message);
         }
     }
 }
+template<typename Q_type1, typename Operation, typename Error, std::size_t iterations = 100u>
+void test_the_precision_of(Operation _op, Error _limit, logger& _log)
+{
+    return test_the_precision_of<Q_type1, Q_type1>(_op, _limit, _log);
+}
+
 BOOST_AUTO_TEST_SUITE(Precision)
 
-class plus
+class plus_op
 {
 public:
     template<typename T1, typename T2>
@@ -120,24 +161,26 @@ BOOST_AUTO_TEST_CASE(precision_of_plus)
  * x, y are the referenced real numbers
  * a = x + e_x, b = y + e_y are their approximations by fixed-point numbers (as real numbers)
 */
-#define error(precision) [](double, double, double, double){ return 2 * precision; }
+#define error(_precision, _prescale) [](double, double, double, double){ \
+    double const factor = 1u << std::abs(_prescale); \
+    return 2 * _precision * ((_prescale > 0) ? 1.0/factor : factor); \
+}
     using libq::Q;
     using libq::UQ;
 
-    plus const op;
-    logger log("plus.log");
+    plus_op const op;
+    logger custom_log("plus.log");
 
-    test_the_precision_of<UQ<23, 13>, UQ<23, 13> >(op, error(1E-3), log); // floor(log(10,2^13-1))=3
-    test_the_precision_of<Q<56, 34>, Q<56, 34> >(op, error(1E-10), log);
-    test_the_precision_of<Q<61, 52>, Q<61, 52> >(op, error(1E-15), log);
-    test_the_precision_of<UQ<53, 23>, UQ<53, 23> >(op, error(1E-6), log);
-#undef error
+    test_the_precision_of<UQ<23, 13, 3> >(op, error(1E-3, 3), custom_log); // floor(log(10,2^13-1))=3
+    test_the_precision_of<Q<56, 34, -5> >(op, error(1E-10, -5), custom_log);
+    test_the_precision_of<Q<61, 52, 3> >(op, error(1E-15, 3), custom_log);
+    test_the_precision_of<UQ<53, 23, 7> >(op, error(1E-6, 7), custom_log);
 }
 
 /*
  note, the subtraction max error is the same as the summation has
 */
-class minus
+class minus_op
 {
 public:
     template<typename T1, typename T2>
@@ -145,61 +188,109 @@ public:
 };
 BOOST_AUTO_TEST_CASE(precision_of_minus)
 {
-#define error(precision) [](double, double, double, double){ return 2 * precision; }
-    minus const op;
-    logger log("minus.log");
+    minus_op const op;
+    logger custom_log("minus.log");
 
-    test_the_precision_of<Q<28, 13>, Q<28, 13> >(op, error(1E-3), log);
-    test_the_precision_of<Q<56, 34>, Q<56, 34> >(op, error(1E-10), log);
-    test_the_precision_of<Q<61, 52>, Q<61, 52> >(op, error(1E-15), log);
-    test_the_precision_of<Q<53, 23>, Q<53, 23> >(op, error(1E-6), log);
+    using libq::Q;
+    using libq::UQ;
+
+    test_the_precision_of<Q<28, 13, 5> >(op, error(1E-3, 5), custom_log);
+    test_the_precision_of<Q<56, 34, -6> >(op, error(1E-10, -6), custom_log);
+    test_the_precision_of<Q<61, 52, 23> >(op, error(1E-15, 23), custom_log);
+    test_the_precision_of<Q<53, 23, 1> >(op, error(1E-6, 1), custom_log);
 #undef error
 }
-//
-///*
-// note, the multiplication max error can be determined as shown below:
-// (x + e_x) * (y + e_y) = (x * y) + (|x| * e_y + |y| * e_x) + o(e_x, e_y)
-//*/
-//#define ERROR(precision1, precision2) [](double x, double y, double a, double b) \
-//{ \
-//    return (std::fabs(x) * precision1) + (std::fabs(y) * precision2); \
-//}
-//#define MULTIPLY(a, b) a*b
-//    TEST_THE_PRECISION_OF2(UQ(18, 13), UQ(20, 15), MULTIPLY, ERROR(1E-3, 1E-4));
-//    TEST_THE_PRECISION_OF2(Q(24, 23), Q(30, 22), MULTIPLY, ERROR(1E-6, 1E-6));
-//    TEST_THE_PRECISION_OF2(Q(30, 29), Q(33, 33), MULTIPLY, ERROR(1E-8, 1E-9));
-//
-//    TEST_THE_PRECISION_OF1(UQ(18, 13), MULTIPLY, ERROR(1E-3, 1E-3));
-//    TEST_THE_PRECISION_OF1(UQ(20, 15), MULTIPLY, ERROR(1E-4, 1E-4));
-//    TEST_THE_PRECISION_OF1(Q(24, 23), MULTIPLY, ERROR(1E-6, 1E-6));
-//    TEST_THE_PRECISION_OF1(Q(30, 22), MULTIPLY, ERROR(1E-6, 1E-6));
-//    TEST_THE_PRECISION_OF1(Q(30, 29), MULTIPLY, ERROR(1E-8, 1E-8));
-//#undef MULTIPLY
-//#undef ERROR
-//
-//    /*
-//     note, the division max error can be determined as shown below:
-//     (x + e_x) / (y + e_y) = c = (x/y + e_x/y) / (1 + e_y/y)
-//     c = x/y + (e_x + |c|*e_y)/|y|
-//    */
-//#define ERROR(precision1, precision2) [](double x, double y, double a, double b) \
-//{ \
-//    return (precision1 + std::fabs(a / b) * precision2) / std::fabs(y); \
-//}
-//#define DIVISION(a, b) a/b
-//    TEST_THE_PRECISION_OF2(UQ(18, 13), UQ(20, 15), DIVISION, ERROR(1E-3, 1E-4));
-//    TEST_THE_PRECISION_OF2(Q(24, 23), Q(30, 22), DIVISION, ERROR(1E-6, 1E-6));
-//    TEST_THE_PRECISION_OF2(Q(29, 29), Q(33, 33), DIVISION, ERROR(1E-8, 1E-9));
-//    TEST_THE_PRECISION_OF2(QExtended(52, 52, 1), Q(5, 4), DIVISION, ERROR(1E-15, 1E-1));
-//
-//    TEST_THE_PRECISION_OF1(UQ(18, 13), DIVISION, ERROR(1E-3, 1E-3));
-//    TEST_THE_PRECISION_OF1(UQ(20, 15), DIVISION, ERROR(1E-4, 1E-4));
-//    TEST_THE_PRECISION_OF1(Q(24, 23), DIVISION, ERROR(1E-6, 1E-6));
-//    TEST_THE_PRECISION_OF1(Q(30, 22), DIVISION, ERROR(1E-6, 1E-6));
-//    TEST_THE_PRECISION_OF1(Q(30, 29), DIVISION, ERROR(1E-8, 1E-8));
-//#undef ERROR
-//#undef DIVISION
 
+class multiply_op
+{
+public:
+    template<typename T1, typename T2>
+    double operator()(T1 _x, T2 _y) const{ return static_cast<double>(_x * _y); }
+};
+BOOST_AUTO_TEST_CASE(precision_of_multiplication)
+{
+    /*
+     note, the multiplication max error can be determined as shown below:
+     (x + e_x) * (y + e_y) = (x * y) + (|x| * e_y + |y| * e_x) + o(e_x, e_y)
+     */
+#define error(_precision1, _precision2) [](double _x, double _y, double _a, double _b) \
+{ \
+    return (std::fabs(_x) * _precision1) + (std::fabs(_y) * _precision2); \
+}
+    multiply_op const op;
+    logger custom_log("multiplication.log");
+
+    using libq::Q;
+    using libq::UQ;
+
+    test_the_precision_of<UQ<18, 13>, UQ<20, 15> >(op, error(1E-3, 1E-4), custom_log);
+    test_the_precision_of<Q<24, 23>, Q<30, 22> >(op, error(1E-6, 1E-6), custom_log);
+    test_the_precision_of<Q<30, 29>, Q<33, 33> >(op, error(1E-8, 1E-9), custom_log);
+
+    test_the_precision_of<UQ<18, 13>, UQ<18, 13> >(op, error(1E-3, 1E-3), custom_log);
+    test_the_precision_of<UQ<20, 15>, UQ<20, 15> >(op, error(1E-4, 1E-4), custom_log);
+    test_the_precision_of<Q<24, 23>, Q<24, 23> >(op, error(1E-6, 1E-6), custom_log);
+    test_the_precision_of<Q<30, 22>, Q<30, 22> >(op, error(1E-6, 1E-6), custom_log);
+    test_the_precision_of<Q<30, 29>, Q<30, 29> >(op, error(1E-8, 1E-8), custom_log);
+#undef error
+}
+
+class division_op
+{
+public:
+    template<typename T1, typename T2>
+    double operator()(T1 _x, T2 _y) const{ return static_cast<double>(_x / _y); }
+};
+BOOST_AUTO_TEST_CASE(precision_of_division)
+{
+    /*
+     note, the division max error can be determined as shown below:
+     (x + e_x) / (y + e_y) = c = (x/y + e_x/y) / (1 + e_y/y)
+     c = x/y + (e_x + |c|*e_y)/|y|
+     */
+#define error(_precision1, _precision2) [](double _x, double _y, double _a, double _b) \
+{ \
+    return (_precision1 + std::fabs(_a / _b) * _precision2) / std::fabs(_y); \
+}
+    division_op const op;
+    logger custom_log("division.log");
+
+    using libq::Q;
+    using libq::UQ;
+
+    test_the_precision_of<UQ<18, 13, 1>, UQ<20, 15, -3> >(op, error(1E-3, 1E-4), custom_log);
+    test_the_precision_of<Q<24, 23, -20>, Q<30, 22, 4> >(op, error(1E-6, 1E-6), custom_log);
+    test_the_precision_of<Q<29, 29>, Q<33, 33> >(op, error(1E-8, 1E-9), custom_log);
+    test_the_precision_of<Q<52, 52, -2>, Q<5, 4, 4> >(op, error(1E-15, 1E-1), custom_log);
+
+    test_the_precision_of<UQ<18, 13>, UQ<18, 13> >(op, error(1E-3, 1E-3), custom_log);
+        test_the_precision_of<UQ<20, 15, 1>, UQ<20, 15> >(op, error(1E-4, 1E-4), custom_log);
+    test_the_precision_of<Q<24, 23>, Q<24, 23, 2> >(op, error(1E-6, 1E-6), custom_log);
+    test_the_precision_of<Q<30, 22>, Q<30, 22> >(op, error(1E-6, 1E-6), custom_log);
+    test_the_precision_of<Q<30, 29, 5>, Q<30, 29> >(op, error(1E-8, 1E-8), custom_log);
+#undef error
+}
+
+class log_op
+{
+public:
+    template<typename T1, typename T2>
+    double operator()(T1 _x, T2 _y) const{ return static_cast<double>(std::log(_x)); }
+};
+BOOST_AUTO_TEST_CASE(precision_of_log)
+{
+#define error(_precision) [](double, double, double, double){ return _precision; }
+    log_op const op;
+    logger custom_log("log.log");
+
+    using libq::Q;
+    using libq::UQ;
+
+    test_the_precision_of<UQ<23, 17> >(op, error(1E-4), custom_log); // floor(log(10, 2^f))-1
+    test_the_precision_of<UQ<32, 16> >(op, error(1E-3), custom_log);
+    test_the_precision_of<UQ<43, 20> >(op, error(1E-4), custom_log);
+    test_the_precision_of<UQ<50, 13> >(op, error(1E-2), custom_log);
+}
 //BOOST_AUTO_TEST_CASE(std_functions)
 //{
 //#define ERROR(limit) [](double, double, double, double){ return limit; }
