@@ -21,8 +21,8 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class acosh_of<libq::fixed_point<T, n, f, e, op, up> >
 {
 public:
-    typedef typename
-        log_of<T, n, f, e, op, up>::promoted_type::to_unsigned_type promoted_type;
+    using promoted_type = typename
+        log_of<T, n, f, e, op, up>::promoted_type::to_unsigned_type;
 };
 } // details
 } // libq
@@ -35,8 +35,8 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::acosh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
     acosh(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
-    typedef typename libq::details::acosh_of<Q>::promoted_type result_type;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
+    using result_type = typename libq::details::acosh_of<Q>::promoted_type;
 
     assert(("[std::acosh] argument is not from [1.0, +inf)", _val > Q(1.0f)));
     if (_val < Q(1.0f)) {

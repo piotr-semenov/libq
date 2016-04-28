@@ -19,7 +19,7 @@ namespace std {
 template<typename T, std::size_t n, std::size_t f, int e, typename op, typename up>
 class numeric_limits<libq::fixed_point<T, n, f, e, op, up> >
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
 
 public:
     static std::float_denorm_style const has_denorm = std::denorm_absent;

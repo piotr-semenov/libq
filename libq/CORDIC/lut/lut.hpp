@@ -28,14 +28,14 @@ template<std::size_t n, typename Q>
 class lut
     :    public std::array<Q, n>
 {
-    typedef std::array<Q, n> base_class;
-    typedef lut<n, Q> this_class;
+    using base_class = std::array<Q, n>;
+    using this_class = lut<n, Q>;
 
     lut(base_class const& _dat)
         : base_class(_dat){}
 
 public:
-    typedef Q fixed_point_type; ///< type of fixed-point numbers
+    using fixed_point_type = Q; ///< type of fixed-point numbers
 
     enum: std::size_t {
         dim = n ///< size of LUT

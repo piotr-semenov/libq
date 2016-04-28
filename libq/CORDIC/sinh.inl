@@ -22,21 +22,20 @@ namespace details {
 template<typename T>
 class sinh_of
 {
-    typedef T promoted_type;
+    using promoted_type = T;
 };
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class sinh_of<libq::fixed_point<T, n, f, e, op, up> >
 {
 public:
-    typedef libq::fixed_point<
+    using promoted_type = libq::fixed_point<
         std::intmax_t,
         std::numeric_limits<std::intmax_t>::digits - f,
         f,
         e,
         op,
-        up
-    > promoted_type;
+        up>;
 };
 } // details
 } // libq
@@ -46,8 +45,8 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::sinh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
     sinh(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
-    typedef typename libq::details::sinh_of<Q>::promoted_type sinh_type;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
+    using sinh_type = typename libq::details::sinh_of<Q>::promoted_type;
 
     auto x = static_cast<sinh_type>(std::exp(_val)) - static_cast<sinh_type>(std::exp(-_val));
     libq::lift(x) >>= 1u;

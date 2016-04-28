@@ -31,15 +31,14 @@ class sqrt_of
     };
 
 public:
-    typedef typename boost::uint_t<number_of_significant_bits>::least promoted_storage_type;
-    typedef libq::fixed_point<
+    using promoted_storage_type = typename boost::uint_t<number_of_significant_bits>::least;
+    using promoted_type = libq::fixed_point<
         promoted_storage_type,
         bits_for_integral,
         bits_for_fractional,
         scaling_factor_exponent,
         op,
-        up
-    > promoted_type;
+        up>;
 };
 } // details
 } // libq

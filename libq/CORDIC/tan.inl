@@ -21,7 +21,7 @@ template<typename T>
 class tan_of
 {
 public:
-    typedef T promoted_type;
+    using promoted_type = T;
 };
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
@@ -39,8 +39,8 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::tan_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
     tan(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
-    typedef typename libq::details::tan_of<Q>::promoted_type tan_type;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
+    using tan_type = typename libq::details::tan_of<Q>::promoted_type;
 
     auto const x = std::sin(_val);
     auto const y = std::cos(_val);

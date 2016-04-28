@@ -23,21 +23,20 @@ template<typename T>
 class exp_of
 {
 public:
-    typedef T promoted_type;
+    using promoted_type = T;
 };
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class exp_of<libq::fixed_point<T, n, f, e, op, up> >
 {
 public:
-    typedef libq::fixed_point<
+    using promoted_type = libq::fixed_point<
         std::uintmax_t,
         std::numeric_limits<std::uintmax_t>::digits - f,
         f,
         e,
         op,
-        up
-    > promoted_type;
+        up>;
 };
 } // details
 } // libq
@@ -47,13 +46,12 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::exp_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
     exp(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
-    typedef typename libq::details::exp_of<Q>::promoted_type exp_type;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
+    using exp_type = typename libq::details::exp_of<Q>::promoted_type;
 
-    typedef libq::Q<f, f, e, op, up> Qw;
-    typedef typename libq::details::type_promotion_base<Qw, 1u, 0, 0>::promoted_type
-        work_type;
-    typedef libq::cordic::lut<f, work_type> lut_type;
+    using Qw = libq::Q<f, f, e, op, up>;
+    using work_type = typename libq::details::type_promotion_base<Qw, 1u, 0, 0>::promoted_type;
+    using lut_type = libq::cordic::lut<f, work_type>;
 
     // reduces argument to interval [0.0, 1.0]
     int power(0);

@@ -21,7 +21,7 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 bool
     signbit(libq::fixed_point<T, n, f, e, op, up> const& _x)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
 
     return _x.value() < 0;
 }

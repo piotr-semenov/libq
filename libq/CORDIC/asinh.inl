@@ -29,7 +29,7 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::asinh_of<T, n, f, e, op, up>::promoted_type
     asinh(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef typename libq::details::asinh_of<T, n, f, e, op, up>::promoted_type result_type;
+    using result_type = typename libq::details::asinh_of<T, n, f, e, op, up>::promoted_type;
 
     return result_type(
         std::log(std::sqrt(_val * _val + 1u) + _val)

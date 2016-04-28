@@ -21,7 +21,7 @@ template<typename T>
 class tanh_of
 {
 public:
-    typedef T promoted_type;
+    using promoted_type = T;
 };
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
@@ -42,8 +42,8 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::tanh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
     tanh(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
-    typedef typename libq::details::tanh_of<Q>::promoted_type tanh_type;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
+    using tanh_type = typename libq::details::tanh_of<Q>::promoted_type;
 
     auto a = std::sinh(_val);
     auto b = std::cosh(_val);
@@ -58,7 +58,7 @@ typename libq::details::tanh_of<libq::fixed_point<T, n, f, e, op, up> >::promote
     libq::lift(a) >>= shifts;
     libq::lift(b) >>= shifts;
 
-    typedef typename libq::Q<f, f, e, op, up> work_type;
+    using work_type = typename libq::Q<f, f, e, op, up>;
     auto const c = tanh_type(work_type(a) / work_type(b));
 
     return tanh_type(c);

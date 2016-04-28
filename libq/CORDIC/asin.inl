@@ -19,7 +19,7 @@ template<typename T>
 class asin_of
 {
 public:
-    typedef T promoted_type;
+    using promoted_type = T;
 };
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
@@ -40,9 +40,9 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::asin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
     asin(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
-    typedef typename libq::details::asin_of<Q>::promoted_type result_type;
-    typedef libq::cordic::lut<result_type::bits_for_fractional, result_type> lut_type;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
+    using result_type = typename libq::details::asin_of<Q>::promoted_type;
+    using lut_type = libq::cordic::lut<result_type::bits_for_fractional, result_type>;
 
     assert(("[std::asin] argument is not from [-1.0, 1.0]", std::fabs(_val) <= Q(1.0f)));
     if (std::fabs(_val) > Q(1.0f)) {

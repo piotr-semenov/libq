@@ -34,8 +34,8 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::atanh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
     atanh(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
-    typedef typename libq::details::atanh_of<Q>::promoted_type result_type;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
+    using result_type = typename libq::details::atanh_of<Q>::promoted_type;
 
     assert(("[std::atanh] argument is not from [-1.0, 1.0]", std::fabs(_val) <= Q(1.0f)));
 

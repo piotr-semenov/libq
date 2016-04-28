@@ -22,7 +22,7 @@ template<typename T>
 class sin_of
 {
 public:
-    typedef T promoted_type;
+    using promoted_type = T;
 };
 
 // trick: an extra base class is required to make the compiler to
@@ -45,10 +45,10 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
     sin(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type sin_type;
+    using sin_type = typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type;
 
     // gap in 3 bits is needed for CONST_PI existence
-    typedef libq::Q<f + 3u, f, e, op, up> work_type;
+    using work_type = libq::Q<f + 3u, f, e, op, up>;
 
     // convergence interval for CORDIC rotations is [-pi/2, pi/2].
     // So anyone must map the input angle to that interval
@@ -72,7 +72,7 @@ typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
         }
     }
 
-    typedef libq::cordic::lut<f, work_type> lut_type;
+    using lut_type = libq::cordic::lut<f, work_type>;
     static auto const angles = lut_type::circular();
 
     // normalization factor: see page 10, table 24.1 and pages 4-5, equations (5)-(6)

@@ -21,7 +21,7 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 libq::fixed_point<T, n, f, e, op, up>
     round(libq::fixed_point<T, n, f, e, op, up> const& _x)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
 
     typename Q::storage_type const extra = Q(0.5f).value();
     typename Q::storage_type const val = _x.value() + (std::signbit(_x) ? -extra : +extra);

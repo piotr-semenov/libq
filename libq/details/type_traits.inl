@@ -21,25 +21,25 @@ struct is_integral<libq::fixed_point<T, n, f, e, op, up> >
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 struct make_signed<libq::fixed_point<T, n, f, e, op, up> >
 {
-    typedef libq::fixed_point <
+    using type = libq::fixed_point <
         typename std::make_signed<T>::type
         , n
         , f
         , e
         , op
-        , up > type;
+        , up >;
 };
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 struct make_unsigned<libq::fixed_point<T, n, f, e, op, up> >
 {
-    typedef libq::fixed_point <
+    using type = libq::fixed_point <
         typename std::make_unsigned<T>::type
         , n
         , f
         , e
         , op
-        , up > type;
+        , up >;
 };
 } // std
 

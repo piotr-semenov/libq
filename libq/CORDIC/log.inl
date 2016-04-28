@@ -45,9 +45,9 @@ template<typename T, std::size_t n, std::size_t f, int e, typename op, typename 
 typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
     log(libq::fixed_point<T, n, f, e, op, up> _val)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
-    typedef typename libq::details::log_of<T, n, f, e, op, up>::promoted_type log_type;
-    typedef libq::cordic::lut<f, Q> lut;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
+    using log_type = typename libq::details::log_of<T, n, f, e, op, up>::promoted_type;
+    using lut = libq::cordic::lut<f, Q>;
 
     assert(("[std::log] argument is negaitve", _val >= Q(0)));
     if (_val <= Q(0)) {
@@ -55,7 +55,7 @@ typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
     }
 
     // one need 1 bit to represent integer part of reals from [1.0, 2.0]
-    typedef libq::UQ<f + 1u, f, 0, op, up> work_type;
+    using work_type = libq::UQ<f + 1u, f, 0, op, up>;
 
     // reduces argument to interval [1.0, 2.0]
     int power(0);

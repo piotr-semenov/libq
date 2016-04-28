@@ -21,7 +21,7 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 libq::fixed_point<T, n, f, e, op, up>
     ceil(libq::fixed_point<T, n, f, e, op, up> const& _x)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
 
     typename Q::storage_type val = _x.value();
     if (val & Q::fractional_bits_mask) {
