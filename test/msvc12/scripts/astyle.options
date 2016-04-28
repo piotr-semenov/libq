@@ -1,1 +1,0 @@
---style=google --indent=spaces=4 --align-pointer=type --align-reference=type --max-code-length=132 --attach-namespaces --attach-classes --attach-inlines --attach-extern-c --indent-modifiers --pad-oper --pad-header --unpad-paren --close-templates --add-brackets --add-one-line-brackets --convert-tabs --break-after-logical --remove-comment-prefix --mode=c
