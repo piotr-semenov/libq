@@ -1,0 +1,1 @@
+python "./../test/msvc12/scripts/cpplint.py" --extensions hpp fixed_point.hpp

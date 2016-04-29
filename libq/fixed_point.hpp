@@ -1,12 +1,12 @@
 // fixed_point.hpp
 //
-// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Copyright (c) 2014-2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
 /*!
  \file fixed_point.hpp
 
- Provides the fixed-point numbers of arbitrary format.
+ \brief Provides the fixed-point numbers of arbitrary format.
 */
 
 #ifndef INC_LIBQ_FIXED_POINT_HPP_
@@ -29,7 +29,16 @@ namespace libq {
  \brief provides a proxy class to deal with stored integer behind the fixed-point number
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-T& lift(fixed_point<T, n, f, e, op, up>& _x){ return _x.m_value; }
+T& lift(fixed_point<T, n, f, e, op, up>& _x) {  // NOLINT
+    return _x.m_value;
+}
+
+
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+T const lift(fixed_point<T, n, f, e, op, up> const& _x) {
+    return _x.m_value;
+}
+
 
 /*!
  \brief fixed-point number and its arithmetics. It extends the formats like UQn.f, Qn.f with fixed pre-scaling factor \f$2^e\f$.
@@ -51,54 +60,88 @@ T& lift(fixed_point<T, n, f, e, op, up>& _x){ return _x.m_value; }
 
     int main(int, char**)
     {
-        using Q1 = libq::Q<10, 20>; // represents the dynamic range []
-        using Q2 = libq::Q<20, 15>; // represents the dynamic range []
+        using Q1 = libq::Q<10, 20>;  // represents the dynamic range []
+        using Q2 = libq::Q<20, 15>;  // represents the dynamic range []
         return 0;
     }
  \endcode
 
  \ref see http://en.wikipedia.org/wiki/Q_(number_format) for details
 */
-template<typename value_type, std::size_t n, std::size_t f, int e, class op, class up>
+template<typename value_type,
+         std::size_t n,
+         std::size_t f,
+         int e,
+         class op,
+         class up>
 class fixed_point {
-    static_assert(std::is_integral<value_type>::value, "value_type must be of the built-in integral type like std::uint8_t");
+        static_assert(std::is_integral<value_type>::value,
+                      "value_type must be of the built-in integral type");
 
     using this_class = fixed_point<value_type, n, f, e, op, up>;
-    using largest_type = typename std::conditional<std::numeric_limits<value_type>::is_signed, std::intmax_t, std::uintmax_t>::type;
+    using largest_type = typename std::conditional<
+                                    std::numeric_limits<value_type>::is_signed,
+                                    std::intmax_t, std::uintmax_t>::type;
 
- public:
+  public:
     using type = this_class;
     using overflow_policy = op;
     using underflow_policy = up;
 
-    /// \brief the integral type behind the fixed-point object
+    /*!
+     \brief the integral type behind the fixed-point object
+    */
     using storage_type = value_type;
 
     enum: int {
         scaling_factor_exponent = e
     };
     enum: std::size_t {
-        number_of_significant_bits = n + f, ///< total number of significant bits
+        /*!
+         \brief total number of significant bits
+        */
+        number_of_significant_bits = n + f,
 
-        bits_for_fractional = f, ///< queried number of bits to represent the fractional part of fixed-point number
-        bits_for_integral = n, ///< number of bits to represent the integer part of fixed-point number
+        /*!
+         \brief queried number of bits to represent the fractional part of
+         fixed-point number
+        */
+        bits_for_fractional = f,
 
-        is_signed = std::numeric_limits<storage_type>::is_signed ///< checks if this fixed-point number is signed
+        /*!
+         \brief number of bits to represent the integral part
+        */
+        bits_for_integral = n,
+
+        /*!
+         \brief checks if this fixed-point number is signed
+        */
+        is_signed = std::numeric_limits<storage_type>::is_signed
     };
 
-    /// \brief gets the scaling factor
+    /*!
+     \brief gets the scaling factor
+    */
     inline static double scaling_factor() {
-        static double const factor = std::exp2(-static_cast<double>(this_class::scaling_factor_exponent));
-        //static double const factor = std::pow(2.0, -static_cast<double>(this_class::scaling_factor_exponent));
+        static double const factor = std::exp2(
+                    -static_cast<double>(this_class::scaling_factor_exponent));
+
         return factor;
     }
 
-    static_assert(this_class::number_of_significant_bits <= std::numeric_limits<largest_type>::digits, "too big word size is required");
+    static_assert(this_class::number_of_significant_bits <=
+                    std::numeric_limits<largest_type>::digits,
+                  "too big word size is required");
     enum : std::uintmax_t {
-        scale = std::uintmax_t(1u) << this_class::bits_for_fractional, ///< scale factor for fixed-point of current number
+        /*!
+         \brief scale factor for fixed-point of current number
+        */
+        scale = std::uintmax_t(1u) << this_class::bits_for_fractional,
 
-        // some trick to handle the case n + f = max possible word size
-        /// \brief binary mask to extract the integral bits from the stored integer
+        /*!
+         \brief some trick to handle the case n + f = max possible word size
+         \brief binary mask to extract the integral bits from the stored integer
+        */
         integer_bits_mask =
             (this_class::bits_for_integral > 0) ?
                 2u * (
@@ -120,7 +163,7 @@ class fixed_point {
     };
 
     /// \brief the minimum rational value represented with current fixed-point format
-    static this_class largest() { 
+    static this_class largest() {
         return this_class::make_fixed_point<typename this_class::largest_type>(this_class::largest_stored_integer);
     }
     static this_class least(){ return this_class::make_fixed_point(this_class::least_stored_integer); }
