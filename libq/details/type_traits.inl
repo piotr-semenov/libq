@@ -1,12 +1,13 @@
 // type_traits.inl
 //
-// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
 /*!
  \file type_traits.inl
 
- Gets the templates from <type_traits> specialized for fixed-point number type.
+ \brief Gets the templates from <type_traits> specialized for fixed-point
+ number type.
 */
 
 #ifndef INC_STD_TYPE_TRAITS_INL_

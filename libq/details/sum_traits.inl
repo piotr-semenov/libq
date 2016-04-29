@@ -6,6 +6,7 @@
 /*!
  \file sum_traits.inl
 
+ \brief 
 */
 
 #ifndef INC_LIBQ_DETAILS_SUM_TRAITS_INL_
@@ -28,7 +29,7 @@ public:
     static double error(){ return std::exp2(-f+e); }
 };
 
-} // details
-} // libq
+}  // namespace details
+}  // namespace libq
 
-#endif // INC_LIBQ_DETAILS_SUM_TRAITS_INL_
+#endif  // INC_LIBQ_DETAILS_SUM_TRAITS_INL_

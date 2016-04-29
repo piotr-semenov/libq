@@ -96,8 +96,8 @@ template<typename value_type,
          class op,
          class up>
 class fixed_point {
-        static_assert(std::is_integral<value_type>::value,
-                      "value_type must be of the built-in integral type");
+    static_assert(std::is_integral<value_type>::value,
+                  "value_type must be of the built-in integral type");
 
     using this_class = fixed_point<value_type, n, f, e, op, up>;
     using largest_type = typename std::conditional<
@@ -327,63 +327,104 @@ class fixed_point {
     this_class& operator =(this_class const& _x) = default;
 
 
-    /// \brief assign operator in case of rvalue being of different fixed-point format
-    template<typename T1, std::size_t n1, std::size_t f1, int e1, typename op1, typename up1>
+    /*!
+     \brief Assigns the fixed-point number being of different format.
+    */
+    template<typename T1,
+            std::size_t n1,
+            std::size_t f1,
+            int e1,
+            typename op1,
+            typename up1>
     this_class& operator =(fixed_point<T1, n1, f1, e1, op1, up1> const& _x) {
+        using status_type =
+            std::integral_constant<bool,
+                            (static_cast<int>(f1) + e1 -
+                            static_cast<int>(this_class::bits_for_fractional) -
+                            this_class::scaling_factor_exponent > 0)>;  // NOLINT
         return
-            this->set_value_to(
-            this_class::normalize(_x, std::integral_constant<bool,
-                (int(f1) + e1 - int(this_class::bits_for_fractional) - this_class::scaling_factor_exponent > 0)>())
-            );
+            this->set_value_to(this_class::normalize(_x, status_type()));
     }
 
-    /// \brief assign operator in all other cases: rvalue is integer/floating-point number/arithmetic type
-    template<typename T>
-    void operator =(T const& _x) {
-        static_assert(std::is_arithmetic<T>::value, "T must be of the arithmetic type");
-
-        this->m_value = this_class::calc_stored_integer_from(_x, std::integral_constant<bool, std::is_floating_point<T>::value>());
-    }
-
-    /// \brief converts this fixed-point number to the single-precision floating-point number
-    operator float() const{ return static_cast<float>(to_floating_point()); }
-
-    /// \brief converts this fixed-point number to the double-precision floating-point number
-    operator double() const{ return to_floating_point(); }
-
-    /// \brief returns the stored integer
-    storage_type value() const{ return this->m_value; }
-
-/// to use boost!
-#define cond_operator(op) \
-    template<typename T> \
-    bool operator op(T const& _x) const{ return this->value() op this_class(_x).value(); }
-
-    cond_operator(<);
-    cond_operator(<=);
-    cond_operator(>);
-    cond_operator(>=);
-    cond_operator(==);
-    cond_operator(!=);
-#undef cond_operator
-
-    bool operator !() const{ return this->value() == 0; }
 
     /*!
-     widely-used constants
-     naming conventions:
-     1. CONST_2PI means 2*pi;
-     2. CONST_2_PI means 2/pi;
-     3. CONST PI_2 means pi/2.
+     \brief Assigns any arithmetic type.
+    */
+    template<typename T>
+    void operator =(T const& _x) {
+        static_assert(std::is_arithmetic<T>::value,
+                      "T must be of the arithmetic type");
+        using status_type = std::integral_constant<bool,
+                                             std::is_floating_point<T>::value>;
+
+        this->m_value =
+            this_class::calc_stored_integer_from(_x, status_type());
+    }
+
+
+    /*!
+     \brief Converts this fixed-point number to the single-precision
+     floating-point number.
+    */
+    operator float() const {
+        return static_cast<float>(to_floating_point());
+    }
+
+
+    /*!
+     \brief Converts this fixed-point number to the double-precision
+     floating-point number.
+    */
+    operator double() const {
+        return to_floating_point();
+    }
+
+
+    /*!
+     \brief Gets the stored integer behind this fixed-point number.
+    */
+    storage_type value() const {
+        return this->m_value;
+    }
+
+
+    // Unfortunately, nobody can use BOOST.Operators here because it cannot
+    // handle the template operators
+#define COMPARISON_OPERATOR(op) \
+    template<typename T> \
+    bool operator op(T const& _x) const { \
+        return this->value() op this_class(_x).value(); \
+     }
+
+    COMPARISON_OPERATOR(<);  // NOLINT
+    COMPARISON_OPERATOR(<=);  // NOLINT
+    COMPARISON_OPERATOR(>);  // NOLINT
+    COMPARISON_OPERATOR(>=);  // NOLINT
+    COMPARISON_OPERATOR(==);  // NOLINT
+    COMPARISON_OPERATOR(!=);  // NOLINT
+#undef COMPARISON_OPERATOR
+
+    bool operator !() const {
+        return this->value() == 0;
+    }
+
+    /*!
+     \brief Fixed-point approximation of the widely-used constants.
+     \note This uses the following naming convention:
+     - CONST_2PI is for \f$2 * \pi\f$.
+     - CONST_2_PI is for \f$\frac{2}{\pi}\f$.
+     - CONST_PI_2 is for \f$\frac{\pi}{2}\f$.
     */
     static this_class const CONST_E, CONST_LOG2E, CONST_1_LOG2E, CONST_LOG10E,
-        CONST_LOG102, CONST_LN2, CONST_LN10, CONST_2PI, CONST_PI, CONST_PI_2,
-        CONST_PI_4, CONST_1_PI, CONST_2_PI, CONST_2_SQRTPI, CONST_SQRT2,
-        CONST_SQRT1_2, CONST_2SQRT2;
+                            CONST_LOG102, CONST_LN2, CONST_LN10, CONST_2PI,
+                            CONST_PI, CONST_PI_2, CONST_PI_4, CONST_1_PI,
+                            CONST_2_PI, CONST_2_SQRTPI, CONST_SQRT2,
+                            CONST_SQRT1_2, CONST_2SQRT2;
+
 
     // arithmetics: summation
     template<typename T>
-    inline typename libq::details::sum_traits<this_class>::promoted_type
+    typename libq::details::sum_traits<this_class>::promoted_type
         operator +(T const& _x) const {
         using sum_type = typename libq::details::sum_traits<this_class>::promoted_type;
         using word_type = typename sum_type::storage_type;
