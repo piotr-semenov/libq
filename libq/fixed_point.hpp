@@ -300,11 +300,16 @@ class fixed_point {
      \brief Normalizes the input fixed-point number to be accepted by current
      format.
     */
-    template<typename T1, std::size_t n1, std::size_t f1, int e1, class ... Ps>
-    explicit fixed_point(fixed_point<T1, n1, f1, e1, Ps...> const& _x)
+    template<typename T1,
+             std::size_t n1,
+             std::size_t f1,
+             int e1,
+             typename op,
+             typename up>
+    explicit fixed_point(fixed_point<T1, n1, f1, e1, op, up> const& _x)
         : m_value(
             this_class::normalize(_x,
-                                  std::integral_constant<bool, (int(f1) + e1 - int(this_class::bits_for_fractional) - this_class::scaling_factor_exponent > 0)>())) { // NOLINT
+                std::integral_constant<bool, (int(f1) + e1 - int(this_class::bits_for_fractional) - this_class::scaling_factor_exponent > 0)>())) { // NOLINT
     }
 
 
