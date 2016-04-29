@@ -33,19 +33,8 @@ class type_promotion_base {
     using promoted_type = T;
 };
 
-template<typename T,
-        std::size_t n,
-        std::size_t f,
-        int e,
-        class op,
-        class up,
-        std::size_t delta_n,
-        std::size_t delta_f,
-        int delta_e>
-class type_promotion_base<libq::fixed_point<T, n, f, e, op, up>,
-                          delta_n,
-                          delta_f,
-                          delta_e> {
+template<typename T, std::size_t n, std::size_t f, int e, class op, class up, std::size_t delta_n, std::size_t delta_f, int delta_e>  // NOLINT
+class type_promotion_base<libq::fixed_point<T, n, f, e, op, up>, delta_n, delta_f, delta_e> {  // NOLINT
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using this_class = type_promotion_base<Q, delta_n, delta_f, delta_e>;
 
@@ -91,6 +80,7 @@ class type_promotion_base<libq::fixed_point<T, n, f, e, op, up>,
         libq::fixed_point<promoted_storage_type, n + delta_n, f + delta_f, e + delta_e, typename Q::overflow_policy, typename Q::underflow_policy>,  // NOLINT
         libq::fixed_point<promoted_storage_type, n, f, e, typename Q::overflow_policy, typename Q::underflow_policy> >::type;  // NOLINT
 };
+
 }  // namespace details
 }  // namespace libq
 #endif  // INC_LIBQ_TYPE_PROMOTION_HPP_
