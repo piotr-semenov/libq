@@ -80,8 +80,8 @@ typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
     for (std::size_t i = 0; i != f; ++i) {
         int const sign = (z > Q(0)) ? 1 : -1;
 
-        Q const x_scaled = Q::make_fixed_point(sign * (x.value() >> i));
-        Q const y_scaled = Q::make_fixed_point(sign * (y.value() >> i));
+        Q const x_scaled = Q::wrap(sign * (x.value() >> i));
+        Q const y_scaled = Q::wrap(sign * (y.value() >> i));
 
         x1 = Q(x - y_scaled);
         y1 = Q(y + x_scaled);

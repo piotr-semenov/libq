@@ -69,7 +69,7 @@ typename libq::details::exp_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
     exp_type result(1.0);
     work_type x(arg);
     for (std::size_t i = 0; i != f; ++i) {
-        work_type const pow2 = work_type::make_fixed_point(T(1u) << (f - i - 1u));
+        work_type const pow2 = work_type::wrap(T(1u) << (f - i - 1u));
 
         if (x - pow2 >= work_type(0.0)) {
             x = x - pow2;

@@ -28,16 +28,16 @@ template<typename T, std::size_t delta_n, std::size_t delta_f, int delte_e>
 class type_promotion_base
 {
 public:
-    typedef T promoted_type;
+    using promoted_type = T;
 };
 
 template<typename _T, std::size_t _n, std::size_t _f, int _e, class _op, class _up, std::size_t delta_n, std::size_t delta_f, int delta_e>
 class type_promotion_base<libq::fixed_point<_T, _n, _f, _e, _op, _up>, delta_n, delta_f, delta_e>
 {
-    typedef libq::fixed_point<_T, _n, _f, _e, _op, _up> Q;
-    typedef type_promotion_base<Q, delta_n, delta_f, delta_e> this_class;
+    using Q = libq::fixed_point<_T, _n, _f, _e, _op, _up>;
+    using this_class = type_promotion_base<Q, delta_n, delta_f, delta_e>;
 
-    typedef typename std::conditional<Q::is_signed, std::intmax_t, std::uintmax_t>::type max_type;
+    using max_type = typename std::conditional<Q::is_signed, std::intmax_t, std::uintmax_t>::type;
     enum: std::size_t {
         sign_bit = static_cast<std::size_t>(Q::is_signed),
 
@@ -51,15 +51,15 @@ class type_promotion_base<libq::fixed_point<_T, _n, _f, _e, _op, _up>, delta_n, 
     // simple "type" wrapper for lazy instantiation of its "internal" type
     struct storage_type_promotion_traits
     {
-        typedef typename std::conditional<
+        using type = typename std::conditional<
             Q::is_signed
             , typename boost::int_t<(n + delta_n) + (f + delta_f) + this_class::sign_bit>::least // boost::int_t takes a sign bit into account
             , typename boost::uint_t<(n + delta_n) + (f + delta_f)>::least
-        >::type type;
+        >::type;
     };
     struct storage_type_default_traits
     {
-        typedef typename Q::storage_type type;
+        using type = typename Q::storage_type;
     };
 
 public:
@@ -71,17 +71,17 @@ public:
     /*!
      \brief
     */
-    typedef typename boost::mpl::eval_if_c<
+    using promoted_storage_type = typename boost::mpl::eval_if_c<
         this_class::is_expandable
         , typename this_class::storage_type_promotion_traits
         , typename this_class::storage_type_default_traits
-    >::type promoted_storage_type;
+    >::type;
 
-    typedef typename std::conditional<
+    using promoted_type = typename std::conditional<
         this_class::is_expandable
         , libq::fixed_point<promoted_storage_type, n + delta_n, f + delta_f, e + delta_e, typename Q::overflow_policy, typename Q::underflow_policy>
         , libq::fixed_point<promoted_storage_type, n, f, e, typename Q::overflow_policy, typename Q::underflow_policy>
-    >::type promoted_type;
+    >::type;
 };
 
 } // details

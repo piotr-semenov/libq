@@ -61,13 +61,13 @@ public:
 
     /// \brief returns the machine epsilon, that is, the difference between
     /// 1.0 and the next value representable by the fixed-point type
-    static Q epsilon(){ return Q::make_fixed_point(1u); }
+    static Q epsilon(){ return Q::wrap(1u); }
 
     /// \brief the maximum rounding error for fixed-point type
     static Q round_error(){ return Q(0.5f); }
 
-    static Q denorm_min(){ return Q::make_fixed_point(0); }
-    static Q infinity(){ return Q::make_fixed_point(0); }
+    static Q denorm_min(){ return Q::wrap(0); }
+    static Q infinity(){ return Q::wrap(0); }
     static Q quiet_NaN(){ return Q(0); }
     static Q signaling_NaN(){ return Q(0); }
 };

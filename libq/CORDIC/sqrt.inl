@@ -53,8 +53,8 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::sqrt_of<T, n, f, e, op, up>::promoted_type
     sqrt(libq::fixed_point<T, n, f, e, op, up> const& _val)
 {
-    typedef libq::fixed_point<T, n, f, e, op, up> Q;
-    typedef typename libq::details::sqrt_of<T, n, f, e, op, up>::promoted_type sqrt_type;
+    using Q = libq::fixed_point<T, n, f, e, op, up>;
+    using sqrt_type = typename libq::details::sqrt_of<T, n, f, e, op, up>::promoted_type;
 
     assert(("[std::sqrt] argument is negative", _val >= Q(0)));
     if (_val < Q(0)) {
@@ -71,14 +71,14 @@ typename libq::details::sqrt_of<T, n, f, e, op, up>::promoted_type
     // Work fixed-point format must have several bits to represent
     // lut. Also format must enable argument translating to interval [1.0, 2.0].
     // So format must reserve two bits at least for integer part.
-    typedef libq::Q<f + 2u, f, e, op, up> work_type;
-    typedef libq::cordic::lut<f, work_type> lut_type;
+    using work_type = libq::Q<f + 2u, f, e, op, up>;
+    using lut_type = libq::cordic::lut<f, work_type>;
 
-    typedef typename std::conditional<
+    using reduced_type = typename std::conditional<
         Q::bits_for_integral >= 2,
         Q,
         work_type
-    >::type reduced_type;
+    >::type;
 
     int power(0);
     reduced_type arg(_val);
@@ -103,16 +103,16 @@ typename libq::details::sqrt_of<T, n, f, e, op, up>::promoted_type
         for (std::size_t i = 1u; i < f + 1u; ++i) {
             int const sign = ((x.value() < 0)? -1 : +1) * ((y.value() < 0)? -1 : +1);
             typename work_type::storage_type const store(x.value());
-            x = x - work_type::make_fixed_point(sign * (y.value() >> (num + 1u)));
-            y = y - work_type::make_fixed_point(sign * (store >> (num + 1u)));
+            x = x - work_type::wrap(sign * (y.value() >> (num + 1u)));
+            y = y - work_type::wrap(sign * (store >> (num + 1u)));
             z = (sign > 0) ? z + angles[num] : z - angles[num];
 
             // repeat until convergence is reached
             if (i == repeated && i != n - 1) {
                 int const sign = ((x.value() < 0)? -1 : +1) * ((y.value() < 0)? -1 : +1);
                 typename work_type::storage_type const store(x.value());
-                x = x - work_type::make_fixed_point(sign * (y.value() >> (num + 1u)));
-                y = y - work_type::make_fixed_point(sign * (store >> (num + 1u)));
+                x = x - work_type::wrap(sign * (y.value() >> (num + 1u)));
+                y = y - work_type::wrap(sign * (store >> (num + 1u)));
                 z = (sign > 0) ? z + angles[num] : z - angles[num];
 
                 i += 1u;

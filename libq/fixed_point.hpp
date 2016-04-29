@@ -1,24 +1,25 @@
 // fixed_point.hpp
 //
-// Copyright (c) 2014-2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
 /*!
  \file fixed_point.hpp
 
- \brief Provides the fixed-point numbers of arbitrary format.
+ \brief Provides the fixed-point numbers of any format and CORDIC-based
+ overloading of STD math as well.
 */
 
 #ifndef INC_LIBQ_FIXED_POINT_HPP_
 #define INC_LIBQ_FIXED_POINT_HPP_
 
+#include <boost/integer.hpp>
+#include <boost/integer/integer_mask.hpp>
+
 #include <cstdint>
 #include <cmath>
 #include <exception>
 #include <type_traits>
-
-#include "boost/integer.hpp"
-#include "boost/integer/integer_mask.hpp"
 
 #include "arithmetics_safety.hpp"
 #include "type_promotion.hpp"
@@ -26,43 +27,63 @@
 namespace libq {
 
 /*!
- \brief provides a proxy class to deal with stored integer behind the fixed-point number
+ \brief Gets the reference to the stored integer behind the fixed-point number
+ \param[in] _x the fixed-point number
 */
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-T& lift(fixed_point<T, n, f, e, op, up>& _x) {  // NOLINT
+template<typename T, std::size_t n, std::size_t f, int e, class ... Ps>
+T& lift(fixed_point<T, n, f, e, Ps...>& _x) {  // NOLINT
     return _x.m_value;
 }
-
-
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-T const lift(fixed_point<T, n, f, e, op, up> const& _x) {
-    return _x.m_value;
-}
-
 
 /*!
- \brief fixed-point number and its arithmetics. It extends the formats like UQn.f, Qn.f with fixed pre-scaling factor \f$2^e\f$.
- \tparam value_type built-in integral type to represent a fixed-point number.
- \tparam n number of integral bits. So \f$n \leq 0\f$.
- \tparam f number of fractional bits. So \f$f \leq 0\f$.
- \remark note, \f$n\f$ and \f$f\f$ exclude the sign bit. So if storage_type is signed then total number of bits is \f$(n + f + 1)\f$.
- \remake note, the supremum of \f$(n + f)\f$ is std::numeric_limits<std::uintmax_t>::digits in case of unsigned numbers and
- std::numeric_limits<std::intmax_t>::digits in case of signed numbers.
- \tparam e exponent of the pre-scaling factor \f2^e\f$.
- \tparam op class specifying the actions to do if overflow occurred
- \tparam up class specifying the actions to do if underflow occurred
+ \brief Gets the value of the stored integer behind the fixed-point number
+ \param[in] _x the fixed-point number
+*/
+template<typename T, std::size_t n, std::size_t f, int e, class ... Ps>
+T const lift(fixed_point<T, n, f, e, Ps...> const& _x) {
+    return _x.m_value;
+}
+
+/*!
+ \brief Implements the fixed-point number arithmetics. Note, this extends the
+ Q-formats like UQn.f, Qn.f with fixed pre-scaling factor \f$2^e\f$.
+ \tparam value_type Built-in integral type to represent a fixed-point number.
+ \tparam n Number of integral bits.
+ \tparam f Number of fractional bits.
+ \remark Note, \f$n\f$ and \f$f\f$ exclude the sign bit. So if storage_type is
+ signed then total number of bits is \f$(n + f + 1)\f$.
+ \remake Note, the supremum of \f$(n + f)\f$ is
+ std::numeric_limits<std::uintmax_t>::digits in case of the unsigned numbers
+ and std::numeric_limits<std::intmax_t>::digits in case of the signed numbers.
+ \tparam e Exponent of the pre-scaling factor \f2^e\f$.
+ \tparam op Policy class specifying the actions to do if overflow occurred.
+ \tparam up Policy class specifying the actions to do if underflow occurred.
 
  <B>Usage</B>
 
- <I>Example 1</I>:
+ <I>Example 1</I>: Flexible switch between the floating-point calculations and
+ fixed precision calculations while algorithm staying the same.
  \code{.cpp}
     #include "fixed_point.hpp"
+    #include <iostream>
+    #include <cstdlib>
 
-    int main(int, char**)
-    {
-        using Q1 = libq::Q<10, 20>;  // represents the dynamic range []
-        using Q2 = libq::Q<20, 15>;  // represents the dynamic range []
-        return 0;
+    namespace floating_point {
+        using value_type = double;
+    };  // namespace floating_point
+    namespace fixed_precision {
+        using value_type = libq::Q<10, 20>;
+    };  // namespace fixed_precision
+    using value_type = fixed_precision::value_type;
+
+    int main(int, char**) {
+        value_type input{ 0.0 };
+        std::cin >> input;
+
+        value_type const result = your_algorithm_here(input);
+        std::cout << result << std::endl;
+
+        return EXIT_SUCCESS;
     }
  \endcode
 
@@ -89,7 +110,7 @@ class fixed_point {
     using underflow_policy = up;
 
     /*!
-     \brief the integral type behind the fixed-point object
+     \brief Used type for the stored integer.
     */
     using storage_type = value_type;
 
@@ -98,29 +119,29 @@ class fixed_point {
     };
     enum: std::size_t {
         /*!
-         \brief total number of significant bits
+         \brief Total number of significant bits.
         */
         number_of_significant_bits = n + f,
 
         /*!
-         \brief queried number of bits to represent the fractional part of
-         fixed-point number
+         \brief Queried number of bits to represent the fractional part of
+         fixed-point number.
         */
         bits_for_fractional = f,
 
         /*!
-         \brief number of bits to represent the integral part
+         \brief Number of bits to represent the integral part.
         */
         bits_for_integral = n,
 
         /*!
-         \brief checks if this fixed-point number is signed
+         \brief This checks if this fixed-point number is signed.
         */
         is_signed = std::numeric_limits<storage_type>::is_signed
     };
 
     /*!
-     \brief gets the scaling factor
+     \brief Gets the scaling factor for this fixed-point number.
     */
     inline static double scaling_factor() {
         static double const factor = std::exp2(
@@ -129,79 +150,135 @@ class fixed_point {
         return factor;
     }
 
+
     static_assert(this_class::number_of_significant_bits <=
                     std::numeric_limits<largest_type>::digits,
                   "too big word size is required");
+#define EXP2N(N) (std::uintmax_t(1u) << (N))
     enum : std::uintmax_t {
         /*!
-         \brief scale factor for fixed-point of current number
+         \brief Scale factor for this fixed-point number.
         */
-        scale = std::uintmax_t(1u) << this_class::bits_for_fractional,
+        scale = EXP2N(this_class::bits_for_fractional),
 
         /*!
-         \brief some trick to handle the case n + f = max possible word size
-         \brief binary mask to extract the integral bits from the stored integer
+         \brief Binary mask to extract the integral bits only from the stored
+         integer.
         */
-        integer_bits_mask =
-            (this_class::bits_for_integral > 0) ?
-                2u * (
-                    (std::uintmax_t(1) << (this_class::bits_for_fractional + this_class::bits_for_integral - 1u)) -
-                    ((this_class::bits_for_fractional > 0) ? (std::uintmax_t(1) << (this_class::bits_for_fractional - 1u)) : 0)
-                ) : 0,
+        // This is tricky to process if n + f = max. possible word size.
+        integer_bits_mask = (this_class::bits_for_integral > 0u) ?
+            2u * ( EXP2N(this_class::bits_for_fractional + this_class::bits_for_integral - 1u) -  // NOLINT
+                   ( (this_class::bits_for_fractional > 0u) ? EXP2N(this_class::bits_for_fractional - 1u) : 0u)) : 0u,  // NOLINT
 
-        /// \brief binary mask to extract the fractional bits from the stored integer
-        fractional_bits_mask =
-            (this_class::bits_for_fractional > 0) ?
-                2u * ((std::uintmax_t(1) << (this_class::bits_for_fractional - 1u)) - 1u) + 1 : 0
+        /*!
+         \brief Binary mask to extract the fractional bits from the stored
+         integer.
+        */
+        fractional_bits_mask = (this_class::bits_for_fractional > 0u) ?
+            2u * (EXP2N(this_class::bits_for_fractional - 1u) - 1u) + 1u : 0u
     };
+#undef EXP2N
 
-    // need to avoid the signed/unsigned mismatch in arithmetic safety checks
-    enum: typename this_class::largest_type {
-        /// \brief the value of underlying integer behind the fixed-point maximum number
-        largest_stored_integer =
-            boost::low_bits_mask_t<this_class::number_of_significant_bits>::sig_bits
-    };
-
-    /// \brief the minimum rational value represented with current fixed-point format
+    /*!
+     \brief The maximum value of stored integer for this fixed-point format.
+    */
+    static typename this_class::largest_type const largest_stored_integer =
+        boost::low_bits_mask_t<this_class::number_of_significant_bits>::sig_bits;  // NOLINT
+    /*!
+     \brief Gets the maximum available fixed-point number.
+    */
     static this_class largest() {
-        return this_class::make_fixed_point<typename this_class::largest_type>(this_class::largest_stored_integer);
+        return
+            this_class::wrap<typename this_class::largest_type>(
+                                           this_class::largest_stored_integer);
     }
-    static this_class least(){ return this_class::make_fixed_point(this_class::least_stored_integer); }
 
-    /// \brief the value of underlying integer behind the fixed-point minimum number
-    static std::intmax_t const least_stored_integer = is_signed*(-static_cast<std::intmax_t>(this_class::largest_stored_integer)-1);
 
-    /// \brief the dynamic range (dB) of fixed-point number
-    static double dynamic_range_db(){ return 20.0 * std::log10(static_cast<double>(this_class::largest_stored_integer)); }
+    /*
+     \brief The minimum value of stored integer for this fixed-point format.
+    */
+    static std::intmax_t const least_stored_integer =
+        this_class::is_signed * (-static_cast<std::intmax_t>(this_class::largest_stored_integer) - 1);  // NOLINT
+    /*!
+     \brief Gets the minimum available fixed-point number.
+    */
+    static this_class least() {
+        return
+            this_class::wrap(this_class::least_stored_integer);
+    }
 
-    /// \brief the precision of the fixed-point number
-    static double precision(){ return 1.0 / this_class::scale; }
 
-    /// \brief signed version of fixed-point number type
+    /*!
+     \brief Gets the dynamic range (dB) for this fixed-point format
+    */
+    static double dynamic_range_db() {
+        double const max_stored_integer =
+            static_cast<double>(this_class::largest_stored_integer);
+
+        return
+            20.0 * std::log10(max_stored_integer);
+    }
+
+
+    /*!
+     \brief Gets the precision of this fixed-point number.
+    */
+    static double precision() {
+        return
+            1.0 / this_class::scale;
+    }
+
+
+    /*!
+     \brief Signed version of this fixed-point number type.
+    */
     using to_signed_type = fixed_point<
-        typename std::make_signed<storage_type>::type,
-        this_class::bits_for_integral,
-        this_class::bits_for_fractional,
-        this_class::scaling_factor_exponent,
-        overflow_policy, underflow_policy>;
+                                 typename std::make_signed<storage_type>::type,
+                                 this_class::bits_for_integral,
+                                 this_class::bits_for_fractional,
+                                 this_class::scaling_factor_exponent,
+                                 overflow_policy,
+                                 underflow_policy>;
 
-    /// \brief unsigned version of fixed-point number type
+
+    /*!
+     \brief Unsigned version of this fixed-point number type.
+    */
     using to_unsigned_type = fixed_point<
-        typename std::make_unsigned<storage_type>::type,
-        this_class::bits_for_integral,
-        this_class::bits_for_fractional,
-        this_class::scaling_factor_exponent,
-        overflow_policy,
-        underflow_policy>;
+                               typename std::make_unsigned<storage_type>::type,
+                               this_class::bits_for_integral,
+                               this_class::bits_for_fractional,
+                               this_class::scaling_factor_exponent,
+                               overflow_policy,
+                               underflow_policy>;
 
-    /// \brief interprets the input integer as fixed-point number of the current format
+
+    /*!
+     \brief Wraps the input integer _val as a fixed-point number.
+
+     <B>Usage</B>
+
+     <I>Example 1</I>:
+     \code{.cpp}
+         #include "fixed_point.hpp"
+         #include <cstdint>
+     
+         int main(int, char**) {
+             using Q = libq::Q<10, 20>;
+     
+             std::uint8_t input{ 23u };
+             Q const fp = Q::wrap(input);
+     
+             return EXIT_SUCCESS;
+         }
+     \endcode
+    */
     template<typename T>
-    static this_class make_fixed_point(T const& _val) {
-        static_assert(std::is_integral<T>::value, "input param must be of the built-in integral type");
+    static this_class wrap(T const& _val) {
+        static_assert(std::is_integral<T>::value,
+                      "input param must be of the built-in integral type");
 
-        // checks if the input integer is not within the available dynamic range
-        // if raise_overflow_event does nothing then compiler will suppress this check
-        if ((_val < 0 && _val < this_class::least_stored_integer) || 
+        if ((_val < 0 && _val < this_class::least_stored_integer) ||
             (_val > 0 && _val > this_class::largest_stored_integer)) {
             overflow_policy::raise_event();
         }
@@ -211,50 +288,39 @@ class fixed_point {
 
         return x;
     }
-    template<> static this_class make_fixed_point(float const&) = delete;
-    template<> static this_class make_fixed_point(double const&) = delete;
+    template<> static this_class wrap(float const&) = delete;
+    template<> static this_class wrap(double const&) = delete;
 
-    /// \brief creates the zero being of the current fixed-point format
-    explicit fixed_point()
-        :   m_value(0) {
+
+    fixed_point() = default;
+    fixed_point(this_class const& _x) = default;  // NOLINT
+
+
+    /*!
+     \brief Normalizes the input fixed-point number to be accepted by current
+     format.
+    */
+    template<typename T1, std::size_t n1, std::size_t f1, int e1, class ... Ps>
+    explicit fixed_point(fixed_point<T1, n1, f1, e1, Ps...> const& _x)
+        : m_value(
+            this_class::normalize(_x,
+                                  std::integral_constant<bool, (int(f1) + e1 - int(this_class::bits_for_fractional) - this_class::scaling_factor_exponent > 0)>())) { // NOLINT
     }
 
-    fixed_point(this_class const& _x)
-        :   m_value(_x.value()) {
-    }
 
-    fixed_point(this_class const&& _x)
-        :   m_value(_x.value()) {
-    }
-
-    /// \brief normalizes the input fixed-point number to the current format
-    template<typename T1, std::size_t n1, std::size_t f1, int e1, typename op1, typename up1>
-    fixed_point(fixed_point<T1, n1, f1, e1, op1, up1> const& _x)
-        :   m_value(
-                this_class::normalize(
-                    _x,
-                    std::integral_constant<bool, (int(f1) + e1 - int(this_class::bits_for_fractional) - this_class::scaling_factor_exponent > 0)>()
-                )
-            ) {
-    }
-
-    /// \brief creates the fixed-point number from any arithmetic object
+    /*!
+     \brief Creates the fixed-point number from any arithmetic object.
+    */
     template<typename T>
-    explicit fixed_point(T const _value)
-        :   m_value(
-                this_class::calc_stored_integer_from(
-                    _value,
-                    std::integral_constant<bool, std::is_floating_point<T>::value>()
-                )
-            ) {
+    explicit fixed_point(T const& _value)
+        : m_value(
+            this_class::calc_stored_integer_from(_value,
+                                                 std::integral_constant<bool, std::is_floating_point<T>::value>())) {  // NOLINT
     }
 
-    /// \brief move assign operator in case of rvalue being of same fixed-point format
-    this_class& operator =(this_class const& _x) {
-        this->m_value = _x.value();
 
-        return *this;
-    }
+    this_class& operator =(this_class const& _x) = default;
+
 
     /// \brief assign operator in case of rvalue being of different fixed-point format
     template<typename T1, std::size_t n1, std::size_t f1, int e1, typename op1, typename up1>
@@ -323,7 +389,7 @@ class fixed_point {
         }
 
         word_type const stored_integer = word_type(this->value()) + word_type(converted.value());
-        return sum_type::make_fixed_point(stored_integer);
+        return sum_type::wrap(stored_integer);
     }
 
     template<typename T>
@@ -346,7 +412,7 @@ class fixed_point {
         }
 
         word_type const stored_integer = word_type(this->value()) - word_type(converted.value());
-        return diff_type::make_fixed_point(stored_integer);
+        return diff_type::wrap(stored_integer);
     }
 
     template<typename T>
@@ -375,7 +441,7 @@ class fixed_point {
         }
 
         // do the exact/approximate multiplication of fixed-point numbers
-        return result_type::make_fixed_point(
+        return result_type::wrap(
             (static_cast<word_type>(this->value()) * static_cast<word_type>(_x.value()))
                 >> (promotion_traits::is_expandable ? 0 : operand_type::bits_for_fractional)
         );
@@ -407,7 +473,7 @@ class fixed_point {
         }
 
         return
-            result_type::make_fixed_point(shifted / static_cast<word_type>(_x.value()));
+            result_type::wrap(shifted / static_cast<word_type>(_x.value()));
     }
 
     template<typename T1, std::size_t n1, std::size_t f1, int e1, typename... Ps>
@@ -423,10 +489,10 @@ class fixed_point {
             overflow_policy::raise_event();
         }
         if (!this_class::is_signed) {
-            return this_class::make_fixed_point(this_class::largest_stored_integer - this->value());
+            return this_class::wrap(this_class::largest_stored_integer - this->value());
         }
 
-        return this_class::make_fixed_point(-this->value());
+        return this_class::wrap(-this->value());
     }
 
 private:
@@ -512,7 +578,7 @@ using Q = libq::fixed_point<typename boost::int_t<n+1>::least, n-f, f, e, op, up
 template<std::size_t n, std::size_t f, int e = 0, class op = libq::overflow_exception_policy, class up = libq::underflow_exception_policy>
 using UQ = libq::fixed_point<typename boost::uint_t<n>::least, n-f, f, e, op, up>;
 
-} // libq
+}  // namespace libq
 
 // constant implementation
 #define LIBQ_FIXED_POINT_CONSTANT(name, value) \

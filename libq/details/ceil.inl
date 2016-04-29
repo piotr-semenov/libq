@@ -28,7 +28,7 @@ libq::fixed_point<T, n, f, e, op, up>
         val += Q::storage_type(1u) << Q::bits_for_fractional;
     }
 
-    return Q::make_fixed_point(val & Q::integer_bits_mask);
+    return Q::wrap(val & Q::integer_bits_mask);
 }
 } // std
 

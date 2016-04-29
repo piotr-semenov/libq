@@ -25,7 +25,7 @@ libq::fixed_point<T, n, f, e, op, up>
 
     typename Q::storage_type const extra = Q(0.5f).value();
     typename Q::storage_type const val = _x.value() + (std::signbit(_x) ? -extra : +extra);
-    return Q::make_fixed_point(val & Q::integer_bits_mask);
+    return Q::wrap(val & Q::integer_bits_mask);
 }
 } // std
 

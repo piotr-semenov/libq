@@ -47,8 +47,8 @@ typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promote
         int const sign = ((x.value() > 0)? +1 : -1) * ((y.value() > 0)? +1 : -1);
 
         typename result_type::storage_type const store(x.value());
-        x = x + result_type::make_fixed_point(sign * (y.value() >> i));
-        y = y - result_type::make_fixed_point(sign * (store >> i));
+        x = x + result_type::wrap(sign * (y.value() >> i));
+        y = y - result_type::wrap(sign * (store >> i));
         z = (sign > 0)? z + angles[i] : z - angles[i];
     }
 

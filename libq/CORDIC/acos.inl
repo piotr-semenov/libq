@@ -52,12 +52,12 @@ typename libq::details::acos_of<libq::fixed_point<T, n, f, e, op, up> >::promote
         throw std::logic_error("[std::acos] argument is not from [-1.0, 1.0]");
     }
     if (_val == Q(1.0)) {
-        return result_type::make_fixed_point(0);
+        return result_type::wrap(0);
     }
     else if (_val == Q(-1.0)) {
         return result_type::CONST_PI;
     }
-    else if (_val == Q::make_fixed_point(0)) {
+    else if (_val == Q::wrap(0)) {
         return result_type::CONST_PI_2;
     }
 
@@ -80,8 +80,8 @@ typename libq::details::acos_of<libq::fixed_point<T, n, f, e, op, up> >::promote
         }
 
         typename result_type::storage_type const storage(x.value());
-        x = x - result_type::make_fixed_point(sign * (y.value() >> i));
-        y = y + result_type::make_fixed_point(sign * (storage >> i));
+        x = x - result_type::wrap(sign * (y.value() >> i));
+        y = y + result_type::wrap(sign * (storage >> i));
         z = (sign > 0)? z + angles[i] : z - angles[i];
         _val = _val * scales[i]; // multiply by square of K(n)
     }

@@ -86,8 +86,8 @@ typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
     work_type x1, y1, z1;
     for (std::size_t i = 0; i != f; ++i) {
         int const sign = (z > work_type(0)) ? 1 : -1;
-        work_type const x_scaled = work_type::make_fixed_point(sign * (x.value() >> i));
-        work_type const y_scaled = work_type::make_fixed_point(sign * (y.value() >> i));
+        work_type const x_scaled = work_type::wrap(sign * (x.value() >> i));
+        work_type const y_scaled = work_type::wrap(sign * (y.value() >> i));
 
         x1 = work_type(x - y_scaled);
         y1 = work_type(y + x_scaled);

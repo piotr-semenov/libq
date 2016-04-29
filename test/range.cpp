@@ -19,7 +19,7 @@ BOOST_AUTO_TEST_SUITE(Range)
 BOOST_AUTO_TEST_CASE(check_the_division_result_range)
 {
 #define UPVALUE(n, f) std::numeric_limits<libq::Q<n, f> >::max()
-#define DOWNVALUE(n, f) libq::UQ<n, f>::make_fixed_point(1)
+#define DOWNVALUE(n, f) libq::UQ<n, f>::wrap(1)
 #define QMAX(n1,f1, n2,f2) UPVALUE(n1, f1)/DOWNVALUE(n2, f2)
 #define QMIN(n1,f1, n2,f2) DOWNVALUE(n1,f1)/UPVALUE(n2,f2)
 #define TEST(q, val, precision, msg) \
@@ -52,18 +52,18 @@ BOOST_AUTO_TEST_CASE(check_the_division_result_range)
 ///     of range
 BOOST_AUTO_TEST_CASE(out_of_range_policies)
 {
-    typedef libq::UQ<8, 5> type;
+    using Q = libq::UQ<8, 5>;
 
     std::string const msg("positive overflow was detected");
     try {
-        type const x(std::numeric_limits<type>::max() + 1);
+        Q const x(std::numeric_limits<Q>::max() + 1);
 
         BOOST_FAIL(msg);
     }
     catch (std::overflow_error e) {}
 
     try {
-        type const x(std::numeric_limits<type>::min() - 1);
+        Q const x(std::numeric_limits<Q>::min() - 1);
  
         BOOST_FAIL(msg);
     }

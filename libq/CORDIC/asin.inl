@@ -56,7 +56,7 @@ typename libq::details::asin_of<libq::fixed_point<T, n, f, e, op, up> >::promote
         return -(result_type::CONST_PI_2);
     }
     else if (_val == Q(0.0)) {
-        return result_type::make_fixed_point(0);
+        return result_type::wrap(0);
     }
     static lut_type const angles = lut_type::circular();
     static lut_type const scales = lut_type::circular_scales();
@@ -74,8 +74,8 @@ typename libq::details::asin_of<libq::fixed_point<T, n, f, e, op, up> >::promote
         }
 
         typename result_type::storage_type const store(x.value());
-        x = x - result_type::make_fixed_point(sign * (y.value() >> i));
-        y = y + result_type::make_fixed_point(sign * (store >> i));
+        x = x - result_type::wrap(sign * (y.value() >> i));
+        y = y + result_type::wrap(sign * (store >> i));
         z = (sign > 0)? z + angles[i] : z - angles[i];
         _val = _val * scales[i];
     }

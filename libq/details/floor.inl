@@ -23,7 +23,7 @@ libq::fixed_point<T, n, f, e, op, up>
 {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
 
-    return Q::make_fixed_point(_x.value() & Q::integer_bits_mask);
+    return Q::wrap(_x.value() & Q::integer_bits_mask);
 }
 } // std
 
