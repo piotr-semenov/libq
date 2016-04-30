@@ -1,6 +1,6 @@
 // arithmetics_safety.hpp
 //
-// Copyright (c) 2014-2015 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
 /*!
