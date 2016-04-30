@@ -53,10 +53,10 @@ T const lift(fixed_point<T, n, f, e, Ps...> const& _x) {
  \tparam f Number of fractional bits.
  \remark Note, \f$n\f$ and \f$f\f$ exclude the sign bit. So if storage_type is
  signed then total number of bits is \f$(n + f + 1)\f$.
- \remake Note, the supremum of \f$(n + f)\f$ is
+ \remark Note, the supremum of \f$(n + f)\f$ is
  std::numeric_limits<std::uintmax_t>::digits in case of the unsigned numbers
  and std::numeric_limits<std::intmax_t>::digits in case of the signed numbers.
- \tparam e Exponent of the pre-scaling factor \f2^e\f$.
+ \tparam e Exponent of the pre-scaling factor \f$2^e\f$.
  \tparam op Policy class specifying the actions to do if overflow occurred.
  \tparam up Policy class specifying the actions to do if underflow occurred.
 
@@ -88,7 +88,7 @@ T const lift(fixed_point<T, n, f, e, Ps...> const& _x) {
     }
  \endcode
 
- \ref see http://en.wikipedia.org/wiki/Q_(number_format) for details
+ \note Please, see http://en.wikipedia.org/wiki/Q_(number_format) for details.
 */
 template<typename value_type,
          std::size_t n,
