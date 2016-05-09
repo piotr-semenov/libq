@@ -7,14 +7,46 @@ LibQ proposes you the convenient and highly-configurable solution. Do not fix yo
 value type is QN.M, not float/double as previously. The only payment for this magic is to make sure that your
 algorithm satisfies the simple C++ code style requirements.
 
-## Main Disadvantages of Competitors
+Competitors:
+* https://github.com/mizvekov/fp/tree/master/tests/static
+* https://github.com/quicky2000/fixed_point
+* https://github.com/viboes/fixed_point
+* https://github.com/Koasing/FixedPoint
+* https://github.com/lhartmann/fixed_point
+* https://github.com/kirket/compile_time_fixed_point_library
+* https://github.com/davidatroberts/FixedPoint
+* https://github.com/trenki2/FixedPoint
+* https://github.com/rroa/FixedPoint
+* https://github.com/gsarkis/libfi
+* https://github.com/tyc85/FixedPointLDPC
+* https://github.com/geediiiiky/MyFixedPoint
+* https://github.com/cajun-rat/fixed-point-compiler
+
+
+## Main Disadvantages of C++ Competitors
+Fixed-point Library | Overloads for sin/cos/asin/etc. | Result Type Promotion | Description
+------------------- | ------------------------------- | --------------------- | -----------
+https://github.com/coder-mike/FixedPoint | - | - (does the numeric conversions) | Cannot handle the negative count 
+https://github.com/juliusikkala/Fixed-point | - | 
+https://github.com/FS-NulL/Fixed-Point | - | 
+- GitHub repos: https://github.com/coder-mike/FixedPoint, https://github.com/juliusikkala/Fixed-point, https://github.com/FS-NulL/Fixed-Point
+ * No overloads for math functions like sin, cos, etc.
+ * Can not handle the negative count of bits for fractional part.
+ * For the arithmetical operations, it can not infer the actual result type, just do the numeric conversions.
+- GitHub repo: https://github.com/PetteriAimonen/libfixmath
+ * Only for fixed count of word length
+ * No ability to update your floating-point calculatins to the fixed precision easily
+- https://github.com/johnmcfarlane/fixed_point/blob/master/doc/p0037.md, https://github.com/johnmcfarlane/fixed_point/blob/master/src/test/snippets.cpp:
+ * For the arithmetical operations, it does not infer the actual result type, just do the numeric conversions
+ (decltype(std::declval<typename Lhs::rep>() + std::declval<typename Rhs::rep>()) by
+ delegating the implicit numeric conversions to the compiler.
 - fixed-point c++ class from http://www.trenki.net/content/view/17/1/
  * word size is up to 32 bits only
  * sin/cos/sqrt functions only work for Q16.16 format
  * no promotion of sum/product/etc. types
 
 - fpmath from http://fpmath.googlecode.com/svn/trunk/
- * 
+ * Only 8, 16, 32 bits are available
 
 - libfixmath from https://code.google.com/p/libfixmath/
  * lib implements the math functions only for Q16.16 format
