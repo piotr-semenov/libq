@@ -1,14 +1,14 @@
-# LibQ: easy compile-time switch between floating-point/highly configurable fixed-point computations in C++
+# LibQ: Constrain the C++ floating-point algorithms to fixed-point computations easily without any pain!
 ## Project Motivation
-Imagine you have some floating-point algorithm implemented in C++. Now you want to discover how accurate it is
-for the application-specific fixed-point hardware. How to do the simulations without algorithm
-reimplementation/update? How to observe the trade-off between the accuracy loss and chosen fixed-point word length?
-LibQ proposes you the convenient and highly-configurable solution. Do not fix your algorithm, just say that your
-value type is QN.M, not float/double as previously. The only payment for this magic is to make sure that your
-algorithm satisfies the simple C++ code style requirements.
+Imagine you have some floating-point algorithm implemented in C++.
+For example, you can consider the well-known SURF algorithm for keypoint detection.
+Now you want to replace all the floating-point calculations by the fixed-point at once without the algorithm reimplementation.
+For example, you want to investigate how accurately the algorithm will work for the application-specific fixed-point hardware and observe the trade-off between the accuracy loss and chosen fixed-point word length.
+LibQ proposes you the simple, convenient and highly-configurable solution.
+Do not fix your algorithm, just say that you want QN.M as the value type.
+The only requirement to make this magic to work is to ensure that your algorithm satisfies some simple C++ code style.
 
-Competitors:
-* https://github.com/mizvekov/fp/tree/master/tests/static
+## Main Disadvantages of C++ Competitors
 * https://github.com/quicky2000/fixed_point
 * https://github.com/viboes/fixed_point
 * https://github.com/Koasing/FixedPoint
@@ -22,13 +22,17 @@ Competitors:
 * https://github.com/geediiiiky/MyFixedPoint
 * https://github.com/cajun-rat/fixed-point-compiler
 
+The most of the fixed-point libraries do not support the math functions from <cmath> (e.g. CORDIC algorithms for sin/cos/asin/etc) at all.
+Moreover, libraries suggests no type promotion (e.g. for arithmetic operations +,-,/,*). 
+Please, find the summary below.
 
-## Main Disadvantages of C++ Competitors
-Fixed-point Library | Overloads for sin/cos/asin/etc. | Result Type Promotion | Description
-------------------- | ------------------------------- | --------------------- | -----------
-https://github.com/coder-mike/FixedPoint | - | - (does the numeric conversions) | Cannot handle the negative count 
-https://github.com/juliusikkala/Fixed-point | - | 
-https://github.com/FS-NulL/Fixed-Point | - | 
+Fixed-point Library | Supports sin/cos/asin/etc. | Supports type promotions | Additional description
+------------------- | -------------------------- | ------------------------ | ----------------------
+https://github.com/coder-mike/FixedPoint | - | - (Uses the integral promotion instead) | Cannot represent the arbitrary dynamic range.
+https://github.com/juliusikkala/Fixed-point | - | - (Operands have to be normalized and the result type is promoted to the type of lhs) | Cannot represent the arbitrary dynamic range.
+https://github.com/FS-NulL/Fixed-Point | - | - (The result type is promoted to the widest one from lhs, rhs) | Represents the numbers in base of \f$10\f$.
+https://github.com/mizvekov/fp/ | - | - (Uses the integral promotion instead) | Provides the adaptors for Boost.Rational, Boost.MultiPrecision. Provides the numeric_limits tempalte specialization.
+
 - GitHub repos: https://github.com/coder-mike/FixedPoint, https://github.com/juliusikkala/Fixed-point, https://github.com/FS-NulL/Fixed-Point
  * No overloads for math functions like sin, cos, etc.
  * Can not handle the negative count of bits for fractional part.
@@ -57,32 +61,16 @@ https://github.com/FS-NulL/Fixed-Point | - |
 
 - 
 
-## Full List of LibQ Features
-1. Lib was implemented in the most general (templates, constructors and so on)
-way to have the easy float-point/fixed-point and vice versa translations (w/o
-time-consuming editing/refactoring of your code);
-2. Lib supports any Q-format of fixed-point (not only power of two as its
-analogs do);
-3.	Lib does the compile-time type inference for resulting type of addition,
-subtraction, multiplication, division, all elementary functions (exp, log, sin,
-cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh).
-Existing fixed-point libs do not do this stuff at all.
-They assume fixed-point types to be closed under all operations;
-4.	Lib enables capturing the overflow/underflow behavior in run-time (BTW, it
-can be ignored);
-5.	Lib provides the implementation for all math functions for fixed-point
-numbers (CORDIC-based algorithms);
-6.	Lib provides the compile-time scheduling for multiplication/division in goal
-to achieve max possible precision of the result;
-7.	Lib is easy-scalable for any computation platform (24-bit, 28-bit, 32-bit,
-64-bit, 128-bit and so on).
-8. Lib allows to capture the numbers range explicitly. For example, using
-wordlength = 10 and fractional bits = 32, we define the pre-factor 2^-22.
-9. Works with old C++ 99 code (no C++11, C++13 features are used). But you need the BOOST MPL
-10. Lib has no external dependencies. It just uses Boost for unit tests.
+## LibQ Features
+1. Supports any Q-format (not only 2's powers).
+2. Supports the compile-time type promotions for arithmetics (+, -, *, /), all elementary functions (exp, log, sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh).
+3. Proposes certain policies for the overflow/underflow in run-time.
+4. Provides the CORDIC-based implementation for math functions from <cmath>.
+5. Enables user to capture the dynamic range explicitly.
+For example, if set the pre-factor \f$2^{-12}\f$ for unsigned Q0.32 then user gets the range \f$[0.0, 2^{-44}]\f$.
 
 ## Code Style Requirements If You Want to Use LibQ in Your Code
 
 
-## Roadmap
+## Roadmap/Future Plans
 R1C - 
