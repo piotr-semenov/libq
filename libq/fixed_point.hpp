@@ -105,7 +105,7 @@ class fixed_point {
                                     std::numeric_limits<value_type>::is_signed,
                                     std::intmax_t, std::uintmax_t>::type;
 
-  public:
+ public:
     using type = this_class;
     using overflow_policy = op;
     using underflow_policy = up;
@@ -436,7 +436,7 @@ class fixed_point {
         using word_type = typename sum_type::storage_type;
 
         this_class const converted(_x);
-        if (details::does_addition_overflow(*this, converted)) {
+        if (details::does_add_overflow(*this, converted)) {
             overflow_policy::raise_event();
         }
 
@@ -464,7 +464,7 @@ class fixed_point {
         using word_type = typename diff_type::storage_type;
 
         this_class const converted(_x);
-        if (details::does_subtraction_overflow(*this, converted)) {
+        if (details::does_sub_overflow(*this, converted)) {
             overflow_policy::raise_event();
         }
 
@@ -502,7 +502,7 @@ class fixed_point {
         using result_type = typename promotion_traits::promoted_type;
         using word_type = typename promotion_traits::promoted_storage_type;
 
-        if (details::does_multiplication_overflow(*this, _x)) {
+        if (details::does_mul_overflow(*this, _x)) {
             overflow_policy::raise_event();
         }
 
@@ -534,7 +534,7 @@ class fixed_point {
         using result_type = typename promotion_traits::promoted_type;
         using word_type = typename promotion_traits::promoted_storage_type;
 
-        if (details::does_division_overflow(*this, _x)) {
+        if (details::does_div_overflow(*this, _x)) {
             overflow_policy::raise_event();
         }
 
@@ -560,7 +560,7 @@ class fixed_point {
      \brief Gets the negative value of the current fixed-point number.
     */
     this_class operator -() const {
-        if (details::does_unary_negation_overflow(*this)) {
+        if (details::does_unary_neg_overflow(*this)) {
             overflow_policy::raise_event();
         }
         if (!this_class::is_signed) {
@@ -571,7 +571,7 @@ class fixed_point {
         return this_class::wrap(-this->value());
     }
 
-  private:
+ private:
     /*!
      \brief Represents some floating-point number as a fixed-point number.
      \note It uses the rounding-to-nearest logics in case of floating-point
