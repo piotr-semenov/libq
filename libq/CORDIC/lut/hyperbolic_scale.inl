@@ -6,14 +6,12 @@
 /*!
  \file hyperbolic_scale.inl
 
- Computes the look-up table CORDIC-rotations performed in the hyperbolic coordinates
+ Computes the look-up table CORDIC-rotations performed in the hyperbolic
+ coordinates.
 */
 
 #ifndef INC_LIBQ_CORDIC_HYPERBOLIC_SCALE_INL_
 #define INC_LIBQ_CORDIC_HYPERBOLIC_SCALE_INL_
-
-#include "boost/range/irange.hpp"
-#include "boost/foreach.hpp"
 
 namespace libq {
 namespace cordic {
@@ -21,13 +19,11 @@ namespace cordic {
 /*!
 */
 template<std::size_t n, typename Q>
-double
-    lut<n, Q>::hyperbolic_scale_with_repeated_iterations(std::size_t _n)
-{
+double lut<n, Q>::hyperbolic_scale_with_repeated_iterations(std::size_t _n) {
     double scale(1.0);
 
     std::size_t repeated(4u);
-    BOOST_FOREACH(std::size_t i, boost::irange<std::size_t>(1, _n, 1)) {
+    for (std::size_t i = 1u; i != _n; ++i) {
         scale *= std::sqrt(1.0 - std::pow(2.0, -2.0 * i));
 
         if (i == repeated && i != _n - 1) {
@@ -39,7 +35,7 @@ double
 
     return scale;
 }
-} // cordic
-} // libq
+}  // namespace cordic
+}  // namespace libq
 
-#endif // INC_LIBQ_CORDIC_HYPERBOLIC_SCALE_INL_
+#endif  // INC_LIBQ_CORDIC_HYPERBOLIC_SCALE_INL_

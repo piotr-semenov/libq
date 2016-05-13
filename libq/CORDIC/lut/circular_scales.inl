@@ -6,7 +6,7 @@
 /*!
  \file circular_scales.inl
 
- Computes the scales for CORDIC-rotations performed in circular coordinates
+ Computes the scales for CORDIC-rotations performed in circular coordinates.
 */
 
 #ifndef INC_LIBQ_CORDIC_CIRCULAR_SCALES_INL_
@@ -18,9 +18,7 @@ namespace cordic {
 /*!
 */
 template<std::size_t n, typename Q>
-double
-    lut<n, Q>::circular_scale(std::size_t _n)
-{
+double lut<n, Q>::circular_scale(std::size_t _n) {
     double scale(1.0);
 
     for (std::size_t i = 0; i != _n; ++i) {
@@ -30,12 +28,11 @@ double
     return scale;
 }
 
+
 /*!
 */
 template<std::size_t n, typename Q>
-lut<n, Q>
-    lut<n, Q>::circular_scales()
-{
+lut<n, Q> lut<n, Q>::circular_scales() {
     base_class scales;
 
     for (std::size_t i = 0; i != n; ++i) {
@@ -44,7 +41,7 @@ lut<n, Q>
 
     return this_class(scales);
 }
-} // cordic
-} // libq
+}  // namespace cordic
+}  // namespace libq
 
-#endif // INC_LIBQ_CORDIC_CIRCULAR_SCALES_INL_
+#endif  // INC_LIBQ_CORDIC_CIRCULAR_SCALES_INL_

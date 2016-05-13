@@ -6,10 +6,10 @@
 /*!
  \file pow2_lut.inl
 
- Implements the look-up table for log2 function
+ Implements the look-up table for log2 function.
 
- \ref see C. Baumann, "A simple and fast look-up table method to compute the
- exp(x) and ln(x) functions", 2004
+ \ref See C. Baumann, "A simple and fast look-up table method to compute the
+ exp(x) and ln(x) functions", 2004.
 */
 
 #ifndef INC_LIBQ_CORDIC_POW2_LUT_INL_
@@ -21,9 +21,7 @@ namespace cordic {
 /*!
 */
 template<std::size_t n, typename Q>
-lut<n, Q>
-    lut<n, Q>::pow2()
-{
+lut<n, Q> lut<n, Q>::pow2() {
     base_class table;
 
     for (int i = 1; i != n + 1; ++i) {
@@ -32,7 +30,7 @@ lut<n, Q>
 
     return this_class(table);
 }
-} // cordic
-} // libq
+}  // namespace cordic
+}  // namespace libq
 
-#endif // INC_LIBQ_CORDIC_POW2_LUT_INL_
+#endif  // INC_LIBQ_CORDIC_POW2_LUT_INL_

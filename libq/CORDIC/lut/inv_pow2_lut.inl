@@ -4,9 +4,9 @@
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
 /*!
- \brief implements the look-up table for trigonometric functions
- \ref see C. Baumann, "A simple and fast look-up table method to compute the
- exp(x) and ln(x) functions", 2004
+ \brief Implements the look-up table for trigonometric functions.
+ \ref See C. Baumann, "A simple and fast look-up table method to compute the
+ exp(x) and ln(x) functions", 2004.
 */
 
 #ifndef INC_LIBQ_CORDIC_INV_POW2_LUT_INL_
@@ -18,9 +18,7 @@ namespace cordic {
 /*!
 */
 template<std::size_t n, typename Q>
-lut<n, Q>
-    lut<n, Q>::inv_pow2()
-{
+lut<n, Q> lut<n, Q>::inv_pow2() {
     base_class table;
 
     for (int i = 1; i != n + 1; ++i) {
@@ -29,7 +27,7 @@ lut<n, Q>
 
     return this_class(table);
 }
-} // cordic
-} // libq
+}  // namespace cordic
+}  // namespace libq
 
-#endif // INC_LIBQ_CORDIC_INV_POW2_LUT_INL_
+#endif  // INC_LIBQ_CORDIC_INV_POW2_LUT_INL_
