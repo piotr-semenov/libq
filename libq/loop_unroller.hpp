@@ -15,18 +15,20 @@
 
 #include <cstdlib>
 
+
 namespace libq {
 namespace details {
 
 /*!
  \defgroup details details
 
- Aux classes/functions
+ Aux classes/functions.
 
  \{
 */
 template<size_t N>
-struct loop_size{};
+struct loop_size {
+};
 
 /*!
  \brief unrolls the loop represented by the iteration body and the starting iterator
@@ -123,20 +125,20 @@ FOR /L %i in (1,1,50) do (example1.exe) >> log.txt
 ------------------------------------------------------
 @endverbatim
 */
-template<size_t N, typename Functor_type, typename Iterator_type>
-inline void unroll(Functor_type const& _f, Iterator_type _begin, loop_size<N>)
-{
+template<std::size_t N, typename Functor_type, typename Iterator_type>
+inline void unroll(Functor_type const& _f, Iterator_type _begin, loop_size<N>) {
     unroll(_f, _begin, loop_size<N-1>());
+
     _f(_begin + N);
 }
 
+
 template<typename Functor_type, typename Iterator_type>
-inline void unroll(Functor_type const& _f, Iterator_type _begin, loop_size<0>)
-{
+inline void unroll(Functor_type const& _f, Iterator_type _begin, loop_size<0>) {
     _f(_begin);
 }
 
-/*! \} */ // doxygen: details
-} // details
-} // libq
-#endif // INC_LIBQ_DETAILS_LOOP_UNROLLER_HPP_
+/*! \} */  // doxygen: details
+}  // namespace details
+}  // namespace libq
+#endif  // INC_LIBQ_DETAILS_LOOP_UNROLLER_HPP_
