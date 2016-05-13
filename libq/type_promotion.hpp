@@ -29,7 +29,7 @@ namespace details {
 */
 template<typename T, std::size_t delta_n, std::size_t delta_f, int delte_e>
 class type_promotion_base {
-  public:
+ public:
     using promoted_type = T;
 };
 
@@ -62,7 +62,7 @@ class type_promotion_base<libq::fixed_point<T, n, f, e, op, up>, delta_n, delta_
         using type = typename Q::storage_type;
     };
 
-  public:
+ public:
     enum: bool {
         is_expandable = ((n + delta_n) + (f + delta_f) <=
                             std::numeric_limits<max_type>::digits)
