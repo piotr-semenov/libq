@@ -25,6 +25,13 @@
 #include "arithmetics_safety.hpp"
 #include "type_promotion.hpp"
 
+//namespace std {
+//    double exp2(double _val) {
+//        return std::pow(2.0, _val);
+//    }
+//}  // namespace std
+
+
 namespace libq {
 
 /*!
@@ -289,8 +296,8 @@ class fixed_point {
 
         return x;
     }
-    template<> static this_class wrap(float const&) = delete;
-    template<> static this_class wrap(double const&) = delete;
+    //template<> static this_class wrap(float const&) = delete;
+    //template<> static this_class wrap(double const&) = delete;
 
 
     fixed_point() = default;
@@ -305,9 +312,9 @@ class fixed_point {
              std::size_t n1,
              std::size_t f1,
              int e1,
-             typename op,
-             typename up>
-    explicit fixed_point(fixed_point<T1, n1, f1, e1, op, up> const& _x)
+             typename op1,
+             typename up1>
+    explicit fixed_point(fixed_point<T1, n1, f1, e1, op1, up1> const& _x)
         : m_value(
             this_class::normalize(_x,
                 std::integral_constant<bool, (int(f1) + e1 - int(this_class::bits_for_fractional) - this_class::scaling_factor_exponent > 0)>())) { // NOLINT
@@ -692,13 +699,11 @@ using Q = libq::fixed_point<typename boost::int_t<n+1>::least, n-f, f, e, op, up
 template<std::size_t n, std::size_t f, int e = 0, class op = libq::overflow_exception_policy, class up = libq::underflow_exception_policy>  // NOLINT
 using UQ = libq::fixed_point<typename boost::uint_t<n>::least, n-f, f, e, op, up>;  // NOLINT
 
-}  // namespace libq
-
 
 #define CONSTANT(name, value)\
     template<class T, std::size_t n, std::size_t f, int e, class op, class up>\
-    libq::fixed_point<T, n, f, e, op, up> const\
-        libq::fixed_point<T, n, f, e, op, up>::name(value);
+    fixed_point<T, n, f, e, op, up> const fixed_point<T, n, f, e, op, up>::name(value);
+
 
 CONSTANT(CONST_E, 2.71828182845904523536)
 CONSTANT(CONST_1_LOG2E, 0.6931471805599453)
@@ -719,6 +724,8 @@ CONSTANT(CONST_SQRT1_2, 0.707106781186547524401)
 CONSTANT(CONST_2SQRT2, 2.82842712474619009760)
 
 #undef CONSTANT
+}  // namespace libq
+
 
 #include "details/sum_traits.inl"
 #include "details/mult_of.inl"

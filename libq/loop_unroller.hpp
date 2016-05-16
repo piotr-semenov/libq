@@ -88,7 +88,7 @@ struct loop_size {
             << elapsed2.count()
             << std::endl;
     
-        return 0;
+        return EXIT_SUCCESS;
     }
  \endcode
  \note The target machine is x64 Intel(R) i7-4702MQ CPU @ 2.20GHz 2.20GHz.
