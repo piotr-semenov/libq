@@ -26,7 +26,7 @@ class sum_traits<libq::fixed_point<T, n, f, e, op, up> >
     : public type_promotion_base<libq::fixed_point<T, n, f, e, op, up>, 1u, 0, 0>
 {
 public:
-    static double error(){ return std::exp2(-f+e); }
+    static double error(){ return exp2(-f+e); }
 };
 
 }  // namespace details

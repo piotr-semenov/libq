@@ -25,14 +25,16 @@
 #include "arithmetics_safety.hpp"
 #include "type_promotion.hpp"
 
-//namespace std {
-//    double exp2(double _val) {
-//        return std::pow(2.0, _val);
-//    }
-//}  // namespace std
-
-
 namespace libq {
+namespace details {
+    double exp2(double _val) {
+#if defined(_MSC_VER)
+        return std::exp2(_val);
+#elif defined(__GNUC__)
+        return std::pow(2.0, _val);
+#endif 
+    }
+}  // details
 
 /*!
  \brief Gets the reference to the stored integer behind the fixed-point number
@@ -80,7 +82,7 @@ T const lift(fixed_point<T, n, f, e, Ps...> const& _x) {
         using value_type = double;
     };  // namespace floating_point
     namespace fixed_precision {
-        using value_type = libq::Q<10, 20>;
+        using value_type = libq::Q<30, 20>;
     };  // namespace fixed_precision
     using value_type = fixed_precision::value_type;
 
@@ -152,7 +154,7 @@ class fixed_point {
      \brief Gets the scaling factor for this fixed-point number.
     */
     inline static double scaling_factor() {
-        static double const factor = std::exp2(
+        static double const factor = details::exp2(
                     -static_cast<double>(this_class::scaling_factor_exponent));
 
         return factor;
@@ -272,7 +274,7 @@ class fixed_point {
          #include <cstdint>
      
          int main(int, char**) {
-             using Q = libq::Q<10, 20>;
+             using Q = libq::Q<30, 20>;
      
              std::uint8_t input{ 23u };
              Q const fp = Q::wrap(input);
@@ -296,8 +298,9 @@ class fixed_point {
 
         return x;
     }
-    //template<> static this_class wrap(float const&) = delete;
-    //template<> static this_class wrap(double const&) = delete;
+    // TODO!
+    static this_class wrap(float const&) = delete;
+    static this_class wrap(double const&) = delete;
 
 
     fixed_point() = default;
@@ -332,9 +335,6 @@ class fixed_point {
     }
 
 
-    this_class& operator =(this_class const& _x) = default;
-
-
     /*!
      \brief Assigns the fixed-point number being of different format.
     */
@@ -353,6 +353,7 @@ class fixed_point {
         return
             this->set_value_to(this_class::normalize(_x, status_type()));
     }
+    this_class& operator =(this_class const& _x) = default;
 
 
     /*!
@@ -422,12 +423,15 @@ class fixed_point {
      - CONST_2PI is for \f$2 * \pi\f$.
      - CONST_2_PI is for \f$\frac{2}{\pi}\f$.
      - CONST_PI_2 is for \f$\frac{\pi}{2}\f$.
+     \note Weirdly, g++ 5.3.0 needs the full specification of type here.
+     Otherwise, it will not interpret lines 705-707 as declaration instead of
+     definition.
     */
-    static this_class const CONST_E, CONST_LOG2E, CONST_1_LOG2E, CONST_LOG10E,
-                            CONST_LOG102, CONST_LN2, CONST_LN10, CONST_2PI,
-                            CONST_PI, CONST_PI_2, CONST_PI_4, CONST_1_PI,
-                            CONST_2_PI, CONST_2_SQRTPI, CONST_SQRT2,
-                            CONST_SQRT1_2, CONST_2SQRT2;
+    static fixed_point<value_type, n, f, e, op, up> const
+        CONST_E, CONST_LOG2E, CONST_1_LOG2E, CONST_LOG10E, CONST_LOG102,
+        CONST_LN2, CONST_LN10, CONST_2PI, CONST_PI, CONST_PI_2, CONST_PI_4,
+        CONST_1_PI, CONST_2_PI, CONST_2_SQRTPI, CONST_SQRT2, CONST_SQRT1_2,
+        CONST_2SQRT2;
 
 
     /*!
@@ -589,7 +593,7 @@ class fixed_point {
         calc_stored_integer_from(T const& _x, std::true_type) {
         double const scale = static_cast<double>(
                                           this_class::scaling_factor_exponent);
-        double const value = static_cast<double>(_x) / std::exp2(scale);
+        double const value = static_cast<double>(_x) / details::exp2(scale);
         if (_x > T(0)) {
             storage_type const converted = static_cast<storage_type>(
                                   std::floor(value * this_class::scale + 0.5));
@@ -614,7 +618,7 @@ class fixed_point {
         calc_stored_integer_from(T const& _x, std::false_type) {
         double const scale = static_cast<double>(
                                           this_class::scaling_factor_exponent);
-        double const value = static_cast<double>(_x) / std::exp2(scale);
+        double const value = static_cast<double>(_x) / details::exp2(scale);
         return storage_type(value) << this_class::bits_for_fractional;
     }
 
@@ -689,14 +693,14 @@ class fixed_point {
  \brief Short-cut for the signed fixed-point with just 2 template parameters
  n and f.
 */
-template<std::size_t n, std::size_t f, int e = 0, class op = libq::overflow_exception_policy, class up = libq::underflow_exception_policy>  // NOLINT
+template<std::size_t n, std::size_t f, int e = 0, class op = libq::ignorance_policy, class up = libq::ignorance_policy>  // NOLINT
 using Q = libq::fixed_point<typename boost::int_t<n+1>::least, n-f, f, e, op, up>;  // NOLINT
 
 /*!
  \brief Short-cut for the unsigned fixed-point with just 2 template parameters
  n and f.
 */
-template<std::size_t n, std::size_t f, int e = 0, class op = libq::overflow_exception_policy, class up = libq::underflow_exception_policy>  // NOLINT
+template<std::size_t n, std::size_t f, int e = 0, class op = libq::ignorance_policy, class up = libq::ignorance_policy>  // NOLINT
 using UQ = libq::fixed_point<typename boost::uint_t<n>::least, n-f, f, e, op, up>;  // NOLINT
 
 
@@ -741,6 +745,9 @@ CONSTANT(CONST_2SQRT2, 2.82842712474619009760)
 #include "details/fmod.inl"
 #include "details/numeric_limits.inl"
 #include "details/type_traits.inl"
+
+#include "loop_unroller.hpp"
+
 
 #include "CORDIC/lut/lut.hpp"
 
