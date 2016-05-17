@@ -54,7 +54,7 @@ namespace std {
         using namespace std::chrono;
         using std::uintmax_t;
 
-        using Q1 = libq::Q<10, 20>;
+        using Q1 = libq::Q<30, 20>;
         Q1 const value(0.914);
         Q1 volatile result;
 
@@ -79,6 +79,13 @@ namespace std {
   * \verbatim
 g++ -std=gnu++11 -O3 -ftemplate-depth=101 -I"C:\Users\peter.semenov\Libs\boost_1_57_0" -DLOOP_UNROLLING -mtune=native -o example2 ./example2.cpp 2> log
 while true; do ./example2; done
+\endverbatim
+- MS VC 18.00.21005.1 (x64):
+* \verbatim
+SET PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
+vcvarsall.bat amd64
+cl /nologo /O2 /favor:AMD64 /I "C:\Users\peter.semenov\Libs\boost_1_57_0" /DLOOP_UNROLLING /Feexample2 ./example2.cpp
+FOR /L %i in (1,1,50) do (example2.exe) >> log.txt
 \endverbatim
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
@@ -129,7 +136,7 @@ typename libq::details::acos_of<libq::fixed_point<T, n, f, e, op, up> >::promote
         y = y + result_type::wrap(sign * (storage >> i));
         z = (sign > 0)? z + angles[i] : z - angles[i];
         _val = _val * scales[i];  // multiply by square of K(n)
-    }
+    };
 #ifdef LOOP_UNROLLING
     libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f-1>());
 #endif
