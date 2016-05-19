@@ -74,3 +74,8 @@ For example, if set the pre-factor \f$2^{-12}\f$ for unsigned Q0.32 then user ge
 
 ## Roadmap/Future Plans
 R1C - 
+
+
+## TODO
+- Unify all comments (start it with the capital letter)
+- Guard definitions to all inl files
