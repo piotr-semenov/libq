@@ -16,46 +16,45 @@ namespace details {
  \brief
 */
 template<typename T>
-class asin_of
-{
-public:
+class asin_of {
+ public:
     using promoted_type = T;
 };
 
+
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class asin_of<libq::fixed_point<T, n, f, e, op, up> >
-    :   private libq::fixed_point<T, 0, f, e, op, up>,
-        public type_promotion_base<
-            libq::fixed_point<T, 0, f, e, op, up>
-            , 2u
-            , 0
-            , 0
-        >
-{};
-} // details
-} // libq
+    : private libq::fixed_point<T, 0, f, e, op, up>,
+      public type_promotion_base<
+          libq::fixed_point<T, 0, f, e, op, up>
+          , 2u
+          , 0
+          , 0> {
+};
+}  // namespace details
+}  // namespace libq
+
 
 namespace std {
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::asin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-    asin(libq::fixed_point<T, n, f, e, op, up> _val)
-{
+typename libq::details::asin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type  // NOLINT
+    asin(libq::fixed_point<T, n, f, e, op, up> _val) {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using result_type = typename libq::details::asin_of<Q>::promoted_type;
-    using lut_type = libq::cordic::lut<result_type::bits_for_fractional, result_type>;
+    using lut_type = libq::cordic::lut<result_type::bits_for_fractional,
+                                      result_type>;
 
-    assert(("[std::asin] argument is not from [-1.0, 1.0]", std::fabs(_val) <= Q(1.0f)));
+    assert(("[std::asin] argument is not from [-1.0, 1.0]",
+            std::fabs(_val) <= Q(1.0f)));
     if (std::fabs(_val) > Q(1.0f)) {
         throw std::logic_error("[std::asin] argument is out of range");
     }
 
     if (_val == Q(1.0f)) {
         return result_type::CONST_PI_2;
-    }
-    else if (_val == Q(-1.0f)) {
+    } else if (_val == Q(-1.0f)) {
         return -(result_type::CONST_PI_2);
-    }
-    else if (_val == Q(0.0)) {
+    } else if (_val == Q(0.0)) {
         return result_type::wrap(0);
     }
     static lut_type const angles = lut_type::circular();
@@ -68,8 +67,7 @@ typename libq::details::asin_of<libq::fixed_point<T, n, f, e, op, up> >::promote
         int sign(0);
         if (_val >= y) {
             sign = (x < 0.0)? -1 : +1;
-        }
-        else {
+        } else {
             sign = (x < 0.0)? +1 : -1;
         }
 
@@ -82,11 +80,10 @@ typename libq::details::asin_of<libq::fixed_point<T, n, f, e, op, up> >::promote
 
     if (z > result_type::CONST_PI_2) {
         z = result_type::CONST_PI - z;
-    }
-    else if (z < -result_type::CONST_PI_2) {
+    } else if (z < -result_type::CONST_PI_2) {
         z = -result_type::CONST_PI - z;
     }
 
     return z;
 }
-} // std
+}  // namespace std

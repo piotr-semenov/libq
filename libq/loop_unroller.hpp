@@ -138,7 +138,8 @@ inline void unroll(Functor_type const& _f, Iterator_type _begin, loop_size<N>) {
 
 
 template<typename Functor_type, typename Iterator_type>
-inline void unroll(Functor_type const& _f, Iterator_type _begin, loop_size<0u>) {
+inline void
+    unroll(Functor_type const& _f, Iterator_type _begin, loop_size<0u>) {
     _f(_begin);
 }
 

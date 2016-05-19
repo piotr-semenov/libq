@@ -19,8 +19,7 @@ namespace std {
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 libq::fixed_point<T, n, f, e, op, up>
-    ceil(libq::fixed_point<T, n, f, e, op, up> const& _x)
-{
+    ceil(libq::fixed_point<T, n, f, e, op, up> const& _x) {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
 
     typename Q::storage_type val = _x.value();
@@ -30,7 +29,6 @@ libq::fixed_point<T, n, f, e, op, up>
 
     return Q::wrap(val & Q::integer_bits_mask);
 }
-} // std
+}  // namespace std
 
-#endif // INC_STD_CEIL_INL_
-
+#endif  // INC_STD_CEIL_INL_

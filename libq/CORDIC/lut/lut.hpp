@@ -76,14 +76,14 @@ class lut
     */
     static double circular_scale(std::size_t const _n);
 
-    
+
     /*!
      \brief Creates the LUT for scales of n CORDIC-rotations in case of circular
      coordinates.
     */
     static this_class circular_scales();
 
-    
+
     /*!
      \brief Computes the scale of n CORDIC-rotations in hyperbolic coordinates.
      \note This uses repeated iterations for convergence.

@@ -19,24 +19,23 @@ namespace details {
  \brief
 */
 template<typename T>
-class cos_of
-{
-public:
+class cos_of {
+ public:
     using promoted_type = T;
 };
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class cos_of<libq::fixed_point<T, n, f, e, op, up> >
-    :   public libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >
-{};
-} // details
-} // libq
+    : public libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> > {
+};
+}  // namespace details
+}  // namespace libq
+
 
 namespace std {
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-    cos(libq::fixed_point<T, n, f, e, op, up> _val)
-{
+typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type  // NOLINT
+    cos(libq::fixed_point<T, n, f, e, op, up> _val) {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using cos_type = typename libq::details::cos_of<Q>::promoted_type;
 
@@ -48,17 +47,15 @@ typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
     // put argument to [-pi, pi] interval (with change of sign for cos)
     {
         Q const x = Q::CONST_PI - std::fmod(_val, Q::CONST_2PI);
-        if (x < -Q::CONST_PI_2) { // convert to interval [-pi/2, pi/2]
+        if (x < -Q::CONST_PI_2) {  // convert to interval [-pi/2, pi/2]
             arg = x + Q::CONST_PI;
 
             sign = 1;
-        }
-        else if (x > Q::CONST_PI_2) {
+        } else if (x > Q::CONST_PI_2) {
             arg = x - Q::CONST_PI;
 
             sign = 1;
-        }
-        else {
+        } else {
             arg = x;
         }
     }
@@ -92,6 +89,6 @@ typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
 
     return cos_type((sign > 0) ? x : - x);
 }
-} // std
+}  // namespace std
 
-#endif // INC_STD_COS_INL_
+#endif  // INC_STD_COS_INL_

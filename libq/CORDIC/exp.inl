@@ -15,47 +15,48 @@
 #ifndef INC_LIBQ_DETAILS_EXP_INL_
 #define INC_LIBQ_DETAILS_EXP_INL_
 
+#include <limits>
+
 namespace libq {
 namespace details {
 /*!
 */
 template<typename T>
-class exp_of
-{
-public:
+class exp_of {
+ public:
     using promoted_type = T;
 };
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-class exp_of<libq::fixed_point<T, n, f, e, op, up> >
-{
-public:
+class exp_of<libq::fixed_point<T, n, f, e, op, up> > {
+ public:
     using promoted_type = libq::fixed_point<
-        std::uintmax_t,
-        std::numeric_limits<std::uintmax_t>::digits - f,
-        f,
-        e,
-        op,
-        up>;
+                               std::uintmax_t,
+                               std::numeric_limits<std::uintmax_t>::digits - f,
+                               f,
+                               e,
+                               op,
+                               up>;
 };
-} // details
-} // libq
+}  // namespace details
+}  // namespace libq
 
 namespace std {
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::exp_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-    exp(libq::fixed_point<T, n, f, e, op, up> _val)
-{
+typename libq::details::exp_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type  // NOLINT
+    exp(libq::fixed_point<T, n, f, e, op, up> _val) {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using exp_type = typename libq::details::exp_of<Q>::promoted_type;
 
     using Qw = libq::Q<f, f, e, op, up>;
-    using work_type = typename libq::details::type_promotion_base<Qw, 1u, 0, 0>::promoted_type;
+    using work_type =
+        typename libq::details::type_promotion_base<Qw, 1u, 0, 0>::promoted_type;  // NOLINT
     using lut_type = libq::cordic::lut<f, work_type>;
 
     // reduces argument to interval [0.0, 1.0]
     int power(0);
-    typename libq::details::mult_of<Q, work_type>::promoted_type arg(_val * work_type::CONST_LOG2E);
+    typename libq::details::mult_of<Q, work_type>::promoted_type
+        arg(_val * work_type::CONST_LOG2E);
     while (arg >= exp_type(1.0)) {
         arg = arg - 1u;
         power++;
@@ -80,12 +81,11 @@ typename libq::details::exp_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
 
     if (power >= 0) {
         libq::lift(result) <<= power;
-    }
-    else {
+    } else {
         libq::lift(result) >>= (-power);
     }
     return result;
 }
-} // std
+}  // namespace std
 
-#endif // INC_LIBQ_DETAILS_EXP_INL_
+#endif  // INC_LIBQ_DETAILS_EXP_INL_

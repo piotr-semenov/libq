@@ -20,13 +20,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\src\range.cpp">
+    <ClCompile Include="..\as_native_cases.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\as_native_cases.cpp">
+    <ClCompile Include="..\precision.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\src\precision.cpp">
+    <ClCompile Include="..\range.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\libq\example2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

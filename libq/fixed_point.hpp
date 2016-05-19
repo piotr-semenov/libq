@@ -32,7 +32,7 @@ namespace details {
         return std::exp2(_val);
 #elif defined(__GNUC__)
         return std::pow(2.0, _val);
-#endif 
+#endif
     }
 }  // details
 
@@ -298,7 +298,6 @@ class fixed_point {
 
         return x;
     }
-    // TODO!
     static this_class wrap(float const&) = delete;
     static this_class wrap(double const&) = delete;
 
@@ -706,7 +705,7 @@ using UQ = libq::fixed_point<typename boost::uint_t<n>::least, n-f, f, e, op, up
 
 #define CONSTANT(name, value)\
     template<class T, std::size_t n, std::size_t f, int e, class op, class up>\
-    fixed_point<T, n, f, e, op, up> const fixed_point<T, n, f, e, op, up>::name(value);
+    fixed_point<T, n, f, e, op, up> const fixed_point<T, n, f, e, op, up>::name(value);  // NOLINT
 
 
 CONSTANT(CONST_E, 2.71828182845904523536)

@@ -14,27 +14,25 @@ namespace details {
 /*!
 */
 template<typename T>
-class acosh_of
-{};
+class acosh_of {
+};
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-class acosh_of<libq::fixed_point<T, n, f, e, op, up> >
-{
-public:
+class acosh_of<libq::fixed_point<T, n, f, e, op, up> > {
+ public:
     using promoted_type = typename
         log_of<T, n, f, e, op, up>::promoted_type::to_unsigned_type;
 };
-} // details
-} // libq
+}  // namespace details
+}  // namespace libq
 
 namespace std {
 /*!
  \brief computes acosh as logarithm
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::acosh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-    acosh(libq::fixed_point<T, n, f, e, op, up> _val)
-{
+typename libq::details::acosh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type  // NOLINT
+    acosh(libq::fixed_point<T, n, f, e, op, up> _val) {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using result_type = typename libq::details::acosh_of<Q>::promoted_type;
 
@@ -43,10 +41,7 @@ typename libq::details::acosh_of<libq::fixed_point<T, n, f, e, op, up> >::promot
         throw std::logic_error("[std::acosh] argument is not from [1.0, +inf)");
     }
 
-    return result_type(
-        std::log(
-            _val + std::sqrt(_val * _val - 1)
-        )
-    );
+    result_type const result(std::log(_val + std::sqrt(_val * _val - 1)));
+    return result;
 }
-} // std
+}  // namespace std

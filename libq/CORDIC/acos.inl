@@ -120,7 +120,7 @@ typename libq::details::acos_of<libq::fixed_point<T, n, f, e, op, up> >::promote
     result_type x(1.0), y(0.0), z(0.0);
 
 #ifdef LOOP_UNROLLING
-    auto const iteration_body = [&](std::size_t i) {
+    auto const iteration_body = [&](std::size_t i) {  // NOLINT
 #else
     for (std::size_t i = 0; i != f; ++i) {
 #endif

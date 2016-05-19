@@ -16,10 +16,11 @@ namespace details {
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class asinh_of
-    :    public log_of<T, n, f, e, op, up>
-{};
-} // details
-} // libq
+    : public log_of<T, n, f, e, op, up> {
+};
+}  // namespace details
+}  // namespace libq
+
 
 namespace std {
 /*!
@@ -27,12 +28,10 @@ namespace std {
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::asinh_of<T, n, f, e, op, up>::promoted_type
-    asinh(libq::fixed_point<T, n, f, e, op, up> _val)
-{
-    using result_type = typename libq::details::asinh_of<T, n, f, e, op, up>::promoted_type;
+    asinh(libq::fixed_point<T, n, f, e, op, up> _val) {
+    using result_type = typename libq::details::asinh_of<T, n, f, e, op, up>::promoted_type;  // NOLINT
 
     return result_type(
-        std::log(std::sqrt(_val * _val + 1u) + _val)
-    );
+        std::log(std::sqrt(_val * _val + 1u) + _val));
 }
-} // std
+}  // namespace std

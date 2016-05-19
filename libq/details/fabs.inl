@@ -19,12 +19,11 @@ namespace std {
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 libq::fixed_point<T, n, f, e, op, up>
-    fabs(libq::fixed_point<T, n, f, e, op, up> const& _x)
-{
+    fabs(libq::fixed_point<T, n, f, e, op, up> const& _x) {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
 
     return (std::signbit(_x)) ? -_x : _x;
 }
-} // std
+}  // namespace std
 
-#endif // INC_STD_FABS_INL_
+#endif  // INC_STD_FABS_INL_

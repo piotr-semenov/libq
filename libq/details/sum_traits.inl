@@ -18,17 +18,21 @@ namespace details {
 */
 template<typename T>
 class sum_traits
-    : public type_promotion_base<T, 1u, 0, 0>
-{};
+    : public type_promotion_base<T, 1u, 0, 0> {
+};
+
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class sum_traits<libq::fixed_point<T, n, f, e, op, up> >
-    : public type_promotion_base<libq::fixed_point<T, n, f, e, op, up>, 1u, 0, 0>
-{
-public:
-    static double error(){ return exp2(-f+e); }
+    : public type_promotion_base<libq::fixed_point<T, n, f, e, op, up>,
+                                 1u,
+                                 0,
+                                 0> {
+ public:
+    static double error() {
+        return exp2(-f+e);
+    }
 };
-
 }  // namespace details
 }  // namespace libq
 

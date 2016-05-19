@@ -16,26 +16,26 @@ namespace details {
  \brief
 */
 template<typename T>
-class atan_of
-{
-public:
+class atan_of {
+ public:
     using promoted_type = T;
 };
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class atan_of<libq::fixed_point<T, n, f, e, op, up> >
-    :    public asin_of<libq::fixed_point<T, n, f, e, op, up> >
-{};
-} // details
-} // libq
+    : public asin_of<libq::fixed_point<T, n, f, e, op, up> > {
+};
+}  // namespace details
+}  // namespace libq
+
 
 namespace std {
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-    atan(libq::fixed_point<T, n, f, e, op, up> _val)
-{
+typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type  // NOLINT
+    atan(libq::fixed_point<T, n, f, e, op, up> _val) {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
-    using result_type = typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type;
+    using result_type =
+        typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type;  // NOLINT
     using lut_type = libq::cordic::lut<f, Q>;
 
     static lut_type const angles = lut_type::circular();
@@ -44,7 +44,8 @@ typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promote
     // shift sequence is just 0, 1, ... (circular coordinate system)
     result_type x(1.0), y(_val), z(0.0);
     for (std::size_t i = 0; i != f; ++i) {
-        int const sign = ((x.value() > 0)? +1 : -1) * ((y.value() > 0)? +1 : -1);
+        int const sign = ((x.value() > 0)? +1 : -1) *
+            ((y.value() > 0)? +1 : -1);
 
         typename result_type::storage_type const store(x.value());
         x = x + result_type::wrap(sign * (y.value() >> i));
@@ -54,4 +55,4 @@ typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promote
 
     return z;
 }
-} // std
+}  // namespace std

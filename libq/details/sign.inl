@@ -15,16 +15,16 @@
 namespace std {
 
 /*!
-\brief function std::signbit determines if the given fixed-point number is negative
+ \brief Function std::signbit determines if the given fixed-point number is
+ negative.
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 bool
-    signbit(libq::fixed_point<T, n, f, e, op, up> const& _x)
-{
+    signbit(libq::fixed_point<T, n, f, e, op, up> const& _x) {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
 
     return _x.value() < 0;
 }
-} // std
+}  // namespace std
 
-#endif // INC_STD_SIGN_INL_
+#endif  // INC_STD_SIGN_INL_

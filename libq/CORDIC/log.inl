@@ -14,8 +14,8 @@
 #ifndef INC_STD_LOG_INL_
 #define INC_STD_LOG_INL_
 
-#include "boost/integer/static_min_max.hpp"
-#include "boost/integer/static_log2.hpp"
+#include <boost/integer/static_min_max.hpp>
+#include <boost/integer/static_log2.hpp>
 
 #include <cassert>
 
@@ -25,28 +25,27 @@ namespace details {
  \brief
  \note 
 */
-template<typename T, std::size_t n, std::size_t f, int e, typename op, typename up>
-class log_of:
-    public type_promotion_base<
+template<typename T, std::size_t n, std::size_t f, int e, typename op, typename up>  // NOLINT
+class log_of
+    : public type_promotion_base<
         fixed_point<typename std::make_signed<T>::type, n, f, e, op, up>
         , boost::static_unsigned_max<
-            (f > 0) ? (boost::static_log2<f>::value) : 0,
-            (n > 0) ? (boost::static_log2<n>::value) : 0
-        >::value + 1u
+                      (f > 0) ? (boost::static_log2<f>::value) : 0,
+                      (n > 0) ? (boost::static_log2<n>::value) : 0>::value + 1u
         , 0
-        , 0
-    >
-{};
-} // details
-} // libq
+        , 0> {
+};
+}  // namespace details
+}  // namespace libq
+
 
 namespace std {
-template<typename T, std::size_t n, std::size_t f, int e, typename op, typename up>
+template<typename T, std::size_t n, std::size_t f, int e, typename op, typename up>  // NOLINT
 typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
-    log(libq::fixed_point<T, n, f, e, op, up> _val)
-{
+    log(libq::fixed_point<T, n, f, e, op, up> _val) {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
-    using log_type = typename libq::details::log_of<T, n, f, e, op, up>::promoted_type;
+    using log_type =
+        typename libq::details::log_of<T, n, f, e, op, up>::promoted_type;
     using lut = libq::cordic::lut<f, Q>;
 
     assert(("[std::log] argument is negaitve", _val >= Q(0)));
@@ -80,7 +79,8 @@ typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
         if (work_type(arg * inv_pow2_lut[i]) >= work_type(1.0)) {
             arg = work_type(arg * inv_pow2_lut[i]);
 
-            libq::lift(result) += typename work_type::storage_type(1u) << (f - i - 1u);
+            libq::lift(result) +=
+                typename work_type::storage_type(1u) << (f - i - 1u);
         }
     }
 
@@ -89,6 +89,6 @@ typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
 
     return r1;
 }
-} // std
+}  // namespace std
 
-#endif // INC_STD_LOG_INL_
+#endif  // INC_STD_LOG_INL_

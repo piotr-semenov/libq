@@ -19,9 +19,8 @@ namespace details {
  \brief
 */
 template<typename T>
-class sin_of
-{
-public:
+class sin_of {
+ public:
     using promoted_type = T;
 };
 
@@ -29,23 +28,22 @@ public:
 // instantiate the class representing the fixed-point number of a new format
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class sin_of<libq::fixed_point<T, n, f, e, op, up> >
-    :   private libq::fixed_point<T, 0, f, e, op, up>,
-        public type_promotion_base<
-            libq::fixed_point<T, 0, f, e, op, up>
-            , 1u
-            , 0
-            , 0
-        >
-{};
-} // details
-} // libq
+    : private libq::fixed_point<T, 0, f, e, op, up>,
+      public type_promotion_base<libq::fixed_point<T, 0, f, e, op, up>
+                                 , 1u
+                                 , 0
+                                 , 0> {
+};
+}  // namespace details
+}  // namespace libq
+
 
 namespace std {
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-    sin(libq::fixed_point<T, n, f, e, op, up> _val)
-{
-    using sin_type = typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type;
+typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type  // NOLINT
+    sin(libq::fixed_point<T, n, f, e, op, up> _val) {
+    using sin_type =
+        typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type;  // NOLINT
 
     // gap in 3 bits is needed for CONST_PI existence
     using work_type = libq::Q<f + 3u, f, e, op, up>;
@@ -56,18 +54,17 @@ typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
     int sign(1);
     {
         // reduce the argument to interval [-pi, +pi] and preserve its sign
-        work_type const x = work_type::CONST_PI - std::fmod(_val, work_type::CONST_2PI);
+        work_type const x = work_type::CONST_PI -
+            std::fmod(_val, work_type::CONST_2PI);
         if (x < -work_type::CONST_PI_2) {
             arg = x + work_type::CONST_PI;
 
             sign = -1;
-        }
-        else if (x > work_type::CONST_PI_2) {
+        } else if (x > work_type::CONST_PI_2) {
             arg = x - work_type::CONST_PI;
 
             sign = -1;
-        }
-        else {
+        } else {
             arg = x;
         }
     }
@@ -75,9 +72,12 @@ typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
     using lut_type = libq::cordic::lut<f, work_type>;
     static auto const angles = lut_type::circular();
 
-    // normalization factor: see page 10, table 24.1 and pages 4-5, equations (5)-(6)
-    // factor converges to the limit 1.64676 very fast: it takes just 8 iterations.
-    // 8 iterations corresponds to precision of size 0.007812 for the angle approximation
+    // normalization factor: see page 10, table 24.1 and pages 4-5, equations
+    // (5)-(6)
+    // factor converges to the limit 1.64676 very fast: it takes just 8
+    // iterations.
+    // 8 iterations corresponds to precision of size 0.007812 for the angle
+    // approximation
     static work_type norm_factor(1.0 / lut_type::circular_scale(f));
 
     // rotation mode: see page 6
@@ -98,6 +98,6 @@ typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
 
     return sin_type((sign > 0) ? y : -y);
 }
-} // std
+}  // namespace std
 
-#endif // INC_STD_SIN_INL_
+#endif  // INC_STD_SIN_INL_

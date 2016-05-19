@@ -15,16 +15,26 @@ Gets the function std::remainder overloaded for fixed-point numbers.
 namespace std {
 
 /*!
-\brief function std::fmod computes fixed-point remainder of double(x)/double(y)
+ \brief Function std::fmod computes fixed-point remainder of
+ double(x)/double(y).
 */
-template<typename T1, typename T2, std::size_t n1, std::size_t n2, std::size_t f1, std::size_t f2, int e1, int e2, class op, class up>
+template<typename T1,
+         typename T2,
+         std::size_t n1,
+         std::size_t n2,
+         std::size_t f1,
+         std::size_t f2,
+         int e1,
+         int e2,
+         class op,
+         class up>
 libq::fixed_point<T2, n2, f2, e2, op, up>
-    remainder(libq::fixed_point<T1, n1, f1, e1, op, up> const& _x, libq::fixed_point<T2, n2, f2, e2, op, up> const& _y)
-{
+    remainder(libq::fixed_point<T1, n1, f1, e1, op, up> const& _x,
+              libq::fixed_point<T2, n2, f2, e2, op, up> const& _y) {
     using Q = libq::fixed_point<T2, n2, f2, e2, op, up>;
 
     return static_cast<Q>(_x - std::round(_x / _y) * _y);
 }
-} // std
+}  // namespace std
 
-#endif // INC_STD_REMAINDER_INL_
+#endif  // INC_STD_REMAINDER_INL_

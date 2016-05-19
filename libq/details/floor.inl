@@ -19,12 +19,11 @@ namespace std {
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 libq::fixed_point<T, n, f, e, op, up>
-    floor(libq::fixed_point<T, n, f, e, op, up> const& _x)
-{
+    floor(libq::fixed_point<T, n, f, e, op, up> const& _x) {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
 
     return Q::wrap(_x.value() & Q::integer_bits_mask);
 }
-} // std
+}  // namespace std
 
-#endif // INC_STD_FLOOR_INL_
+#endif  // INC_STD_FLOOR_INL_
