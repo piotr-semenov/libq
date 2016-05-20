@@ -85,16 +85,16 @@ typename libq::details::asin_of<libq::fixed_point<T, n, f, e, op, up> >::promote
         y = y + result_type::wrap(sign * (store >> i));
         z = (sign > 0)? z + angles[i] : z - angles[i];
         _val = _val * scales[i];
-    }
+    };  // NOLINT
+#ifdef LOOP_UNROLLING
+    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f - 1>());
+#endif
 
     if (z > result_type::CONST_PI_2) {
         z = result_type::CONST_PI - z;
     } else if (z < -result_type::CONST_PI_2) {
         z = -result_type::CONST_PI - z;
-    };  // NOLINT
-#ifdef LOOP_UNROLLING
-    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f-1>());
-#endif
+    }
 
     return z;
 }

@@ -99,7 +99,7 @@ typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
         z1 = work_type(z - work_type((sign > 0) ? angles[i] : -angles[i]));
 
         x = x1; y = y1; z = z1;
-    }  // NOLINT
+    };  // NOLINT
 #ifdef LOOP_UNROLLING
     libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f-1>());
 #endif
