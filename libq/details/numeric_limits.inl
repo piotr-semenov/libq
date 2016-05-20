@@ -63,36 +63,36 @@ class numeric_limits<libq::fixed_point<T, n, f, e, op, up> > {
     static int const radix = 2;
 
     /// \brief minimum value that can be achieved by fixed-point type
-    static Q min() {
+    static Q min() throw() {
         return Q::least();
     }
 
     /// \brief maximum value that can be achieved by fixed-point type
-    static Q max() {
+    static Q max() throw() {
         return Q::largest();
     }
 
     /// \brief returns the machine epsilon, that is, the difference between
     /// 1.0 and the next value representable by the fixed-point type
-    static Q epsilon() {
+    static Q epsilon() throw() {
         return Q::wrap(1u);
     }
 
     /// \brief the maximum rounding error for fixed-point type
-    static Q round_error() {
+    static Q round_error() throw() {
         return Q(0.5f);
     }
 
-    static Q denorm_min() {
+    static Q denorm_min() throw() {
         return Q::wrap(0);
     }
-    static Q infinity() {
+    static Q infinity() throw() {
         return Q::wrap(0);
     }
-    static Q quiet_NaN() {
+    static Q quiet_NaN() throw() {
         return Q(0);
     }
-    static Q signaling_NaN() {
+    static Q signaling_NaN() throw() {
         return Q(0);
     }
 };
