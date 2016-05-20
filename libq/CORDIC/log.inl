@@ -75,14 +75,22 @@ typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
     static libq::cordic::lut<f, Q> const inv_pow2_lut = lut::inv_pow2();
 
     work_type result(0);
+
+#ifdef LOOP_UNROLLING
+    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+#else
     for (std::size_t i = 0; i != f; ++i) {
+#endif
         if (work_type(arg * inv_pow2_lut[i]) >= work_type(1.0)) {
             arg = work_type(arg * inv_pow2_lut[i]);
 
             libq::lift(result) +=
                 typename work_type::storage_type(1u) << (f - i - 1u);
         }
-    }
+    };  // NOLINT
+#ifdef LOOP_UNROLLING
+    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f-1>());
+#endif
 
     log_type const r0(log_type(result) + log_type(power));
     log_type const r1(r0 * work_type::CONST_1_LOG2E);

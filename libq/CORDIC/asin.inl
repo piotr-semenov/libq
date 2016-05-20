@@ -10,6 +10,10 @@
  \ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 */
 
+#ifndef INC_STD_ASIN_INL_
+#define INC_STD_ASIN_INL_
+
+
 namespace libq {
 namespace details {
 /*!
@@ -63,7 +67,12 @@ typename libq::details::asin_of<libq::fixed_point<T, n, f, e, op, up> >::promote
     // rotation mode: see page 6
     // shift sequence is just 0, 1, ... (circular coordinate system)
     result_type x(1.0f), y(0.0), z(0.0);
-    for (std::size_t i = 0; i != f; ++i) {
+
+#ifdef LOOP_UNROLLING
+    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+#else
+    for (std::size_t i = 0u; i != f; ++i) {
+#endif
         int sign(0);
         if (_val >= y) {
             sign = (x < 0.0)? -1 : +1;
@@ -82,8 +91,13 @@ typename libq::details::asin_of<libq::fixed_point<T, n, f, e, op, up> >::promote
         z = result_type::CONST_PI - z;
     } else if (z < -result_type::CONST_PI_2) {
         z = -result_type::CONST_PI - z;
-    }
+    };  // NOLINT
+#ifdef LOOP_UNROLLING
+    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f-1>());
+#endif
 
     return z;
 }
 }  // namespace std
+
+#endif  // INC_STD_ASIN_INL_

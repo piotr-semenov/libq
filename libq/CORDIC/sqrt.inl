@@ -97,7 +97,11 @@ typename libq::details::sqrt_of<T, n, f, e, op, up>::promoted_type
         std::size_t repeated(4u);
         std::size_t num(0);
 
+#ifdef LOOP_UNROLLING
+        auto const iteration_body = [&](std::size_t i) {  // NOLINT
+#else
         for (std::size_t i = 1u; i < f + 1u; ++i) {
+#endif
             int const sign = ((x.value() < 0)? -1 : +1) *
                 ((y.value() < 0)? -1 : +1);
             typename work_type::storage_type const store(x.value());
@@ -119,7 +123,12 @@ typename libq::details::sqrt_of<T, n, f, e, op, up>::promoted_type
             }
 
             num += 1u;
-        }
+        };  // NOLINT
+#ifdef LOOP_UNROLLING
+        libq::details::unroll(iteration_body,
+                              0u,
+                              libq::details::loop_size<f>());
+#endif
     }
 
     reduced_type result(x / norm);

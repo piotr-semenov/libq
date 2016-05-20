@@ -10,6 +10,10 @@
  \ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 */
 
+#ifndef INC_STD_ATAN_INL_
+#define INC_STD_ATAN_INL_
+
+
 namespace libq {
 namespace details {
 /*!
@@ -43,7 +47,12 @@ typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promote
     // vectoring mode: see page 10, table 24.2
     // shift sequence is just 0, 1, ... (circular coordinate system)
     result_type x(1.0), y(_val), z(0.0);
-    for (std::size_t i = 0; i != f; ++i) {
+
+#ifdef LOOP_UNROLLING
+    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+#else
+    for (std::size_t i = 0u; i != f; ++i) {
+#endif
         int const sign = ((x.value() > 0)? +1 : -1) *
             ((y.value() > 0)? +1 : -1);
 
@@ -51,8 +60,13 @@ typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promote
         x = x + result_type::wrap(sign * (y.value() >> i));
         y = y - result_type::wrap(sign * (store >> i));
         z = (sign > 0)? z + angles[i] : z - angles[i];
-    }
+    };  // NOLINT
+#ifdef LOOP_UNROLLING
+    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f-1>());
+#endif
 
     return z;
 }
 }  // namespace std
+
+#endif  // INC_STD_ATAN_INL_

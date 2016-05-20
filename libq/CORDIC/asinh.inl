@@ -9,6 +9,10 @@
  Provides CORDIC for tanh function as a ratio of sinh and tanh
 */
 
+#ifndef INC_STD_ASINH_INL_
+#define INC_STD_ASINH_INL_
+
+
 namespace libq {
 namespace details {
 /*!
@@ -35,3 +39,5 @@ typename libq::details::asinh_of<T, n, f, e, op, up>::promoted_type
         std::log(std::sqrt(_val * _val + 1u) + _val));
 }
 }  // namespace std
+
+#endif  // INC_STD_ASINH_INL_

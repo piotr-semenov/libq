@@ -122,7 +122,7 @@ typename libq::details::acos_of<libq::fixed_point<T, n, f, e, op, up> >::promote
 #ifdef LOOP_UNROLLING
     auto const iteration_body = [&](std::size_t i) {  // NOLINT
 #else
-    for (std::size_t i = 0; i != f; ++i) {
+    for (std::size_t i = 0u; i != f; ++i) {
 #endif
         int sign(0);
         if (_val <= x) {
@@ -136,7 +136,7 @@ typename libq::details::acos_of<libq::fixed_point<T, n, f, e, op, up> >::promote
         y = y + result_type::wrap(sign * (storage >> i));
         z = (sign > 0)? z + angles[i] : z - angles[i];
         _val = _val * scales[i];  // multiply by square of K(n)
-    };
+    };  // NOLINT
 #ifdef LOOP_UNROLLING
     libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f-1>());
 #endif

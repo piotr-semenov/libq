@@ -69,7 +69,12 @@ typename libq::details::exp_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
     static lut_type const pow2_lut = lut_type::pow2();
     exp_type result(1.0);
     work_type x(arg);
-    for (std::size_t i = 0; i != f; ++i) {
+
+#ifdef LOOP_UNROLLING
+    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+#else
+    for (std::size_t i = 0u; i != f; ++i) {
+#endif
         work_type const pow2 = work_type::wrap(T(1u) << (f - i - 1u));
 
         if (x - pow2 >= work_type(0.0)) {
@@ -77,7 +82,10 @@ typename libq::details::exp_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
 
             result *= pow2_lut[i];
         }
-    }
+    };  // NOLINT
+#ifdef LOOP_UNROLLING
+    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f-1>());
+#endif
 
     if (power >= 0) {
         libq::lift(result) <<= power;

@@ -9,6 +9,10 @@
  Provides CORDIC for tanh function as a ratio of sinh and tanh
 */
 
+#ifndef INC_STD_ACOSH_INL_
+#define INC_STD_ACOS_INL_
+
+
 namespace libq {
 namespace details {
 /*!
@@ -45,3 +49,5 @@ typename libq::details::acosh_of<libq::fixed_point<T, n, f, e, op, up> >::promot
     return result;
 }
 }  // namespace std
+
+#endif  // INC_STD_ACOSH_INL_

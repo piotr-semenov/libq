@@ -9,6 +9,10 @@
  Provides CORDIC for atanh function
 */
 
+#ifndef INC_STD_ATANH_INL_
+#define INC_STD_ATANH_INL_
+
+
 namespace libq {
 namespace details {
 /*!
@@ -45,3 +49,6 @@ typename libq::details::atanh_of<libq::fixed_point<T, n, f, e, op, up> >::promot
     return x;
 }
 }  // namespace std
+
+
+#endif  // INC_STD_ATANH_INL_

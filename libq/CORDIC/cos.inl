@@ -35,7 +35,7 @@ class cos_of<libq::fixed_point<T, n, f, e, op, up> >
 namespace std {
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type  // NOLINT
-    cos(libq::fixed_point<T, n, f, e, op, up> _val) {
+cos(libq::fixed_point<T, n, f, e, op, up> _val) {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using cos_type = typename libq::details::cos_of<Q>::promoted_type;
 
@@ -51,11 +51,13 @@ typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
             arg = x + Q::CONST_PI;
 
             sign = 1;
-        } else if (x > Q::CONST_PI_2) {
+        }
+        else if (x > Q::CONST_PI_2) {
             arg = x - Q::CONST_PI;
 
             sign = 1;
-        } else {
+        }
+        else {
             arg = x;
         }
     }
@@ -74,7 +76,12 @@ typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
     // shift sequence is just 0, 1, ... (circular coordinate system)
     Q x(norm_factor), y(0.0), z(arg);
     Q x1, y1, z1;
-    for (std::size_t i = 0; i != f; ++i) {
+
+#ifdef LOOP_UNROLLING
+    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+#else
+    for (std::size_t i = 0u; i != f; ++i) {
+#endif
         int const sign = (z > Q(0)) ? 1 : -1;
 
         Q const x_scaled = Q::wrap(sign * (x.value() >> i));
@@ -85,7 +92,10 @@ typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
         z1 = Q(z - Q((sign > 0) ? angles[i] : -angles[i]));
 
         x = x1; y = y1; z = z1;
-    }
+    };  // NOLINT
+#ifdef LOOP_UNROLLING
+    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f-1>());
+#endif
 
     return cos_type((sign > 0) ? x : - x);
 }

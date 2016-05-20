@@ -84,7 +84,12 @@ typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
     // shift sequence is just 0, 1, ... (circular coordinate system)
     work_type x(norm_factor), y(0.0), z(arg);
     work_type x1, y1, z1;
+
+#ifdef LOOP_UNROLLING
+    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+#else
     for (std::size_t i = 0; i != f; ++i) {
+#endif
         int const sign = (z > work_type(0)) ? 1 : -1;
         work_type const x_scaled = work_type::wrap(sign * (x.value() >> i));
         work_type const y_scaled = work_type::wrap(sign * (y.value() >> i));
@@ -94,7 +99,10 @@ typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
         z1 = work_type(z - work_type((sign > 0) ? angles[i] : -angles[i]));
 
         x = x1; y = y1; z = z1;
-    }
+    }  // NOLINT
+#ifdef LOOP_UNROLLING
+    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f-1>());
+#endif
 
     return sin_type((sign > 0) ? y : -y);
 }
