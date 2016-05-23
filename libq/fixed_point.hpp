@@ -573,10 +573,6 @@ class fixed_point {
         if (details::does_unary_neg_overflow(*this)) {
             overflow_policy::raise_event();
         }
-        if (!this_class::is_signed) {
-            return this_class::wrap(this_class::largest_stored_integer -
-                                    this->value());
-        }
 
         return this_class::wrap(-this->value());
     }
