@@ -82,7 +82,7 @@ while true; do ./example2; done
 \endverbatim
 - MS VC 18.00.21005.1 (x64):
 * \verbatim
-SET PATH=%PATH%;C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC
+SET PATH=C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC;%PATH%
 vcvarsall.bat amd64
 cl /nologo /O2 /favor:AMD64 /I "C:\Users\peter.semenov\Libs\boost_1_57_0" /DLOOP_UNROLLING /Feexample2 ./example2.cpp
 FOR /L %i in (1,1,50) do (example2.exe) >> log.txt
@@ -122,6 +122,7 @@ typename libq::details::acos_of<libq::fixed_point<T, n, f, e, op, up> >::promote
 #ifdef LOOP_UNROLLING
     auto const iteration_body = [&](std::size_t i) {  // NOLINT
 #else
+#pragma unroll
     for (std::size_t i = 0u; i != f; ++i) {
 #endif
         int sign(0);

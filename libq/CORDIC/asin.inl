@@ -29,11 +29,10 @@ class asin_of {
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class asin_of<libq::fixed_point<T, n, f, e, op, up> >
     : private libq::fixed_point<T, 0, f, e, op, up>,
-      public type_promotion_base<
-          libq::fixed_point<T, 0, f, e, op, up>
-          , 2u
-          , 0
-          , 0> {
+      public type_promotion_base<libq::fixed_point<T, 0, f, e, op, up>,
+                                 2u,
+                                 0,
+                                 0> {
 };
 }  // namespace details
 }  // namespace libq
