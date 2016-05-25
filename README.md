@@ -1,4 +1,4 @@
-# LibQ: Constrain the C++ floating-point algorithms to fixed-point computations easily without any pain!
+# LibQ: Limit the C++ floating-point algorithms to fixed-point computations easily without any pain :)
 ## Project Motivation
 Imagine you have some floating-point algorithm implemented in C++.
 For example, consider the well-known SURF algorithm for keypoint detection.
