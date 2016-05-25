@@ -78,7 +78,7 @@ Please, see the simple code emphasizing the main idea behind the LibQ:
 The most of the fixed-point libraries do not support the math functions from <cmath> (e.g. CORDIC algorithms for sin/cos/asin/etc) at all.
 Moreover, libraries suggests no type promotion (e.g. for arithmetic operations +,-,/,*). 
 
-+Note+, <cmath> and type promotion supporting is required to make 
++Note+, <cmath> supporting and type promotion are the substantial requirements to make the example above to work.
 
 Please, find the summary table for competitors below.
 Fixed-point Library | Supports sin/cos/asin/etc. | Supports type promotions | Additional description
@@ -96,5 +96,3 @@ https://github.com/davidatroberts/FixedPoint | - | - | Very limited implementati
 https://github.com/trenki2/FixedPoint | - (Implements sin/cos/sqrt for Q32.16) | - (Works only with word length of 32 bits) | Cannot represent the arbitrary dynamic range.
 https://github.com/rroa/FixedPoint | - (Has the sin implementation of limits accuracy) | - (Works only with word length of 32 bits) | Cannot represent the arbitrary dynamic range.
 https://github.com/gsarkis/libfi | - | - | Supports certain rounding/overflow policies. Provides the parser for the stringified numbers.
-https://github.com/geediiiiky/MyFixedPoint | | |
-https://github.com/cajun-rat/fixed-point-compiler | | |
