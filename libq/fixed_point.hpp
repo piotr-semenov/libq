@@ -25,6 +25,14 @@
 #include "arithmetics_safety.hpp"
 #include "type_promotion.hpp"
 
+
+#ifndef IMPLICIT_COPY_CTR
+#define COPY_CTR_EXPLICIT_SPECIFIER explicit
+#else
+#define COPY_CTR_EXPLICIT_SPECIFIER
+#endif
+
+
 namespace libq {
 namespace details {
     double exp2(double _val) {
@@ -303,7 +311,7 @@ class fixed_point {
 
 
     fixed_point() = default;
-    fixed_point(this_class const& _x) = default;  // NOLINT
+    COPY_CTR_EXPLICIT_SPECIFIER fixed_point(this_class const& _x) = default;  // NOLINT
 
 
     /*!
@@ -316,7 +324,8 @@ class fixed_point {
              int e1,
              typename op1,
              typename up1>
-    explicit fixed_point(fixed_point<T1, n1, f1, e1, op1, up1> const& _x)
+    COPY_CTR_EXPLICIT_SPECIFIER
+        fixed_point(fixed_point<T1, n1, f1, e1, op1, up1> const& _x)
         : m_value(
             this_class::normalize(_x,
                 std::integral_constant<bool, (int(f1) + e1 - int(this_class::bits_for_fractional) - this_class::scaling_factor_exponent > 0)>())) { // NOLINT
@@ -327,7 +336,7 @@ class fixed_point {
      \brief Creates the fixed-point number from any arithmetic object.
     */
     template<typename T>
-    explicit fixed_point(T const& _value)
+    COPY_CTR_EXPLICIT_SPECIFIER fixed_point(T const& _value)
         : m_value(
             this_class::calc_stored_integer_from(_value,
                                                  std::integral_constant<bool, std::is_floating_point<T>::value>())) {  // NOLINT
