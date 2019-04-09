@@ -62,7 +62,7 @@ class ignorance_policy {
         does_throw = false
     };
 
-    static void raise_event(std::string const& _msg = std::string{}) {
+    static void raise_event(std::string const&  = std::string{}) {
     }
 };
 

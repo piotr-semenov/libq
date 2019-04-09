@@ -35,11 +35,14 @@
 
 namespace libq {
 namespace details {
-    double exp2(double _val) {
+    inline double exp2(double _val) {
 #if defined(_MSC_VER)
         return std::exp2(_val);
 #elif defined(__GNUC__)
         return std::pow(2.0, _val);
+#else
+/// @bug Only GNU and MS compilers are supported?
+#error Only GNU and MS compilers are supported?
 #endif
     }
 }  // details
@@ -311,7 +314,7 @@ class fixed_point {
 
 
     fixed_point() = default;
-    COPY_CTR_EXPLICIT_SPECIFIER fixed_point(this_class const& _x) = default;  // NOLINT
+    fixed_point(this_class const& _x) = default;  // NOLINT
 
 
     /*!
