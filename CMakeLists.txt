@@ -81,46 +81,48 @@ set(CXX_USED_FEATURES
 )
 
 add_library(libq INTERFACE)
-target_sources(libq INTERFACE
+set(SRC_libq
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/loop_unroller.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/type_promotion.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/fixed_point.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/type_traits.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sign.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sum_traits.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/round.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/remainder.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/numeric_limits.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fmod.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/mult_of.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/floor.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/div_of.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fabs.inl
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/type_traits.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sign.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sum_traits.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/round.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/remainder.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/numeric_limits.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fmod.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/mult_of.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/floor.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/div_of.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fabs.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/arithmetics_safety.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/ceil.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/tanh.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sqrt.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/tan.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sinh.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sin.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/pow2_lut.inl
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/ceil.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/tanh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sqrt.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/tan.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sinh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sin.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/pow2_lut.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/lut.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/inv_pow2_lut.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/hyperbolic_scale.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/arctanh_lut.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/circular_scales.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/arctan_lut.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/exp.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/log.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/cosh.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/cos.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/atan.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/atanh.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/asin.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/asinh.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/acos.inl
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/acosh.inl
-)
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/inv_pow2_lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/hyperbolic_scale.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/arctanh_lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/circular_scales.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/arctan_lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/exp.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/log.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/cosh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/cos.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/atan.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/atanh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/asin.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/asinh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/acos.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/acosh.hpp
+    )
+target_sources(libq INTERFACE ${SRC_libq})
+
 target_include_directories(libq INTERFACE ${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIR})
 target_link_libraries(libq INTERFACE Boost::boost)
 target_compile_features(libq INTERFACE ${CXX_USED_FEATURES})
