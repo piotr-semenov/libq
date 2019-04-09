@@ -1,6 +1,6 @@
-#define BOOST_TEST_STATIC_LINK
+#define BOOST_TEST_MODULE precision
+#include "boost/test/included/unit_test.hpp"
 
-#include "boost/test/unit_test.hpp"
 #include "boost/random.hpp"
 
 #include "boost/log/trivial.hpp"

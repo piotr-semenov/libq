@@ -1,10 +1,9 @@
-#define BOOST_TEST_STATIC_LINK
+#define BOOST_TEST_MODULE range
+#include "boost/test/included/unit_test.hpp"
 
 #include <string>
 #include <limits>
 #include <stdexcept>
-
-#include "boost/test/unit_test.hpp"
 
 #include "libq/fixed_point.hpp"
 
