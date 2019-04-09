@@ -93,13 +93,13 @@ class lut
 }  // namespace cordic
 }  // namespace libq
 
-#include "arctan_lut.inl"
-#include "arctanh_lut.inl"
+#include "arctan_lut.hpp"
+#include "arctanh_lut.hpp"
 
-#include "pow2_lut.inl"
-#include "inv_pow2_lut.inl"
+#include "pow2_lut.hpp"
+#include "inv_pow2_lut.hpp"
 
-#include "circular_scales.inl"
-#include "hyperbolic_scale.inl"
+#include "circular_scales.hpp"
+#include "hyperbolic_scale.hpp"
 
 #endif  // INC_LIBQ_CORDIC_LUT_HPP_

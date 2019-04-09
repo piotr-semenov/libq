@@ -35,11 +35,14 @@
 
 namespace libq {
 namespace details {
-    double exp2(double _val) {
+    inline double exp2(double _val) {
 #if defined(_MSC_VER)
         return std::exp2(_val);
 #elif defined(__GNUC__)
         return std::pow(2.0, _val);
+#else
+/// @bug Only GNU and MS compilers are supported?
+#error Only GNU and MS compilers are supported?
 #endif
     }
 }  // details
@@ -311,7 +314,7 @@ class fixed_point {
 
 
     fixed_point() = default;
-    COPY_CTR_EXPLICIT_SPECIFIER fixed_point(this_class const& _x) = default;  // NOLINT
+    fixed_point(this_class const& _x) = default;  // NOLINT
 
 
     /*!
@@ -735,45 +738,45 @@ CONSTANT(CONST_2SQRT2, 2.82842712474619009760)
 }  // namespace libq
 
 
-#include "details/sum_traits.inl"
-#include "details/mult_of.inl"
-#include "details/div_of.inl"
+#include "details/sum_traits.hpp"
+#include "details/mult_of.hpp"
+#include "details/div_of.hpp"
 
-#include "details/sign.inl"
+#include "details/sign.hpp"
 
-#include "details/ceil.inl"
-#include "details/fabs.inl"
-#include "details/floor.inl"
-#include "details/round.inl"
-#include "details/remainder.inl"
-#include "details/fmod.inl"
-#include "details/numeric_limits.inl"
-#include "details/type_traits.inl"
+#include "details/ceil.hpp"
+#include "details/fabs.hpp"
+#include "details/floor.hpp"
+#include "details/round.hpp"
+#include "details/remainder.hpp"
+#include "details/fmod.hpp"
+#include "details/numeric_limits.hpp"
+#include "details/type_traits.hpp"
 
 #include "loop_unroller.hpp"
 
 
 #include "CORDIC/lut/lut.hpp"
 
-#include "CORDIC/log.inl"
-#include "CORDIC/sqrt.inl"
+#include "CORDIC/log.hpp"
+#include "CORDIC/sqrt.hpp"
 
-#include "CORDIC/sin.inl"
-#include "CORDIC/cos.inl"
-#include "CORDIC/tan.inl"
+#include "CORDIC/sin.hpp"
+#include "CORDIC/cos.hpp"
+#include "CORDIC/tan.hpp"
 
-#include "CORDIC/exp.inl"
+#include "CORDIC/exp.hpp"
 
-#include "CORDIC/sinh.inl"
-#include "CORDIC/cosh.inl"
-#include "CORDIC/tanh.inl"
+#include "CORDIC/sinh.hpp"
+#include "CORDIC/cosh.hpp"
+#include "CORDIC/tanh.hpp"
 
-#include "CORDIC/acos.inl"
-#include "CORDIC/asin.inl"
-#include "CORDIC/atan.inl"
+#include "CORDIC/acos.hpp"
+#include "CORDIC/asin.hpp"
+#include "CORDIC/atan.hpp"
 
-#include "CORDIC/asinh.inl"
-#include "CORDIC/acosh.inl"
-#include "CORDIC/atanh.inl"
+#include "CORDIC/asinh.hpp"
+#include "CORDIC/acosh.hpp"
+#include "CORDIC/atanh.hpp"
 
 #endif  // INC_LIBQ_FIXED_POINT_HPP_
