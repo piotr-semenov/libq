@@ -86,6 +86,7 @@ set(SRC_libq
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/type_promotion.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/fixed_point.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/type_traits.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fixed_point_common.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sign.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sum_traits.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/round.hpp
@@ -126,4 +127,9 @@ target_sources(libq INTERFACE ${SRC_libq})
 target_include_directories(libq INTERFACE ${CMAKE_CURRENT_SOURCE_DIR} ${Boost_INCLUDE_DIR})
 target_link_libraries(libq INTERFACE Boost::boost)
 target_compile_features(libq INTERFACE ${CXX_USED_FEATURES})
-add_subdirectory(tests)
+
+set(LIBQ_TEST ON CACHE BOOL "Include libq tests")
+
+if(LIBQ_TEST)
+    add_subdirectory(tests)
+endif(LIBQ_TEST)

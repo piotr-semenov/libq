@@ -3,8 +3,8 @@
 // Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
-/*!
-\file remainder.hpp
+/**
+@file remainder.hpp
 
 Gets the function std::remainder overloaded for fixed-point numbers.
 */
@@ -12,10 +12,12 @@ Gets the function std::remainder overloaded for fixed-point numbers.
 #ifndef INC_STD_REMAINDER_HPP_
 #define INC_STD_REMAINDER_HPP_
 
+#include "libq/details/fixed_point_common.hpp"
+
 namespace std {
 
-/*!
- \brief Function std::fmod computes fixed-point remainder of
+/**
+ @brief Function std::fmod computes fixed-point remainder of
  double(x)/double(y).
 */
 template<typename T1,

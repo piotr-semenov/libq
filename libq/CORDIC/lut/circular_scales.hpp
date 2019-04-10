@@ -1,12 +1,9 @@
-// circular_scales.hpp
-//
-// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
-// Distributed under the New BSD License. (See accompanying file LICENSE)
+/** @file circular_scales.hpp
+    @brief Computes the scales for CORDIC-rotations performed in circular coordinates.
 
-/*!
- \file circular_scales.hpp
+    @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
- Computes the scales for CORDIC-rotations performed in circular coordinates.
+    Distributed under the New BSD License. (See accompanying file LICENSE)
 */
 
 #ifndef INC_LIBQ_CORDIC_CIRCULAR_SCALES_HPP_
@@ -15,10 +12,10 @@
 namespace libq {
 namespace cordic {
 
-/*!
-*/
 template<std::size_t n, typename Q>
-double lut<n, Q>::circular_scale(std::size_t _n) {
+double
+lut<n, Q>::circular_scale(std::size_t _n)
+{
     double scale(1.0);
 
     for (std::size_t i = 0; i != _n; ++i) {
@@ -28,19 +25,19 @@ double lut<n, Q>::circular_scale(std::size_t _n) {
     return scale;
 }
 
-
-/*!
-*/
 template<std::size_t n, typename Q>
-lut<n, Q> lut<n, Q>::circular_scales() {
-    base_class scales;
+lut<n, Q>
+lut<n, Q>::circular_scales()
+{
+    Base_class scales;
 
     for (std::size_t i = 0; i != n; ++i) {
         scales[i] = std::sqrt(1.0 + std::pow(2.0, -2.0 * i));
     }
 
-    return this_class(scales);
+    return This_class(scales);
 }
+
 }  // namespace cordic
 }  // namespace libq
 

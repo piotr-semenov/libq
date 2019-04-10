@@ -3,8 +3,8 @@
 // Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
-/*!
- \file remainder.hpp
+/**
+ @file remainder.hpp
 
  Gets the function std::signbit overloaded for fixed-point numbers.
 */
@@ -12,10 +12,12 @@
 #ifndef INC_STD_SIGN_HPP_
 #define INC_STD_SIGN_HPP_
 
+#include "libq/details/fixed_point_common.hpp"
+
 namespace std {
 
-/*!
- \brief Function std::signbit determines if the given fixed-point number is
+/**
+ @brief Function std::signbit determines if the given fixed-point number is
  negative.
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>

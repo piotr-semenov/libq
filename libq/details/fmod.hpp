@@ -3,8 +3,8 @@
 // Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
-/*!
- \file fmod.hpp
+/**
+ @file fmod.hpp
 
  Gets the function std::fmod overloaded for fixed-point numbers.
 */
@@ -12,10 +12,12 @@
 #ifndef INC_STD_FMOD_HPP_
 #define INC_STD_FMOD_HPP_
 
+#include "libq/details/fixed_point_common.hpp"
+
 namespace std {
 
-/*!
- \brief function std::fmod computes fixed-point remainder of double(x)/double(y)
+/**
+ @brief function std::fmod computes fixed-point remainder of double(x)/double(y)
 */
 template<typename T1,
          typename T2,

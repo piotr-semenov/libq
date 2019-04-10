@@ -29,7 +29,7 @@ namespace sinks = boost::log::sinks;
 namespace keywords = boost::log::keywords;
 
 class logger
-    :    public src::severity_logger<logging::trivial::severity_level>
+    : public src::severity_logger<logging::trivial::severity_level>
 {
 public:
     logger(std::string const& _log_filename)
@@ -38,16 +38,17 @@ public:
             keywords::file_name = _log_filename,
             keywords::format = "[%TimeStamp%]: %Message%"
         );
+
         logging::core::get()->set_filter(
             logging::trivial::severity >= logging::trivial::info
         );
+
         logging::add_common_attributes();
     }
 };
 
-/*!
- \brief gets the random uniform number that is within
- the dynamic range of specified fixed-point format
+/** @brief gets the random uniform number that is within 
+    the dynamic range of specified fixed-point format
 */
 template<typename Q>
 double uniform_distribution_sample(void)
@@ -61,25 +62,26 @@ double uniform_distribution_sample(void)
     return low + uniform() * (high - low);
 }
 
-/// \brief stringify the type
+/// @brief stringify the type
 template<typename Q_type>
 class Q_stringifier
 {
 public:
-    static std::string name()
+    static std::string
+        name()
     {
         static std::string type_label;
         if (type_label.empty()) {
             std::stringstream stream;
             if (Q_type::is_signed) {
                 stream << "Q";
-            }
-            else {
+            } else {
                 stream << "UQ";
             }
 
             stream
                 << Q_type::number_of_significant_bits << "." << Q_type::bits_for_fractional;
+
             if (Q_type::scaling_factor_exponent > 0) {
                 stream << "." << Q_type::scaling_factor_exponent;
             }
@@ -91,18 +93,16 @@ public:
     }
 };
 
-/*!
- \brief 
-*/
 template<typename Q_type1, typename Q_type2, typename Operation, typename Error, std::size_t iterations = 1000u>
-void test_the_precision_of(Operation _op, Error _limit, logger& _log)
+void
+test_the_precision_of(Operation _op, Error _limit, logger& _log)
 {
     for (std::size_t it = 0; it != iterations; ++it) {
         double const u1 = uniform_distribution_sample<Q_type1>();
         double const u2 = uniform_distribution_sample<Q_type2>();
 
         if (Q_type2(u2).value() == 0) {
-            it--;
+            --it;
             continue;
         }
 
@@ -124,12 +124,10 @@ void test_the_precision_of(Operation _op, Error _limit, logger& _log)
             if (abs_diff > _limit(u1, u2, static_cast<double>(a), static_cast<double>(b))) {
                 BOOST_LOG_SEV(_log, logging::trivial::error) << "[Error]\t" << message;
                 BOOST_CHECK_MESSAGE(false, message);
-            }
-            else {
+            } else {
                 BOOST_LOG_SEV(_log, logging::trivial::info) << "[Info]\t" << message;
             }
-        }
-        catch (std::exception const& _e) {
+        } catch (std::exception const& _e) {
             stream << _e.what();
             std::string const message = stream.str();
             BOOST_LOG_SEV(_log, logging::trivial::error) << "[Error]\t" << message;
@@ -149,18 +147,21 @@ class plus_op
 {
 public:
     template<typename T1, typename T2>
-    double operator()(T1 _x, T2 _y) const{ return static_cast<double>(_x + _y); }
+    double operator()(T1 _x, T2 _y) const
+    {
+        return static_cast<double>(_x + _y);
+    }
 };
 BOOST_AUTO_TEST_CASE(precision_of_plus)
 {
-/*
- note, the summation max error can be determined as shown below:
- (x + e_x) + (y + e_y) = (x + y) + (e_x + e_y)
+    /*
+     note, the summation max error can be determined as shown below:
+     (x + e_x) + (y + e_y) = (x + y) + (e_x + e_y)
 
- note, error = error(x, y, a, b), where
- * x, y are the referenced real numbers
- * a = x + e_x, b = y + e_y are their approximations by fixed-point numbers (as real numbers)
-*/
+     note, error = error(x, y, a, b), where
+     * x, y are the referenced real numbers
+     * a = x + e_x, b = y + e_y are their approximations by fixed-point numbers (as real numbers)
+    */
 #define error(_precision, _prescale) [](double, double, double, double){ \
     double const factor = 1u << std::abs(_prescale); \
     return 2 * _precision * ((_prescale > 0) ? 1.0/factor : factor); \
@@ -184,7 +185,10 @@ class minus_op
 {
 public:
     template<typename T1, typename T2>
-    double operator()(T1 _x, T2 _y) const{ return static_cast<double>(_x - _y); }
+    double operator()(T1 _x, T2 _y) const
+    {
+        return static_cast<double>(_x - _y);
+    }
 };
 BOOST_AUTO_TEST_CASE(precision_of_minus)
 {
@@ -205,7 +209,10 @@ class multiply_op
 {
 public:
     template<typename T1, typename T2>
-    double operator()(T1 _x, T2 _y) const{ return static_cast<double>(_x * _y); }
+    double operator()(T1 _x, T2 _y) const
+    {
+        return static_cast<double>(_x * _y);
+    }
 };
 BOOST_AUTO_TEST_CASE(precision_of_multiplication)
 {
@@ -239,7 +246,10 @@ class division_op
 {
 public:
     template<typename T1, typename T2>
-    double operator()(T1 _x, T2 _y) const{ return static_cast<double>(_x / _y); }
+    double operator()(T1 _x, T2 _y) const
+    {
+        return static_cast<double>(_x / _y);
+    }
 };
 BOOST_AUTO_TEST_CASE(precision_of_division)
 {
@@ -264,7 +274,7 @@ BOOST_AUTO_TEST_CASE(precision_of_division)
     test_the_precision_of<Q<52, 52, -2>, Q<5, 4, 4> >(op, error(1E-15, 1E-1), custom_log);
 
     test_the_precision_of<UQ<18, 13>, UQ<18, 13> >(op, error(1E-3, 1E-3), custom_log);
-        test_the_precision_of<UQ<20, 15, 1>, UQ<20, 15> >(op, error(1E-4, 1E-4), custom_log);
+    test_the_precision_of<UQ<20, 15, 1>, UQ<20, 15> >(op, error(1E-4, 1E-4), custom_log);
     test_the_precision_of<Q<24, 23>, Q<24, 23, 2> >(op, error(1E-6, 1E-6), custom_log);
     test_the_precision_of<Q<30, 22>, Q<30, 22> >(op, error(1E-6, 1E-6), custom_log);
     test_the_precision_of<Q<30, 29, 5>, Q<30, 29> >(op, error(1E-8, 1E-8), custom_log);
@@ -275,7 +285,10 @@ class log_op
 {
 public:
     template<typename T1, typename T2>
-    double operator()(T1 _x, T2 _y) const{ return static_cast<double>(std::log(_x)); }
+    double operator()(T1 _x, T2 _y) const
+    {
+        return static_cast<double>(std::log(_x));
+    }
 };
 BOOST_AUTO_TEST_CASE(precision_of_log)
 {
@@ -398,6 +411,6 @@ BOOST_AUTO_TEST_CASE(precision_of_log)
 ////
 ////#undef PRECISION_TEST
 ////
-    BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END()
 } // unit_tests
 } // libq

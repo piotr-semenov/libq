@@ -1,13 +1,10 @@
-// tanh.hpp
-//
-// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
-// Distributed under the New BSD License. (See accompanying file LICENSE)
+/** @file tanh.hpp
+    @brief Provides CORDIC for tanh function as a ratio of sinh and tanh
+    @copyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
-/*!
- \file tanh.hpp
+    Distributed under the New BSD License. (See accompanying file LICENSE)
 
- Provides CORDIC for tanh function as a ratio of sinh and tanh
- \ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
+    @note H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 */
 
 #ifndef INC_LIBQ_DETAILS_TANH_HPP_
@@ -17,31 +14,34 @@
 
 namespace libq {
 namespace details {
-/*!
-*/
+
 template<typename T>
-class tanh_of {
- public:
+class tanh_of
+{
+public:
     using promoted_type = T;
 };
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class tanh_of<libq::fixed_point<T, n, f, e, op, up> >
-    : private libq::fixed_point<T, 0, f, e, op, up>,
-      public type_promotion_base<
-          libq::fixed_point<typename std::make_signed<T>::type, 0, f, e, op, up>,  // NOLINT
-          1u,
-          0,
-          0> {
-};
+    : private libq::fixed_point<T, 0, f, e, op, up>
+    , public type_promotion_base<
+        libq::fixed_point<typename std::make_signed<T>::type, 0, f, e, op, up>,
+        1u,
+        0,
+        0>
+{};
+
 }  // namespace details
 }  // namespace libq
 
 
 namespace std {
+
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::tanh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type  // NOLINT
-    tanh(libq::fixed_point<T, n, f, e, op, up> _val) {
+tanh(libq::fixed_point<T, n, f, e, op, up> _val)
+{
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using tanh_type = typename libq::details::tanh_of<Q>::promoted_type;
 
@@ -51,10 +51,11 @@ typename libq::details::tanh_of<libq::fixed_point<T, n, f, e, op, up> >::promote
     // reduce a and b to [0, 1] interval
     auto m = std::max(std::fabs(a), std::fabs(b));
     std::size_t shifts(0);
-    while (m >= 1.0) {
+
+    for (; m >= 1.0; ++shifts) {
         libq::lift(m) >>= 1u;
-        shifts++;
     }
+
     libq::lift(a) >>= shifts;
     libq::lift(b) >>= shifts;
 
@@ -63,6 +64,7 @@ typename libq::details::tanh_of<libq::fixed_point<T, n, f, e, op, up> >::promote
 
     return tanh_type(c);
 }
+
 }  // namespace std
 
 #endif  // INC_LIBQ_DETAILS_TANH_HPP_

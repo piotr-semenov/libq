@@ -1,105 +1,98 @@
-// lut.hpp
-//
-// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
-// Distributed under the New BSD License. (See accompanying file LICENSE)
+/** @file lut.hpp
+    @brief Provides a look-up table (LUT) for CORDIC stuff.
+    @note See H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures".
+    @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
-/*!
- \file lut.hpp
-
- Provides a look-up table (LUT) for CORDIC stuff.
-
- \ref See H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures".
+    Distributed under the New BSD License. (See accompanying file LICENSE)
 */
 
 #ifndef INC_LIBQ_CORDIC_LUT_HPP_
 #define INC_LIBQ_CORDIC_LUT_HPP_
+
+#include "libq/details/fixed_point_common.hpp"
 
 #include <array>
 
 namespace libq {
 namespace cordic {
 
-/*!
- \brief Look-up table for CORDIC algorithms.
- \tparam n
- \tparam Q
+/** @brief Look-up table for CORDIC algorithms.
+    @tparam n
+    @tparam Q
 */
 template<std::size_t n, typename Q>
 class lut
-    : public std::array<Q, n> {
-    using base_class = std::array<Q, n>;
-    using this_class = lut<n, Q>;
+    : public std::array<Q, n>
+{
+    using Base_class = std::array<Q, n>;
+    using This_class = lut<n, Q>;
 
-    explicit lut(base_class const& _dat)
-        : base_class(_dat) {
-    }
+    explicit lut(Base_class const& _dat)
+        : Base_class(_dat)
+    {}
 
- public:
-    using fixed_point_type = Q;  ///< type of fixed-point numbers
+public:
+    /// @brief type of fixed-point numbers
+    using fixed_point_type = Q;
 
-    enum: std::size_t {
-        dim = n  ///< size of LUT
-    };
+    /// @brief size of LUT
+    static constexpr std::size_t const dim = n;
 
 
-    /*!
-     \brief Creates the LUT for angles in case of CORDIC rotations are
+    /** @brief Creates the LUT for angles in case of CORDIC rotations are
      performed for circular coordinates.
     */
-    static this_class circular();
+    static This_class
+        circular();
 
+    /** @brief Creates the LUT for angles in case of CORDIC rotations are performed
+        in hyperbolic coordinates.
 
-    /*!
-     \brief Creates the LUT for angles in case of CORDIC rotations are performed
-     in hyperbolic coordinates.
-     \note This does not use the repeated iterations. All values are unique.
+        @note This does not use the repeated iterations. All values are unique.
     */
-    static this_class hyperbolic_wo_repeated_iterations();
+    static This_class
+        hyperbolic_wo_repeated_iterations();
 
 
-    /*!
-     \brief Creates the LUT of \f$2^{2^{-i}}\f$ for n positions.
-     \note This LUT is used for exp function.
+    /** @brief Creates the LUT of \f$2^{2^{-i}}\f$ for n positions.
+        @note This LUT is used for exp function.
     */
-    static this_class pow2();
+    static This_class
+        pow2();
 
-
-    /*!
-     \brief Creates the LUT of \f$\frac1{2^\frac1{2^i}}\f$ for n positions.
-     \note This LUT is used for log2 function.
+    /** @brief Creates the LUT of \f$\frac1{2^\frac1{2^i}}\f$ for n positions.
+        @note This LUT is used for log2 function.
     */
-    static this_class inv_pow2();
+    static This_class
+        inv_pow2();
+
+    /// @brief Computes the scale of n CORDIC-rotations in circular coordinates.
+    static double
+        circular_scale(std::size_t const _n);
 
 
-    /*!
-     \brief Computes the scale of n CORDIC-rotations in circular coordinates.
+    /** @brief Creates the LUT for scales of n CORDIC-rotations in case of circular
+        coordinates.
     */
-    static double circular_scale(std::size_t const _n);
+    static This_class
+        circular_scales();
 
-
-    /*!
-     \brief Creates the LUT for scales of n CORDIC-rotations in case of circular
-     coordinates.
+    /** @brief Computes the scale of n CORDIC-rotations in hyperbolic coordinates.
+        @note This uses repeated iterations for convergence.
     */
-    static this_class circular_scales();
-
-
-    /*!
-     \brief Computes the scale of n CORDIC-rotations in hyperbolic coordinates.
-     \note This uses repeated iterations for convergence.
-    */
-    static double hyperbolic_scale_with_repeated_iterations(std::size_t _n);
+    static double
+        hyperbolic_scale_with_repeated_iterations(std::size_t _n);
 };
+
 }  // namespace cordic
 }  // namespace libq
 
-#include "arctan_lut.hpp"
-#include "arctanh_lut.hpp"
-
-#include "pow2_lut.hpp"
-#include "inv_pow2_lut.hpp"
-
-#include "circular_scales.hpp"
-#include "hyperbolic_scale.hpp"
+/// @bug #include after code
+#include "libq/CORDIC/lut/arctan_lut.hpp"
+#include "libq/CORDIC/lut/arctanh_lut.hpp"
+#include "libq/CORDIC/lut/pow2_lut.hpp"
+#include "libq/CORDIC/lut/inv_pow2_lut.hpp"
+#include "libq/CORDIC/lut/circular_scales.hpp"
+#include "libq/CORDIC/lut/hyperbolic_scale.hpp"
 
 #endif  // INC_LIBQ_CORDIC_LUT_HPP_

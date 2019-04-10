@@ -3,14 +3,16 @@
 // Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
-/*!
- \file numeric_limits.hpp
+/**
+ @file numeric_limits.hpp
 
  Provides the partial specialization of numeric_limits template for fixed-point numbers.
 */
 
 #ifndef INC_STD_NUMERIC_LIMITS_HPP_
 #define INC_STD_NUMERIC_LIMITS_HPP_
+
+#include "libq/details/fixed_point_common.hpp"
 
 #include <limits>
 
@@ -62,23 +64,23 @@ class numeric_limits<libq::fixed_point<T, n, f, e, op, up> > {
         static_cast<int>(min_exponent * M_LOG10_2);
     static int const radix = 2;
 
-    /// \brief minimum value that can be achieved by fixed-point type
+    /// @brief minimum value that can be achieved by fixed-point type
     static Q min() throw() {
         return Q::least();
     }
 
-    /// \brief maximum value that can be achieved by fixed-point type
+    /// @brief maximum value that can be achieved by fixed-point type
     static Q max() throw() {
         return Q::largest();
     }
 
-    /// \brief returns the machine epsilon, that is, the difference between
+    /// @brief returns the machine epsilon, that is, the difference between
     /// 1.0 and the next value representable by the fixed-point type
     static Q epsilon() throw() {
         return Q::wrap(1u);
     }
 
-    /// \brief the maximum rounding error for fixed-point type
+    /// @brief the maximum rounding error for fixed-point type
     static Q round_error() throw() {
         return Q(0.5f);
     }

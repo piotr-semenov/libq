@@ -3,18 +3,20 @@
 // Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
-/*!
- \file sum_traits.hpp
+/**
+ @file sum_traits.hpp
 
- \brief 
+ @brief 
 */
 
 #ifndef INC_LIBQ_DETAILS_SUM_TRAITS_HPP_
 #define INC_LIBQ_DETAILS_SUM_TRAITS_HPP_
 
+#include "libq/details/fixed_point_common.hpp"
+
 namespace libq {
 namespace details {
-/*!
+/**
 */
 template<typename T>
 class sum_traits

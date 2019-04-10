@@ -1,13 +1,9 @@
-// cos.hpp
-//
-// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
-// Distributed under the New BSD License. (See accompanying file LICENSE)
+/** @file cos.hpp
+    @brief Provides CORDIC for cos function
+    @note See H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 
-/*!
- \file cos.hpp
-
- Provides CORDIC for cos function
- \ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
+    @copyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+    Distributed under the New BSD License. (See accompanying file LICENSE)
 */
 
 #ifndef INC_STD_COS_HPP_
@@ -15,27 +11,29 @@
 
 namespace libq {
 namespace details {
-/*!
- \brief
-*/
+
 template<typename T>
-class cos_of {
- public:
+class cos_of
+{
+public:
     using promoted_type = T;
 };
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class cos_of<libq::fixed_point<T, n, f, e, op, up> >
-    : public libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> > {
-};
+    : public libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >
+{};
+
 }  // namespace details
 }  // namespace libq
 
 
 namespace std {
+
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type  // NOLINT
-cos(libq::fixed_point<T, n, f, e, op, up> _val) {
+typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
+cos(libq::fixed_point<T, n, f, e, op, up> _val)
+{
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using cos_type = typename libq::details::cos_of<Q>::promoted_type;
 
@@ -47,17 +45,15 @@ cos(libq::fixed_point<T, n, f, e, op, up> _val) {
     // put argument to [-pi, pi] interval (with change of sign for cos)
     {
         Q const x = Q::CONST_PI - std::fmod(_val, Q::CONST_2PI);
-        if (x < -Q::CONST_PI_2) {  // convert to interval [-pi/2, pi/2]
+
+        // convert to interval [-pi/2, pi/2]
+        if (x < -Q::CONST_PI_2) {
             arg = x + Q::CONST_PI;
-
             sign = 1;
-        }
-        else if (x > Q::CONST_PI_2) {
+        } else if (x > Q::CONST_PI_2) {
             arg = x - Q::CONST_PI;
-
             sign = 1;
-        }
-        else {
+        } else {
             arg = x;
         }
     }
@@ -65,8 +61,7 @@ cos(libq::fixed_point<T, n, f, e, op, up> _val) {
     using lut_type = libq::cordic::lut<f, Q>;
     static lut_type const angles = lut_type::circular();
 
-    // normalization factor: see page 10, table 24.1 and pages 4-5, equations
-    // (5)-(6)
+    // normalization factor: see page 10, table 24.1 and pages 4-5, equations (5)-(6)
     // factor converges to the limit 1.64676 very fast: it takes 8 iterations
     // only. 8 iterations corresponds to precision of size 0.007812 for
     // angle approximation
@@ -94,11 +89,12 @@ cos(libq::fixed_point<T, n, f, e, op, up> _val) {
         x = x1; y = y1; z = z1;
     };  // NOLINT
 #ifdef LOOP_UNROLLING
-    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f-1>());
+    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f - 1>());
 #endif
 
-    return cos_type((sign > 0) ? x : - x);
+    return cos_type((sign > 0) ? x : -x);
 }
+
 }  // namespace std
 
 #endif  // INC_STD_COS_HPP_

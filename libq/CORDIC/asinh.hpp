@@ -3,8 +3,8 @@
 // Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
-/*!
- \file asinh.hpp
+/**
+ @file asinh.hpp
 
  Provides CORDIC for tanh function as a ratio of sinh and tanh
 */
@@ -15,8 +15,8 @@
 
 namespace libq {
 namespace details {
-/*!
- \brief
+/**
+ @brief
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class asinh_of
@@ -27,8 +27,8 @@ class asinh_of
 
 
 namespace std {
-/*!
- \brief computes arcinh as logarithm
+/**
+ @brief computes arcinh as logarithm
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 typename libq::details::asinh_of<T, n, f, e, op, up>::promoted_type

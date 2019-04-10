@@ -3,8 +3,8 @@
 // Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 // Distributed under the New BSD License. (See accompanying file LICENSE)
 
-/*!
-\file fmod.hpp
+/**
+@file fmod.hpp
 
 Gets the function std::round overloaded for fixed-point numbers.
 */
@@ -12,10 +12,12 @@ Gets the function std::round overloaded for fixed-point numbers.
 #ifndef INC_STD_ROUND_HPP_
 #define INC_STD_ROUND_HPP_
 
+#include "libq/details/fixed_point_common.hpp"
+
 namespace std {
 
-/*!
- \brief std::round in case of fixed-point number.
+/**
+ @brief std::round in case of fixed-point number.
 */
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 libq::fixed_point<T, n, f, e, op, up>

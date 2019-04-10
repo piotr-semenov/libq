@@ -1,24 +1,22 @@
-// cosh.hpp
-//
-// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
-// Distributed under the New BSD License. (See accompanying file LICENSE)
+/** @file cosh.hpp
+    @brief Provides CORDIC for cosh function as a sum of exponents
+    @note See H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
+    and J.S. Walther, "A Unified Algorithm for Elementary Functions"
 
-/*!
- \file cosh.hpp
+    @copyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
- Provides CORDIC for cosh function as a sum of exponents
-
- \ref see H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures" and
- J.S. Walther, "A Unified Algorithm for Elementary Functions"
+    Distributed under the New BSD License. (See accompanying file LICENSE)
 */
 
 #ifndef INC_LIBQ_DETAILS_COSH_HPP_
 #define INC_LIBQ_DETAILS_COSH_HPP_
 
 namespace std {
+
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::sinh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type  // NOLINT
-    cosh(libq::fixed_point<T, n, f, e, op, up> _val) {
+typename libq::details::sinh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
+cosh(libq::fixed_point<T, n, f, e, op, up> _val)
+{
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using cosh_type = typename libq::details::sinh_of<Q>::promoted_type;
 
@@ -28,6 +26,7 @@ typename libq::details::sinh_of<libq::fixed_point<T, n, f, e, op, up> >::promote
 
     return x;
 }
+
 }  // namespace std
 
 #endif  // INC_LIBQ_DETAILS_COSH_HPP_

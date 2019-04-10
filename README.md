@@ -10,7 +10,7 @@ The only requirement to make this magic to work is to ensure that your algorithm
 
 Please, see the simple code emphasizing the main idea behind the LibQ:
 
-```C++
+```` c++
 #include <cstdlib>
 #include <vector>
 #include <numeric>
@@ -75,13 +75,13 @@ int main(int argc, char** argv) {
         << std::endl;
     return EXIT_SUCCESS;
 }
-```
+````
 
 ## Main Disadvantages of C++ Competitors
-The most of the fixed-point libraries do not support the math functions from <cmath> (e.g. CORDIC algorithms for sin/cos/asin/etc) at all.
+The most of the fixed-point libraries do not support the math functions from `<cmath>` (e.g. CORDIC algorithms for sin/cos/asin/etc) at all.
 Moreover, libraries suggests no type promotion (e.g. for arithmetic operations +,-,/,*). 
 
-> Note, <cmath> supporting and type promotion are the substantial requirements to make the example above to work.
+> Note, `<cmath>` supporting and type promotion are the substantial requirements to make the example above to work.
 
 Please, find the summary table for competitors below.
 
