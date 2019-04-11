@@ -1,9 +1,9 @@
 /** @file lut.hpp
     @brief Provides a look-up table (LUT) for CORDIC stuff.
-    @note See H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures".
     @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
+    @note See H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures".
 */
 
 #ifndef INC_LIBQ_CORDIC_LUT_HPP_
@@ -38,7 +38,6 @@ public:
     /// @brief size of LUT
     static constexpr std::size_t const dim = n;
 
-
     /** @brief Creates the LUT for angles in case of CORDIC rotations are
      performed for circular coordinates.
     */
@@ -53,14 +52,13 @@ public:
     static This_class
         hyperbolic_wo_repeated_iterations();
 
-
     /** @brief Creates the LUT of \f$2^{2^{-i}}\f$ for n positions.
         @note This LUT is used for exp function.
     */
     static This_class
         pow2();
 
-    /** @brief Creates the LUT of \f$\frac1{2^\frac1{2^i}}\f$ for n positions.
+    /** @brief Creates the LUT of @f$ \frac1{2 ^ \frac1{2^i}} @f$ for @f$ n @f$ positions.
         @note This LUT is used for log2 function.
     */
     static This_class

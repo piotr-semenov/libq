@@ -9,12 +9,14 @@
 #ifndef INC_LIBQ_CORDIC_INV_POW2_LUT_HPP_
 #define INC_LIBQ_CORDIC_INV_POW2_LUT_HPP_
 
+#include "libq/CORDIC/lut/lut.hpp"
+
 namespace libq {
 namespace cordic {
 
 template<std::size_t n, typename Q>
-lut<n, Q>
-lut<n, Q>::inv_pow2()
+auto
+lut<n, Q>::inv_pow2()->This_class
 {
     Base_class table;
 

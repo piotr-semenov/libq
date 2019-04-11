@@ -10,6 +10,8 @@
 #ifndef INC_LIBQ_CORDIC_ARCTANH_LUT_HPP_
 #define INC_LIBQ_CORDIC_ARCTANH_LUT_HPP_
 
+#include "libq/CORDIC/lut/lut.hpp"
+
 namespace libq {
 namespace cordic {
 
@@ -17,7 +19,8 @@ namespace cordic {
     @note See page 5, equation 7, m = -1 (hyperbolic coordinate system).
 */
 template<size_t n, typename Q>
-lut<n, Q> lut<n, Q>::hyperbolic_wo_repeated_iterations()
+auto
+lut<n, Q>::hyperbolic_wo_repeated_iterations()->This_class
 {
     Base_class table;
 

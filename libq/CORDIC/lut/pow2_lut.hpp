@@ -10,6 +10,8 @@
 #ifndef INC_LIBQ_CORDIC_POW2_LUT_HPP_
 #define INC_LIBQ_CORDIC_POW2_LUT_HPP_
 
+#include "libq/CORDIC/lut/lut.hpp"
+
 namespace libq {
 namespace cordic {
 

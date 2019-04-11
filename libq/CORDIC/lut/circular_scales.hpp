@@ -1,6 +1,5 @@
 /** @file circular_scales.hpp
     @brief Computes the scales for CORDIC-rotations performed in circular coordinates.
-
     @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
@@ -26,8 +25,8 @@ lut<n, Q>::circular_scale(std::size_t _n)
 }
 
 template<std::size_t n, typename Q>
-lut<n, Q>
-lut<n, Q>::circular_scales()
+auto
+lut<n, Q>::circular_scales()->This_class
 {
     Base_class scales;
 
