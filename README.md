@@ -102,12 +102,12 @@ https://github.com/rroa/FixedPoint | - (Has the sin implementation of limits acc
 https://github.com/gsarkis/libfi | - | - | Supports certain rounding/overflow policies. Provides the parser for the stringified numbers.
 https://github.com/geediiiiky/MyFixedPoint | - (Implements the inverse sqrt only) | - (Supports only the 64-bit word length) | Cannot represent the arbitrary dynamic range.
 https://github.com/PetteriAimonen/libfixmath | +- (Implemented only for Q32.16) | - | Is a C libyrary. No C++ is supported.
-https://github.com/johnmcfarlane/fixed_point | - (The <cmath> functions are just wrapped to provide fixed-point conversions of floating-point results) | - (Delegates the underlying type promotion to compiler. The resulting exponent for fixed-point arithmetics is always the maximum one) | This is the reference implementation of the recent proposal P0037R1 ("Fixed-point Real Numbers") for C++ STD (please, see the corresponding paper at http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0037r1.html). Also it provides natvis for Visual Studio's debugger.
+https://github.com/johnmcfarlane/fixed_point | - (The `<cmath>` functions are just wrapped to provide fixed-point conversions of floating-point results) | - (Delegates the underlying type promotion to compiler. The resulting exponent for fixed-point arithmetics is always the maximum one) | This is the reference implementation of the recent proposal P0037R1 ("Fixed-point Real Numbers") for C++ STD (please, see the corresponding paper at http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2016/p0037r1.html). Also it provides natvis for Visual Studio's debugger.
 
 
 ## Main LibQ Features
 1. Supports any word lengths (not only 2's powers) and any reasonable dynamic ranges.
-2. Supports the CORDIC-implementation of all the elementary functions from <cmath> (exp, log, sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh).
+2. Supports the CORDIC-implementation of all the elementary functions from `<cmath>` (exp, log, sin, cos, tan, asin, acos, atan, sinh, cosh, tanh, asinh, acosh, atanh).
 3. Provides the type promotions for the arithmetics (+, -, *, /) and all elementary functions listed above.
 4. Provides the certain policies for the overflow/underflow in run-time.
 5. Enables the user to simulate his fixed-point algorithm with fixed-point numbers easily (see the Project Motivation section).
