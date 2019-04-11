@@ -530,7 +530,7 @@ _line_length = 80
 
 # The allowed extensions for file names
 # This is set by --extensions flag.
-_valid_extensions = set(['cc', 'h', 'cpp', 'cu', 'cuh'])
+_valid_extensions = set(['cc', 'cp', 'cxx', 'CPP', 'c++', 'C', 'h', 'hh', 'H', 'hp', 'hxx', 'hpp', 'HPP', 'h++', 'tcc', 'cu', 'cuh'])
 
 # {str, bool}: a map from error categories to booleans which indicate if the
 # category should be suppressed for every line.
