@@ -3,7 +3,6 @@
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
 */
-
 #ifndef INC_LIBQ_DETAILS_DIV_OF_HPP_
 #define INC_LIBQ_DETAILS_DIV_OF_HPP_
 

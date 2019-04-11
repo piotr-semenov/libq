@@ -13,8 +13,7 @@
 #ifndef INC_LIBQ_FIXED_POINT_HPP_
 #define INC_LIBQ_FIXED_POINT_HPP_
 
-#include "libq/loop_unroller.hpp"
-
+#include "libq/details/loop_unroller.hpp"
 #include "libq/details/sum_traits.hpp"
 #include "libq/details/mult_of.hpp"
 #include "libq/details/div_of.hpp"

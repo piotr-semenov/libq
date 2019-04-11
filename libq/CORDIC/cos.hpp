@@ -5,9 +5,8 @@
     @copyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
     Distributed under the New BSD License. (See accompanying file LICENSE)
 */
-
-#ifndef INC_STD_COS_HPP_
-#define INC_STD_COS_HPP_
+#ifndef INC_LIBQ_CORDIC_COS_HPP_
+#define INC_LIBQ_CORDIC_COS_HPP_
 
 namespace libq {
 namespace details {
@@ -73,7 +72,7 @@ cos(libq::fixed_point<T, n, f, e, op, up> _val)
     Q x1, y1, z1;
 
 #ifdef LOOP_UNROLLING
-    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+    auto const iteration_body = [&](std::size_t i) {
 #else
     for (std::size_t i = 0u; i != f; ++i) {
 #endif
@@ -87,7 +86,7 @@ cos(libq::fixed_point<T, n, f, e, op, up> _val)
         z1 = Q(z - Q((sign > 0) ? angles[i] : -angles[i]));
 
         x = x1; y = y1; z = z1;
-    };  // NOLINT
+    };
 #ifdef LOOP_UNROLLING
     libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f - 1>());
 #endif
@@ -97,4 +96,4 @@ cos(libq::fixed_point<T, n, f, e, op, up> _val)
 
 }  // namespace std
 
-#endif  // INC_STD_COS_HPP_
+#endif  // INC_LIBQ_CORDIC_COS_HPP_

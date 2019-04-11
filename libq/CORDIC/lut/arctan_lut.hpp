@@ -6,9 +6,8 @@
 
     @note See H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 */
-
-#ifndef INC_LIBQ_CORDIC_ARCTAN_LUT_HPP_
-#define INC_LIBQ_CORDIC_ARCTAN_LUT_HPP_
+#ifndef INC_LIBQ_CORDIC_LUT_ARCTAN_LUT_HPP_
+#define INC_LIBQ_CORDIC_LUT_ARCTAN_LUT_HPP_
 
 #include "libq/CORDIC/lut/lut.hpp"
 
@@ -38,4 +37,4 @@ lut<n, Q>::circular()->This_class
 }  // namespace cordic
 }  // namespace libq
 
-#endif  // INC_LIBQ_CORDIC_ARCTAN_LUT_HPP_
+#endif  // INC_LIBQ_CORDIC_LUT_ARCTAN_LUT_HPP_

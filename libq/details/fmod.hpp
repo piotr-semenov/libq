@@ -1,16 +1,12 @@
-// fmod.hpp
-//
-// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
-// Distributed under the New BSD License. (See accompanying file LICENSE)
+/** @file fmod.hpp
+    @brief Gets the function std::fmod overloaded for fixed-point numbers.
 
-/**
- @file fmod.hpp
+    @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
- Gets the function std::fmod overloaded for fixed-point numbers.
+    Distributed under the New BSD License. (See accompanying file LICENSE)
 */
-
-#ifndef INC_STD_FMOD_HPP_
-#define INC_STD_FMOD_HPP_
+#ifndef INC_LIBQ_DETAILS_FMOD_HPP_
+#define INC_LIBQ_DETAILS_FMOD_HPP_
 
 #include "libq/details/fixed_point_common.hpp"
 
@@ -42,4 +38,4 @@ libq::fixed_point<T2, n2, f2, e2, op, up>
 }
 }  // namespace std
 
-#endif  // INC_STD_FMOD_HPP_
+#endif  // INC_LIBQ_DETAILS_FMOD_HPP_

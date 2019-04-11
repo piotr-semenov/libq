@@ -1,17 +1,12 @@
-
 /** @file asin.hpp
     @brief Provides CORDIC for tanh function as a ratio of sinh and tanh
-    @remark See H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
-
     @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
-
-*/
-
-#ifndef INC_STD_ASIN_HPP_
-#define INC_STD_ASIN_HPP_
-
+    @remark See H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
+    */
+#ifndef INC_LIBQ_CORDIC_ASIN_HPP_
+#define INC_LIBQ_CORDIC_ASIN_HPP_
 
 namespace libq {
 namespace details {
@@ -27,10 +22,10 @@ template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class asin_of<libq::fixed_point<T, n, f, e, op, up> >
     : private libq::fixed_point<T, 0, f, e, op, up>
     , public type_promotion_base<
-        libq::fixed_point<T, 0, f, e, op, up>,
-        2u,
-        0,
-        0>
+    libq::fixed_point<T, 0, f, e, op, up>,
+    2u,
+    0,
+    0>
 {};
 
 }  // namespace details
@@ -57,11 +52,11 @@ asin(libq::fixed_point<T, n, f, e, op, up> _val)
     if (_val == Q(1.0f)) {
         return result_type::CONST_PI_2;
     }
-    
+
     if (_val == Q(-1.0f)) {
         return -(result_type::CONST_PI_2);
     }
-    
+
     if (_val == Q(0.0)) {
         return result_type::wrap(0);
     }
@@ -74,7 +69,7 @@ asin(libq::fixed_point<T, n, f, e, op, up> _val)
     result_type x(1.0f), y(0.0), z(0.0);
 
 #ifdef LOOP_UNROLLING
-    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+    auto const iteration_body = [&](std::size_t i) {
 #else
     for (std::size_t i = 0u; i != f; ++i) {
 #endif
@@ -107,4 +102,4 @@ asin(libq::fixed_point<T, n, f, e, op, up> _val)
 
 }  // namespace std
 
-#endif  // INC_STD_ASIN_HPP_
+#endif  // INC_LIBQ_CORDIC_ASIN_HPP_

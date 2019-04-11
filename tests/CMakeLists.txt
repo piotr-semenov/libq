@@ -1,6 +1,6 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
 
-project(libq-tests) 
+project(libq-tests)
 
 set(tests
     as_native_cases

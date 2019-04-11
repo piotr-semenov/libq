@@ -7,9 +7,8 @@
     Distributed under the New BSD License. (See accompanying file LICENSE)
 
 */
-
-#ifndef INC_STD_LOG_HPP_
-#define INC_STD_LOG_HPP_
+#ifndef INC_LIBQ_CORDIC_LOG_HPP_
+#define INC_LIBQ_CORDIC_LOG_HPP_
 
 #include <boost/integer/static_min_max.hpp>
 #include <boost/integer/static_log2.hpp>
@@ -21,16 +20,15 @@ namespace details {
 
 template<typename T, std::size_t n, std::size_t f, int e, typename op, typename up>
 class log_of
-    : public type_promotion_base<
+    : public
+    type_promotion_base<
         fixed_point<typename std::make_signed<T>::type, n, f, e, op, up>,
         boost::static_unsigned_max<
             (f > 0) ? (boost::static_log2<f>::value) : 0,
             (n > 0) ? (boost::static_log2<n>::value) : 0
-        >::value + 1u,
-        0,
-        0>
-{
-};
+            >::value + 1u,
+        0, 0>
+{};
 
 }  // namespace details
 }  // namespace libq
@@ -78,7 +76,7 @@ log(libq::fixed_point<T, n, f, e, op, up> _val)
     work_type result(0);
 
 #ifdef LOOP_UNROLLING
-    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+    auto const iteration_body = [&](std::size_t i) {
 #else
     for (std::size_t i = 0; i != f; ++i) {
 #endif
@@ -101,4 +99,4 @@ log(libq::fixed_point<T, n, f, e, op, up> _val)
 
 }  // namespace std
 
-#endif  // INC_STD_LOG_HPP_
+#endif  // INC_LIBQ_CORDIC_LOG_HPP_

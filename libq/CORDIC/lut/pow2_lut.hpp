@@ -7,8 +7,8 @@
     Distributed under the New BSD License. (See accompanying file LICENSE)
 */
 
-#ifndef INC_LIBQ_CORDIC_POW2_LUT_HPP_
-#define INC_LIBQ_CORDIC_POW2_LUT_HPP_
+#ifndef INC_LIBQ_CORDIC_LUT_POW2_LUT_HPP_
+#define INC_LIBQ_CORDIC_LUT_POW2_LUT_HPP_
 
 #include "libq/CORDIC/lut/lut.hpp"
 
@@ -31,4 +31,4 @@ lut<n, Q>::pow2()->This_class
 }  // namespace cordic
 }  // namespace libq
 
-#endif  // INC_LIBQ_CORDIC_POW2_LUT_HPP_
+#endif  // INC_LIBQ_CORDIC_LUT_POW2_LUT_HPP_

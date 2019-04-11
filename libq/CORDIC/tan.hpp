@@ -6,9 +6,8 @@
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
 */
-
-#ifndef INC_STD_TAN_HPP_
-#define INC_STD_TAN_HPP_
+#ifndef INC_LIBQ_CORDIC_TAN_HPP_
+#define INC_LIBQ_CORDIC_TAN_HPP_
 
 namespace libq {
 namespace details {
@@ -54,4 +53,4 @@ tan(libq::fixed_point<T, n, f, e, op, up> _val)
 
 }  // namespace std
 
-#endif  // INC_STD_SIN_HPP_
+#endif  // INC_LIBQ_CORDIC_TAN_HPP_

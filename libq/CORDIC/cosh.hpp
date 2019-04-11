@@ -7,9 +7,8 @@
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
 */
-
-#ifndef INC_LIBQ_DETAILS_COSH_HPP_
-#define INC_LIBQ_DETAILS_COSH_HPP_
+#ifndef INC_LIBQ_CORDIC_COSH_HPP_
+#define INC_LIBQ_CORDIC_COSH_HPP_
 
 namespace std {
 
@@ -29,4 +28,4 @@ cosh(libq::fixed_point<T, n, f, e, op, up> _val)
 
 }  // namespace std
 
-#endif  // INC_LIBQ_DETAILS_COSH_HPP_
+#endif  // INC_LIBQ_CORDIC_COSH_HPP_

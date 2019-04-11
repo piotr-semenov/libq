@@ -5,9 +5,8 @@
 
     Gets the function std::fabs overloaded for fixed-point numbers.
 */
-
-#ifndef INC_STD_FABS_HPP_
-#define INC_STD_FABS_HPP_
+#ifndef INC_LIBQ_DETAILS_FABS_HPP_
+#define INC_LIBQ_DETAILS_FABS_HPP_
 
 #include "libq/details/fixed_point_common.hpp"
 
@@ -25,4 +24,4 @@ fabs(libq::fixed_point<T, n, f, e, op, up> const& _x)
 
 }  // namespace std
 
-#endif  // INC_STD_FABS_HPP_
+#endif  // INC_LIBQ_DETAILS_FABS_HPP_

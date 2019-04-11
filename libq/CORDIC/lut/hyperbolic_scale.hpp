@@ -1,14 +1,13 @@
 /** @file hyperbolic_scale.hpp
-    
-    @copyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
-    Distributed under the New BSD License. (See accompanying file LICENSE)
-
-    Computes the look-up table CORDIC-rotations performed in the hyperbolic
+    @brief Computes the look-up table CORDIC-rotations performed in the hyperbolic
     coordinates.
-*/
 
-#ifndef INC_LIBQ_CORDIC_HYPERBOLIC_SCALE_HPP_
-#define INC_LIBQ_CORDIC_HYPERBOLIC_SCALE_HPP_
+    @copyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+
+    Distributed under the New BSD License. (See accompanying file LICENSE)
+*/
+#ifndef INC_LIBQ_CORDIC_LUT_HYPERBOLIC_SCALE_HPP_
+#define INC_LIBQ_CORDIC_LUT_HYPERBOLIC_SCALE_HPP_
 
 #include "libq/CORDIC/lut/lut.hpp"
 
@@ -37,4 +36,4 @@ lut<n, Q>::hyperbolic_scale_with_repeated_iterations(std::size_t _n)
 }  // namespace cordic
 }  // namespace libq
 
-#endif  // INC_LIBQ_CORDIC_HYPERBOLIC_SCALE_HPP_
+#endif  // INC_LIBQ_CORDIC_LUT_HYPERBOLIC_SCALE_HPP_

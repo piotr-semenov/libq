@@ -6,9 +6,8 @@
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
 */
-
-#ifndef INC_LIBQ_CORDIC_ARCTANH_LUT_HPP_
-#define INC_LIBQ_CORDIC_ARCTANH_LUT_HPP_
+#ifndef INC_LIBQ_CORDIC_LUT_ARCTANH_LUT_HPP_
+#define INC_LIBQ_CORDIC_LUT_ARCTANH_LUT_HPP_
 
 #include "libq/CORDIC/lut/lut.hpp"
 
@@ -38,4 +37,4 @@ lut<n, Q>::hyperbolic_wo_repeated_iterations()->This_class
 }  // namespace cordic
 }  // namespace libq
 
-#endif  // INC_LIBQ_CORDIC_ARCTANH_LUT_HPP_
+#endif  // INC_LIBQ_CORDIC_LUT_ARCTANH_LUT_HPP_

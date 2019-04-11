@@ -6,9 +6,8 @@
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
 */
-
-#ifndef INC_STD_SIN_HPP_
-#define INC_STD_SIN_HPP_
+#ifndef INC_LIBQ_CORDIC_SIN_HPP_
+#define INC_LIBQ_CORDIC_SIN_HPP_
 
 namespace libq {
 namespace details {
@@ -38,7 +37,7 @@ typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted
 sin(libq::fixed_point<T, n, f, e, op, up> _val)
 {
     using sin_type =
-        typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type;  // NOLINT
+        typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type;
 
     // gap in 3 bits is needed for CONST_PI existence
     using work_type = libq::Q<f + 3u, f, e, op, up>;
@@ -82,7 +81,7 @@ sin(libq::fixed_point<T, n, f, e, op, up> _val)
     work_type z1;
 
 #ifdef LOOP_UNROLLING
-    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+    auto const iteration_body = [&](std::size_t i) {
 #else
     for (std::size_t i = 0; i != f; ++i) {
 #endif
@@ -107,4 +106,4 @@ sin(libq::fixed_point<T, n, f, e, op, up> _val)
 
 }  // namespace std
 
-#endif  // INC_STD_SIN_HPP_
+#endif  // INC_LIBQ_CORDIC_SIN_HPP_

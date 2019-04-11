@@ -6,9 +6,8 @@
 
     @note H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures"
 */
-
-#ifndef INC_LIBQ_DETAILS_TANH_HPP_
-#define INC_LIBQ_DETAILS_TANH_HPP_
+#ifndef INC_LIBQ_CORDIC_TANH_HPP_
+#define INC_LIBQ_CORDIC_TANH_HPP_
 
 #include <algorithm>
 
@@ -39,7 +38,7 @@ class tanh_of<libq::fixed_point<T, n, f, e, op, up> >
 namespace std {
 
 template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::tanh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type  // NOLINT
+typename libq::details::tanh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
 tanh(libq::fixed_point<T, n, f, e, op, up> _val)
 {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
@@ -67,4 +66,4 @@ tanh(libq::fixed_point<T, n, f, e, op, up> _val)
 
 }  // namespace std
 
-#endif  // INC_LIBQ_DETAILS_TANH_HPP_
+#endif  // INC_LIBQ_CORDIC_TANH_HPP_

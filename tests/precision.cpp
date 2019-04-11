@@ -47,9 +47,7 @@ public:
     }
 };
 
-/** @brief gets the random uniform number that is within 
-    the dynamic range of specified fixed-point format
-*/
+/// @brief gets the random uniform number that is within the dynamic range of specified fixed-point format
 template<typename Q>
 double uniform_distribution_sample(void)
 {
@@ -73,14 +71,11 @@ public:
         static std::string type_label;
         if (type_label.empty()) {
             std::stringstream stream;
-            if (Q_type::is_signed) {
-                stream << "Q";
-            } else {
-                stream << "UQ";
-            }
-
-            stream
-                << Q_type::number_of_significant_bits << "." << Q_type::bits_for_fractional;
+            stream <<
+                (Q_type::is_signed ? "Q" : "UQ") <<
+                Q_type::number_of_significant_bits <<
+                "." <<
+                Q_type::bits_for_fractional;
 
             if (Q_type::scaling_factor_exponent > 0) {
                 stream << "." << Q_type::scaling_factor_exponent;
@@ -110,11 +105,11 @@ test_the_precision_of(Operation _op, Error _limit, logger& _log)
         Q_type2 const b(u2);
 
         std::stringstream stream;
-        stream
-            << Q_stringifier<Q_type1>::name() << "\t"
-            << Q_stringifier<Q_type2>::name() << "\t"
-            << std::setprecision(20)
-            << u1 << "\t" << u2 << "\t";
+        stream <<
+            Q_stringifier<Q_type1>::name() <<
+            "\t" << Q_stringifier<Q_type2>::name() <<
+            "\t" << std::setprecision(20) << u1 << "\t" << u2 << "\t";
+
         try {
             double const abs_diff = std::fabs(_op(a, b) - _op(u1, u2));
 
@@ -152,20 +147,24 @@ public:
         return static_cast<double>(_x + _y);
     }
 };
+
+#define error(_precision, _prescale) \
+    [](double, double, double, double){ \
+        double const factor = 1u << std::abs(_prescale); \
+        return 2 * _precision * ((_prescale > 0) ? 1.0/factor : factor); \
+    }
+
 BOOST_AUTO_TEST_CASE(precision_of_plus)
 {
     /*
-     note, the summation max error can be determined as shown below:
-     (x + e_x) + (y + e_y) = (x + y) + (e_x + e_y)
+        note, the summation max error can be determined as shown below:
+        (x + e_x) + (y + e_y) = (x + y) + (e_x + e_y)
 
-     note, error = error(x, y, a, b), where
-     * x, y are the referenced real numbers
-     * a = x + e_x, b = y + e_y are their approximations by fixed-point numbers (as real numbers)
+        note, error = error(x, y, a, b), where
+        * x, y are the referenced real numbers
+        * a = x + e_x, b = y + e_y are their approximations by fixed-point numbers (as real numbers)
     */
-#define error(_precision, _prescale) [](double, double, double, double){ \
-    double const factor = 1u << std::abs(_prescale); \
-    return 2 * _precision * ((_prescale > 0) ? 1.0/factor : factor); \
-}
+
     using libq::Q;
     using libq::UQ;
 
@@ -178,8 +177,8 @@ BOOST_AUTO_TEST_CASE(precision_of_plus)
     test_the_precision_of<UQ<53, 23, 7> >(op, error(1E-6, 7), custom_log);
 }
 
-/*
- note, the subtraction max error is the same as the summation has
+/**
+    @note, the subtraction max error is the same as the summation has
 */
 class minus_op
 {
@@ -190,6 +189,7 @@ public:
         return static_cast<double>(_x - _y);
     }
 };
+
 BOOST_AUTO_TEST_CASE(precision_of_minus)
 {
     minus_op const op;
@@ -202,8 +202,9 @@ BOOST_AUTO_TEST_CASE(precision_of_minus)
     test_the_precision_of<Q<56, 34, -6> >(op, error(1E-10, -6), custom_log);
     test_the_precision_of<Q<61, 52, 23> >(op, error(1E-15, 23), custom_log);
     test_the_precision_of<Q<53, 23, 1> >(op, error(1E-6, 1), custom_log);
-#undef error
 }
+
+#undef error
 
 class multiply_op
 {
@@ -214,16 +215,19 @@ public:
         return static_cast<double>(_x * _y);
     }
 };
+
+#define error(_precision1, _precision2) \
+    [](double _x, double _y, double _a, double _b) \
+    { \
+        return (std::fabs(_x) * _precision1) + (std::fabs(_y) * _precision2); \
+    }
+
 BOOST_AUTO_TEST_CASE(precision_of_multiplication)
 {
-    /*
-     note, the multiplication max error can be determined as shown below:
+    /**
+     @note The multiplication max error can be determined as shown below:
      (x + e_x) * (y + e_y) = (x * y) + (|x| * e_y + |y| * e_x) + o(e_x, e_y)
      */
-#define error(_precision1, _precision2) [](double _x, double _y, double _a, double _b) \
-{ \
-    return (std::fabs(_x) * _precision1) + (std::fabs(_y) * _precision2); \
-}
     multiply_op const op;
     logger custom_log("multiplication.log");
 
@@ -239,8 +243,9 @@ BOOST_AUTO_TEST_CASE(precision_of_multiplication)
     test_the_precision_of<Q<24, 23>, Q<24, 23> >(op, error(1E-6, 1E-6), custom_log);
     test_the_precision_of<Q<30, 22>, Q<30, 22> >(op, error(1E-6, 1E-6), custom_log);
     test_the_precision_of<Q<30, 29>, Q<30, 29> >(op, error(1E-8, 1E-8), custom_log);
-#undef error
 }
+
+#undef error
 
 class division_op
 {
@@ -251,17 +256,20 @@ public:
         return static_cast<double>(_x / _y);
     }
 };
+
+#define error(_precision1, _precision2) \
+    [](double _x, double _y, double _a, double _b) \
+    { \
+        return (_precision1 + std::fabs(_a / _b) * _precision2) / std::fabs(_y); \
+    }
+
 BOOST_AUTO_TEST_CASE(precision_of_division)
 {
     /*
-     note, the division max error can be determined as shown below:
+     @note The division max error can be determined as shown below:
      (x + e_x) / (y + e_y) = c = (x/y + e_x/y) / (1 + e_y/y)
      c = x/y + (e_x + |c|*e_y)/|y|
      */
-#define error(_precision1, _precision2) [](double _x, double _y, double _a, double _b) \
-{ \
-    return (_precision1 + std::fabs(_a / _b) * _precision2) / std::fabs(_y); \
-}
     division_op const op;
     logger custom_log("division.log");
 
@@ -278,8 +286,9 @@ BOOST_AUTO_TEST_CASE(precision_of_division)
     test_the_precision_of<Q<24, 23>, Q<24, 23, 2> >(op, error(1E-6, 1E-6), custom_log);
     test_the_precision_of<Q<30, 22>, Q<30, 22> >(op, error(1E-6, 1E-6), custom_log);
     test_the_precision_of<Q<30, 29, 5>, Q<30, 29> >(op, error(1E-8, 1E-8), custom_log);
-#undef error
 }
+
+#undef error
 
 class log_op
 {
@@ -290,9 +299,12 @@ public:
         return static_cast<double>(std::log(_x));
     }
 };
+
+#define error(_precision) \
+    [](double, double, double, double){ return _precision; }
+
 BOOST_AUTO_TEST_CASE(precision_of_log)
 {
-#define error(_precision) [](double, double, double, double){ return _precision; }
     log_op const op;
     logger custom_log("log.log");
 
@@ -304,113 +316,120 @@ BOOST_AUTO_TEST_CASE(precision_of_log)
     test_the_precision_of<UQ<43, 20> >(op, error(1E-4), custom_log);
     test_the_precision_of<UQ<50, 13> >(op, error(1E-2), custom_log);
 }
-//BOOST_AUTO_TEST_CASE(std_functions)
-//{
-//#define ERROR(limit) [](double, double, double, double){ return limit; }
-//#define LOG(a, b) std::log(a)
-//    TEST_THE_PRECISION_OF1(UQ(23, 17), LOG, ERROR(1E-2));
-//    TEST_THE_PRECISION_OF1(UQ(32, 16), LOG, ERROR(1E-3));
-//    TEST_THE_PRECISION_OF1(UQ(43, 20), LOG, ERROR(1E-2));
-//    TEST_THE_PRECISION_OF1(UQ(50, 13), LOG, ERROR(1E-2));
-//#undef LOG
-//
-//#define SQRT(a, b) std::sqrt(a)
-//    TEST_THE_PRECISION_OF1(UQ(23, 17), SQRT, ERROR(1E-2));
-//    TEST_THE_PRECISION_OF1(UQ(32, 30), SQRT, ERROR(1E-2));
-//    TEST_THE_PRECISION_OF1(UQ(40, 20), SQRT, ERROR(1));
-//    TEST_THE_PRECISION_OF1(UQ(40, 40), SQRT, ERROR(1E-5));
-//#undef SQRT
-//
-//#define SIN(a, b) std::sin(a)
-//    TEST_THE_PRECISION_OF1(Q(25, 21), SIN, ERROR(1E-4));
-//    TEST_THE_PRECISION_OF1(Q(44, 40), SIN, ERROR(1E-7));
-//    TEST_THE_PRECISION_OF1(Q(20, 16), SIN, ERROR(1E-3));
-//    TEST_THE_PRECISION_OF1(Q(63, 60), SIN, ERROR(1E-13));
-//#undef SIN
-//
-//#define COS(a, b) std::cos(a)
-//    TEST_THE_PRECISION_OF1(Q(25, 21), COS, ERROR(1E-4));
-//    TEST_THE_PRECISION_OF1(Q(44, 40), COS, ERROR(1E-7));
-//    TEST_THE_PRECISION_OF1(Q(20, 16), COS, ERROR(1E-3));
-//    TEST_THE_PRECISION_OF1(Q(63, 60), COS, ERROR(1E-13));
-//#undef COS
-//
-//#define TAN(a, b) std::tan(a)
-//    TEST_THE_PRECISION_OF1(Q(25, 21), TAN, ERROR(1E-4));
-//    TEST_THE_PRECISION_OF1(Q(44, 40), TAN, ERROR(1E-7));
-//    TEST_THE_PRECISION_OF1(Q(20, 16), TAN, ERROR(1E-3));
-//    TEST_THE_PRECISION_OF1(Q(63, 60), TAN, ERROR(1E-13));
-//#undef TAN
-//
-//#define ASIN(a, b) std::asin(a)
-//    TEST_THE_PRECISION_OF1(Q(23, 21), ASIN, ERROR(1E-4));
-//    TEST_THE_PRECISION_OF1(Q(17, 16), ASIN, ERROR(1E-2));
-//    TEST_THE_PRECISION_OF1(Q(31, 30), ASIN, ERROR(1E-6));
-//    TEST_THE_PRECISION_OF1(Q(63, 60), ASIN, ERROR(1E-13));
-//#undef ASIN
-//
-//#undef ERROR
-//}
-////
-////        PRECISION_TEST(t1, -0.999, 0.999, acos, 1E-4, "./acos_Q4_21.dat");
-////        PRECISION_TEST(t2, -0.999, 0.999, acos, 1E-2, "./acos_Q4_16.dat");
-////        PRECISION_TEST(t3, -0.999, 0.999, acos, 1E-6, "./acos_Q1_30.dat");
-////
-////        PRECISION_TEST(t1, -0.999, 0.999, atan, 1E-5, "./atan_Q4_21.dat");
-////        PRECISION_TEST(t2, -0.999, 0.999, atan, 1E-3, "./atan_Q4_16.dat");
-////        PRECISION_TEST(t3, -0.999, 0.999, atan, 1E-7, "./atan_Q1_30.dat");
-////    }
-////
-////    BOOST_AUTO_TEST_CASE(exp)
-////    {
-////        S(22,21,t1); PRECISION_TEST(t1, FMIN(t1), FMAX(t1), exp, 1E-4, "./exp_Q4_21.dat");
-////        S(17,16,t2); PRECISION_TEST(t2, FMIN(t2), FMAX(t2), exp, 1E-3, "./exp_Q4_16.dat");
-////        S(31,30,t3); PRECISION_TEST(t3, FMIN(t3), FMAX(t3), exp, 1E-7, "./exp_Q1_30.dat");
-////    }
-////
-////    BOOST_AUTO_TEST_CASE(sinh)
-////    {
-////        S(23,21,t1); PRECISION_TEST(t1, FMIN(t1), FMAX(t1), sinh, 1E-4, "./sinh_Q4_21.dat");
-////        S(31,16,t2); PRECISION_TEST(t2, -3, 3u, sinh, 1E-3, "./sinh_Q15_16.dat");
-////        S(31,30,t3); PRECISION_TEST(t3, FMIN(t3), FMAX(t3), sinh, 1E-7, "./sinh_Q3_60.dat");
-////    }
-////
-////    BOOST_AUTO_TEST_CASE(cosh)
-////    {
-////        S(23,21,t1); PRECISION_TEST(t1, FMIN(t1), FMAX(t1), cosh, 1E-4, "./cosh_Q4_21.dat");
-////        S(31,16,t2); PRECISION_TEST(t2, -3, 3u, cosh, 1E-3, "./cosh_Q15_16.dat");
-////        S(31,30,t3); PRECISION_TEST(t3, FMIN(t3), FMAX(t3), cosh, 1E-7, "./cosh_Q3_60.dat");
-////    }
-////
-////    //BOOST_AUTO_TEST_CASE(asinh)
-////    //{
-////    //    S(23,21,t1); PRECISION_TEST(t1, -2.0, 2.0, asinh, 1E-1, "./asinh_Q4_21.dat");
-////    //    S(31,16,t2); PRECISION_TEST(t2, -5.0, 5.0, asinh, 1E-1, "./asinh_Q15_16.dat");
-////    //    S(31,25,t3); PRECISION_TEST(t3, -7.0, 7.0, asinh, 1E-1, "./asinh_Q1_30.dat"); //!
-////    //}
-////
-////    //BOOST_AUTO_TEST_CASE(acosh)
-////    //{
-////    //    S(23,21,t1); PRECISION_TEST(t1, 1.0, FMAX(t1), acosh, 1E-1, "./acosh_Q4_21.dat");
-////    //    S(31,16,t2);/* PRECISION_TEST(t2, 1.0, FMAX(t2), acosh, 1E-1, "./acosh_Q15_16.dat");*/
-////    //    std::acosh(t2(13333.7)); //!
-////    //}
-////
-////    //BOOST_AUTO_TEST_CASE(atanh)
-////    //{
-////    //    S(23,21,t1); PRECISION_TEST(t1, -0.9999, 0.9999, atanh, 1E-1, "./atanh_Q4_21.dat");
-////    //    S(31,16,t2); PRECISION_TEST(t2, -0.9999, 0.9999, atanh, 1E-1, "./atanh_Q15_16.dat");
-////    //}
-////
-////    //BOOST_AUTO_TEST_CASE(tanh)
-////    //{
-////    //    S(23,21,t1);/* PRECISION_TEST(t1, FMIN(t1), FMAX(t1), tanh, 1e-1, "./tanh_q4_21.dat");*/
-////    //    std::tanh(t1(-3.90405)); // !
-////    //    //S(31,16,t2); PRECISION_TEST(t2, FMIN(t2), FMAX(t2), tanh, 1e-1, "./tanh_q15_16.dat");
-////    //}
-////
-////#undef PRECISION_TEST
-////
+
+#if 0
+#define ERROR(limit) \
+    [](double, double, double, double){ return limit; }
+
+BOOST_AUTO_TEST_CASE(std_functions)
+{
+#define LOG(a, b) std::log(a)
+    TEST_THE_PRECISION_OF1(UQ(23, 17), LOG, ERROR(1E-2));
+    TEST_THE_PRECISION_OF1(UQ(32, 16), LOG, ERROR(1E-3));
+    TEST_THE_PRECISION_OF1(UQ(43, 20), LOG, ERROR(1E-2));
+    TEST_THE_PRECISION_OF1(UQ(50, 13), LOG, ERROR(1E-2));
+#undef LOG
+
+#define SQRT(a, b) std::sqrt(a)
+    TEST_THE_PRECISION_OF1(UQ(23, 17), SQRT, ERROR(1E-2));
+    TEST_THE_PRECISION_OF1(UQ(32, 30), SQRT, ERROR(1E-2));
+    TEST_THE_PRECISION_OF1(UQ(40, 20), SQRT, ERROR(1));
+    TEST_THE_PRECISION_OF1(UQ(40, 40), SQRT, ERROR(1E-5));
+#undef SQRT
+
+#define SIN(a, b) std::sin(a)
+    TEST_THE_PRECISION_OF1(Q(25, 21), SIN, ERROR(1E-4));
+    TEST_THE_PRECISION_OF1(Q(44, 40), SIN, ERROR(1E-7));
+    TEST_THE_PRECISION_OF1(Q(20, 16), SIN, ERROR(1E-3));
+    TEST_THE_PRECISION_OF1(Q(63, 60), SIN, ERROR(1E-13));
+#undef SIN
+
+#define COS(a, b) std::cos(a)
+    TEST_THE_PRECISION_OF1(Q(25, 21), COS, ERROR(1E-4));
+    TEST_THE_PRECISION_OF1(Q(44, 40), COS, ERROR(1E-7));
+    TEST_THE_PRECISION_OF1(Q(20, 16), COS, ERROR(1E-3));
+    TEST_THE_PRECISION_OF1(Q(63, 60), COS, ERROR(1E-13));
+#undef COS
+
+#define TAN(a, b) std::tan(a)
+    TEST_THE_PRECISION_OF1(Q(25, 21), TAN, ERROR(1E-4));
+    TEST_THE_PRECISION_OF1(Q(44, 40), TAN, ERROR(1E-7));
+    TEST_THE_PRECISION_OF1(Q(20, 16), TAN, ERROR(1E-3));
+    TEST_THE_PRECISION_OF1(Q(63, 60), TAN, ERROR(1E-13));
+#undef TAN
+
+#define ASIN(a, b) std::asin(a)
+    TEST_THE_PRECISION_OF1(Q(23, 21), ASIN, ERROR(1E-4));
+    TEST_THE_PRECISION_OF1(Q(17, 16), ASIN, ERROR(1E-2));
+    TEST_THE_PRECISION_OF1(Q(31, 30), ASIN, ERROR(1E-6));
+    TEST_THE_PRECISION_OF1(Q(63, 60), ASIN, ERROR(1E-13));
+#undef ASIN
+}
+
+#undef ERROR
+
+        PRECISION_TEST(t1, -0.999, 0.999, acos, 1E-4, "./acos_Q4_21.dat");
+        PRECISION_TEST(t2, -0.999, 0.999, acos, 1E-2, "./acos_Q4_16.dat");
+        PRECISION_TEST(t3, -0.999, 0.999, acos, 1E-6, "./acos_Q1_30.dat");
+
+        PRECISION_TEST(t1, -0.999, 0.999, atan, 1E-5, "./atan_Q4_21.dat");
+        PRECISION_TEST(t2, -0.999, 0.999, atan, 1E-3, "./atan_Q4_16.dat");
+        PRECISION_TEST(t3, -0.999, 0.999, atan, 1E-7, "./atan_Q1_30.dat");
+    }
+
+BOOST_AUTO_TEST_CASE(exp)
+{
+    S(22,21,t1); PRECISION_TEST(t1, FMIN(t1), FMAX(t1), exp, 1E-4, "./exp_Q4_21.dat");
+    S(17,16,t2); PRECISION_TEST(t2, FMIN(t2), FMAX(t2), exp, 1E-3, "./exp_Q4_16.dat");
+    S(31,30,t3); PRECISION_TEST(t3, FMIN(t3), FMAX(t3), exp, 1E-7, "./exp_Q1_30.dat");
+}
+
+BOOST_AUTO_TEST_CASE(sinh)
+{
+    S(23,21,t1); PRECISION_TEST(t1, FMIN(t1), FMAX(t1), sinh, 1E-4, "./sinh_Q4_21.dat");
+    S(31,16,t2); PRECISION_TEST(t2, -3, 3u, sinh, 1E-3, "./sinh_Q15_16.dat");
+    S(31,30,t3); PRECISION_TEST(t3, FMIN(t3), FMAX(t3), sinh, 1E-7, "./sinh_Q3_60.dat");
+}
+
+BOOST_AUTO_TEST_CASE(cosh)
+{
+    S(23,21,t1); PRECISION_TEST(t1, FMIN(t1), FMAX(t1), cosh, 1E-4, "./cosh_Q4_21.dat");
+    S(31,16,t2); PRECISION_TEST(t2, -3, 3u, cosh, 1E-3, "./cosh_Q15_16.dat");
+    S(31,30,t3); PRECISION_TEST(t3, FMIN(t3), FMAX(t3), cosh, 1E-7, "./cosh_Q3_60.dat");
+}
+
+BOOST_AUTO_TEST_CASE(asinh)
+{
+    S(23,21,t1); PRECISION_TEST(t1, -2.0, 2.0, asinh, 1E-1, "./asinh_Q4_21.dat");
+    S(31,16,t2); PRECISION_TEST(t2, -5.0, 5.0, asinh, 1E-1, "./asinh_Q15_16.dat");
+    S(31,25,t3); PRECISION_TEST(t3, -7.0, 7.0, asinh, 1E-1, "./asinh_Q1_30.dat"); //!
+}
+
+BOOST_AUTO_TEST_CASE(acosh)
+{
+    S(23,21,t1); PRECISION_TEST(t1, 1.0, FMAX(t1), acosh, 1E-1, "./acosh_Q4_21.dat");
+    S(31,16,t2);/* PRECISION_TEST(t2, 1.0, FMAX(t2), acosh, 1E-1, "./acosh_Q15_16.dat");*/
+    std::acosh(t2(13333.7)); //!
+}
+
+BOOST_AUTO_TEST_CASE(atanh)
+{
+    S(23,21,t1); PRECISION_TEST(t1, -0.9999, 0.9999, atanh, 1E-1, "./atanh_Q4_21.dat");
+    S(31,16,t2); PRECISION_TEST(t2, -0.9999, 0.9999, atanh, 1E-1, "./atanh_Q15_16.dat");
+}
+
+BOOST_AUTO_TEST_CASE(tanh)
+{
+    S(23,21,t1);/* PRECISION_TEST(t1, FMIN(t1), FMAX(t1), tanh, 1e-1, "./tanh_q4_21.dat");*/
+    std::tanh(t1(-3.90405)); // !
+    //S(31,16,t2); PRECISION_TEST(t2, FMIN(t2), FMAX(t2), tanh, 1e-1, "./tanh_q15_16.dat");
+}
+
+#undef PRECISION_TEST
+
+#endif  // 0
+
 BOOST_AUTO_TEST_SUITE_END()
+
 } // unit_tests
 } // libq

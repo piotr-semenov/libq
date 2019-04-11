@@ -5,9 +5,8 @@
 
     Gets the function std::floor overloaded for fixed-point numbers.
 */
-
-#ifndef INC_STD_FLOOR_HPP_
-#define INC_STD_FLOOR_HPP_
+#ifndef INC_LIBQ_DETAILS_FLOOR_HPP_
+#define INC_LIBQ_DETAILS_FLOOR_HPP_
 
 #include "libq/details/fixed_point_common.hpp"
 
@@ -25,4 +24,4 @@ floor(libq::fixed_point<T, n, f, e, op, up> const& _x)
 
 }  // namespace std
 
-#endif  // INC_STD_FLOOR_HPP_
+#endif  // INC_LIBQ_DETAILS_FLOOR_HPP_

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.6)
 
-project(libq VERSION 1.0.0.0) 
+project(libq VERSION 1.0.0.0)
 
 # set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
@@ -82,45 +82,45 @@ set(CXX_USED_FEATURES
 
 add_library(libq INTERFACE)
 set(SRC_libq
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/loop_unroller.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/type_promotion.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/fixed_point.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/type_traits.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fixed_point_common.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sign.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sum_traits.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/round.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/remainder.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/numeric_limits.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fmod.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/mult_of.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/floor.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/div_of.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fabs.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/arithmetics_safety.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/ceil.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/tanh.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sqrt.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/tan.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sinh.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sin.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/pow2_lut.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/lut.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/inv_pow2_lut.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/hyperbolic_scale.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/arctanh_lut.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/circular_scales.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/arctan_lut.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/exp.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/log.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/cosh.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/cos.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/atan.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/atanh.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/asin.hpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/asinh.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/acos.hpp
     ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/acosh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/asin.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/asinh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/atan.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/atanh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/cos.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/cosh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/exp.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/log.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/arctan_lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/arctanh_lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/circular_scales.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/hyperbolic_scale.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/inv_pow2_lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/pow2_lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sin.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sinh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sqrt.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/tan.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/tanh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/arithmetics_safety.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/ceil.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/div_of.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fabs.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fixed_point_common.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/floor.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fmod.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/loop_unroller.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/mult_of.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/numeric_limits.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/remainder.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/round.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sign.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sum_traits.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/type_traits.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/fixed_point.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/libq/type_promotion.hpp
     )
 target_sources(libq INTERFACE ${SRC_libq})
 

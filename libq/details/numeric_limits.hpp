@@ -1,16 +1,12 @@
-// numeric_limits.hpp
-//
-// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
-// Distributed under the New BSD License. (See accompanying file LICENSE)
+/** @file numeric_limits.hpp
+    @brief Provides the partial specialization of numeric_limits template for fixed-point numbers.
+    @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
-/**
- @file numeric_limits.hpp
-
- Provides the partial specialization of numeric_limits template for fixed-point numbers.
+    Distributed under the New BSD License. (See accompanying file LICENSE)
 */
 
-#ifndef INC_STD_NUMERIC_LIMITS_HPP_
-#define INC_STD_NUMERIC_LIMITS_HPP_
+#ifndef INC_LIBQ_DETAILS_NUMERIC_LIMITS_HPP_
+#define INC_LIBQ_DETAILS_NUMERIC_LIMITS_HPP_
 
 #include "libq/details/fixed_point_common.hpp"
 
@@ -101,4 +97,4 @@ class numeric_limits<libq::fixed_point<T, n, f, e, op, up> > {
 }  // namespace std
 
 #undef M_LOG10_2
-#endif  // INC_STD_NUMERIC_LIMITS_HPP_
+#endif  // INC_LIBQ_DETAILS_NUMERIC_LIMITS_HPP_

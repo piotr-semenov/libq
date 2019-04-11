@@ -6,9 +6,8 @@
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
 */
-
-#ifndef INC_LIBQ_DETAILS_EXP_HPP_
-#define INC_LIBQ_DETAILS_EXP_HPP_
+#ifndef INC_LIBQ_CORDIC_EXP_HPP_
+#define INC_LIBQ_CORDIC_EXP_HPP_
 
 #include <limits>
 
@@ -28,12 +27,12 @@ class exp_of<libq::fixed_point<T, n, f, e, op, up> >
 public:
     using promoted_type =
         libq::fixed_point<
-            std::uintmax_t,
-            std::numeric_limits<std::uintmax_t>::digits - f,
-            f,
-            e,
-            op,
-            up
+        std::uintmax_t,
+        std::numeric_limits<std::uintmax_t>::digits - f,
+        f,
+        e,
+        op,
+        up
         >;
 };
 
@@ -75,7 +74,7 @@ exp(libq::fixed_point<T, n, f, e, op, up> _val)
     work_type x(arg);
 
 #ifdef LOOP_UNROLLING
-    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+    auto const iteration_body = [&](std::size_t i) {
 #else
     for (std::size_t i = 0u; i != f; ++i) {
 #endif
@@ -87,7 +86,7 @@ exp(libq::fixed_point<T, n, f, e, op, up> _val)
 
             result *= pow2_lut[i];
         }
-    };  // NOLINT
+    };
 #ifdef LOOP_UNROLLING
     libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f - 1>());
 #endif
@@ -102,4 +101,4 @@ exp(libq::fixed_point<T, n, f, e, op, up> _val)
 
 }  // namespace std
 
-#endif  // INC_LIBQ_DETAILS_EXP_HPP_
+#endif  // INC_LIBQ_CORDIC_EXP_HPP_

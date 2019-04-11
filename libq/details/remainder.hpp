@@ -1,16 +1,12 @@
-// remainder.hpp
-//
-// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
-// Distributed under the New BSD License. (See accompanying file LICENSE)
+/** @file remainder.hpp
+    @brief Gets the function std::remainder overloaded for fixed-point numbers.
+    @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
-/**
-@file remainder.hpp
-
-Gets the function std::remainder overloaded for fixed-point numbers.
+    Distributed under the New BSD License. (See accompanying file LICENSE)
 */
 
-#ifndef INC_STD_REMAINDER_HPP_
-#define INC_STD_REMAINDER_HPP_
+#ifndef INC_LIBQ_DETAILS_REMAINDER_HPP_
+#define INC_LIBQ_DETAILS_REMAINDER_HPP_
 
 #include "libq/details/fixed_point_common.hpp"
 
@@ -39,4 +35,4 @@ libq::fixed_point<T2, n2, f2, e2, op, up>
 }
 }  // namespace std
 
-#endif  // INC_STD_REMAINDER_HPP_
+#endif  // INC_LIBQ_DETAILS_REMAINDER_HPP_

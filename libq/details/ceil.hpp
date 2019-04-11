@@ -1,16 +1,12 @@
-// ceil.hpp
-//
-// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
-// Distributed under the New BSD License. (See accompanying file LICENSE)
+/** @file ceil.hpp
+    @brief Gets the function std::ceil function overloaded for fixed-point numbers.
+    @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
-/**
- @file ceil.hpp
-
- Gets the function std::ceil function overloaded for fixed-point numbers.
+    Distributed under the New BSD License. (See accompanying file LICENSE)
 */
 
-#ifndef INC_STD_CEIL_HPP_
-#define INC_STD_CEIL_HPP_
+#ifndef INC_LIBQ_DETAILS_CEIL_HPP_
+#define INC_LIBQ_DETAILS_CEIL_HPP_
 
 #include "libq/details/fixed_point_common.hpp"
 
@@ -33,4 +29,4 @@ libq::fixed_point<T, n, f, e, op, up>
 }
 }  // namespace std
 
-#endif  // INC_STD_CEIL_HPP_
+#endif  // INC_LIBQ_DETAILS_CEIL_HPP_

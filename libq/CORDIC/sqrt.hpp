@@ -6,9 +6,8 @@
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
 */
-
-#ifndef INC_STD_SQRT_HPP_
-#define INC_STD_SQRT_HPP_
+#ifndef INC_LIBQ_CORDIC_SQRT_HPP_
+#define INC_LIBQ_CORDIC_SQRT_HPP_
 
 namespace libq {
 namespace details {
@@ -88,7 +87,7 @@ sqrt(libq::fixed_point<T, n, f, e, op, up> const& _val)
     typename libq::UQ<f, f, e, op, up> const
         norm{lut_type::hyperbolic_scale_with_repeated_iterations(f)};
 
-    work_type x{work_type{arg} + 0.25};
+    work_type x{work_type{arg} +0.25};
     work_type y{work_type{arg} -0.25};
     work_type z{arg};
     {
@@ -96,7 +95,7 @@ sqrt(libq::fixed_point<T, n, f, e, op, up> const& _val)
         std::size_t num{0};
 
 #ifdef LOOP_UNROLLING
-        auto const iteration_body = [&](std::size_t i) {  // NOLINT
+        auto const iteration_body = [&](std::size_t i) {
 #else
         for (std::size_t i = 1u; i < f + 1u; ++i) {
 #endif
@@ -109,7 +108,7 @@ sqrt(libq::fixed_point<T, n, f, e, op, up> const& _val)
 
             // repeat until convergence is reached
             if (i == repeated && i != n - 1) {
-                int const sign = 
+                int const sign =
                     (x.value() < 0 ? -1 : +1) *
                     (y.value() < 0 ? -1 : +1);
 
@@ -155,4 +154,4 @@ sqrt(libq::fixed_point<T, n, f, e, op, up> const& _val)
 
 }  // namespace std
 
-#endif  // INC_STD_SQRT_HPP_
+#endif  // INC_LIBQ_CORDIC_SQRT_HPP_

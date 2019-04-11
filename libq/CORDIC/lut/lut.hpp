@@ -6,8 +6,8 @@
     @note See H. Dawid, H. Meyr, "CORDIC Algorithms and Architectures".
 */
 
-#ifndef INC_LIBQ_CORDIC_LUT_HPP_
-#define INC_LIBQ_CORDIC_LUT_HPP_
+#ifndef INC_LIBQ_CORDIC_LUT_LUT_HPP_
+#define INC_LIBQ_CORDIC_LUT_LUT_HPP_
 
 #include "libq/details/fixed_point_common.hpp"
 
@@ -93,4 +93,4 @@ public:
 #include "libq/CORDIC/lut/circular_scales.hpp"
 #include "libq/CORDIC/lut/hyperbolic_scale.hpp"
 
-#endif  // INC_LIBQ_CORDIC_LUT_HPP_
+#endif  // INC_LIBQ_CORDIC_LUT_LUT_HPP_

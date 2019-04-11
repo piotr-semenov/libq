@@ -5,8 +5,8 @@
     Distributed under the New BSD License. (See accompanying file LICENSE)
 */
 
-#ifndef INC_LIBQ_CORDIC_CIRCULAR_SCALES_HPP_
-#define INC_LIBQ_CORDIC_CIRCULAR_SCALES_HPP_
+#ifndef INC_LIBQ_CORDIC_LUT_CIRCULAR_SCALES_HPP_
+#define INC_LIBQ_CORDIC_LUT_CIRCULAR_SCALES_HPP_
 
 namespace libq {
 namespace cordic {
@@ -40,4 +40,4 @@ lut<n, Q>::circular_scales()->This_class
 }  // namespace cordic
 }  // namespace libq
 
-#endif  // INC_LIBQ_CORDIC_CIRCULAR_SCALES_HPP_
+#endif  // INC_LIBQ_CORDIC_LUT_CIRCULAR_SCALES_HPP_

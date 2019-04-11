@@ -4,11 +4,9 @@
     @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
-
 */
-
-#ifndef INC_STD_ATAN_HPP_
-#define INC_STD_ATAN_HPP_
+#ifndef INC_LIBQ_CORDIC_ATAN_HPP_
+#define INC_LIBQ_CORDIC_ATAN_HPP_
 
 namespace libq {
 namespace details {
@@ -50,7 +48,7 @@ atan(libq::fixed_point<T, n, f, e, op, up> _val)
     result_type z{0.0};
 
 #ifdef LOOP_UNROLLING
-    auto const iteration_body = [&](std::size_t i) {  // NOLINT
+    auto const iteration_body = [&](std::size_t i) {
 #else
     for (std::size_t i = 0u; i != f; ++i) {
 #endif
@@ -74,4 +72,4 @@ atan(libq::fixed_point<T, n, f, e, op, up> _val)
 
 }  // namespace std
 
-#endif  // INC_STD_ATAN_HPP_
+#endif  // INC_LIBQ_CORDIC_ATAN_HPP_

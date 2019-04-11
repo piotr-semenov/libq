@@ -1,16 +1,13 @@
-// sign.hpp
-//
-// Copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
-// Distributed under the New BSD License. (See accompanying file LICENSE)
+/** @file remainder.hpp
+    @brief Gets the function std::signbit overloaded for fixed-point numbers.
 
-/**
- @file remainder.hpp
+    @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
- Gets the function std::signbit overloaded for fixed-point numbers.
+    Distributed under the New BSD License. (See accompanying file LICENSE)
 */
 
-#ifndef INC_STD_SIGN_HPP_
-#define INC_STD_SIGN_HPP_
+#ifndef INC_LIBQ_DETAILS_SIGN_HPP_
+#define INC_LIBQ_DETAILS_SIGN_HPP_
 
 #include "libq/details/fixed_point_common.hpp"
 
@@ -29,4 +26,4 @@ bool
 }
 }  // namespace std
 
-#endif  // INC_STD_SIGN_HPP_
+#endif  // INC_LIBQ_DETAILS_SIGN_HPP_

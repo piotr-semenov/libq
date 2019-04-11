@@ -5,9 +5,8 @@
 
     @brief Gets the templates from \<type_traits\> specialized for fixed-point number type.
 */
-
-#ifndef INC_STD_TYPE_TRAITS_HPP_
-#define INC_STD_TYPE_TRAITS_HPP_
+#ifndef INC_LIBQ_DETAILS_TYPE_TRAITS_HPP_
+#define INC_LIBQ_DETAILS_TYPE_TRAITS_HPP_
 
 #include "libq/details/fixed_point_common.hpp"
 
@@ -35,4 +34,4 @@ struct make_unsigned<libq::fixed_point<T, n, f, e, op, up> >
 
 }  // namespace std
 
-#endif  // INC_STD_TYPE_TRAITS_HPP_
+#endif  // INC_LIBQ_DETAILS_TYPE_TRAITS_HPP_

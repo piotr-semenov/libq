@@ -7,9 +7,8 @@
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
 */
-
-#ifndef INC_LIBQ_DETAILS_SINH_HPP_
-#define INC_LIBQ_DETAILS_SINH_HPP_
+#ifndef INC_LIBQ_CORDIC_SINH_HPP_
+#define INC_LIBQ_CORDIC_SINH_HPP_
 
 #include <limits>
 
@@ -57,4 +56,4 @@ sinh(libq::fixed_point<T, n, f, e, op, up> _val)
 
 }  // namespace std
 
-#endif  // INC_LIBQ_DETAILS_SINH_HPP_
+#endif  // INC_LIBQ_CORDIC_SINH_HPP_

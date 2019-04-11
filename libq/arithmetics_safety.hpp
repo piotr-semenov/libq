@@ -1,11 +1,9 @@
 /** @file arithmetics_safety.hpp
-
+    @brief Provides the run-time overflow/underflow safety checks for basic arithmetics operations.
     @copyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+
     Distributed under the New BSD License. (See accompanying file LICENSE)
-
-    Provides the run-time overflow/underflow safety checks for basic arithmetics operations.
 */
-
 #ifndef INC_LIBQ_ARITHMETICS_SAFETY_HPP_
 #define INC_LIBQ_ARITHMETICS_SAFETY_HPP_
 
