@@ -10,17 +10,19 @@ The only requirement to make this magic to work is to ensure that your algorithm
 
 Please, see the simple code emphasizing the main idea behind the LibQ:
 
-```` c++
+```` cpp
+#include "libq/fixed_point.hpp"
+
 #include <cstdlib>
 #include <vector>
 #include <numeric>
 #include <iostream>
 #include <cassert>
-#include <libq/fixed_point.hpp>
 
-
-template<typename Value_type>
-Value_type mean(std::vector<Value_type> const& _samples) {
+template <typename Value_type>
+Value_type
+    mean(std::vector<Value_type> const& _samples)
+{
     Value_type const n = Value_type(_samples.size());
     Value_type const acc = std::accumulate(_samples.cbegin(),
                                            _samples.cend(),
@@ -30,8 +32,10 @@ Value_type mean(std::vector<Value_type> const& _samples) {
     return result;
 }
 
-template<typename Value_type>
-Value_type standard_deviation(std::vector<Value_type> const& _samples) {
+template <typename Value_type>
+Value_type
+    standard_deviation(std::vector<Value_type> const& _samples)
+{
     Value_type const TOLERANCE = Value_type(1E-8);
 
     Value_type const m = mean<Value_type>(_samples);
@@ -57,11 +61,14 @@ namespace fixed_accuracy {
     // Assume, we know that all the samples are < 2.0
     using value_type = libq::Q<31, 29>;
 }  // namespace fixed_accuracy
+
 namespace floating_accuracy {
     using value_type = double;
 }  // namespace floating_accuracy
 
-int main(int argc, char** argv) {
+int
+    main(int argc, char** argv)
+{
     using value_type = fixed_accuracy::value_type;
 
     std::vector<value_type> const samples{

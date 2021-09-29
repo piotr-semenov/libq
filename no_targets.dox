@@ -1,0 +1,8 @@
+/** @mainpage libq targets
+
+    To generate or regenerate a CMake target diagram use the following command in the build directory
+
+    @code{.sh}
+        cmake --graphviz=dot/targets.dot .
+    @endcode
+*/

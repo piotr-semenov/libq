@@ -2,7 +2,7 @@
     @brief Provides CORDIC for ln function
     @note see C. Baumann, "A simple and fast look-up table method to compute the exp(x) and ln(x) functions", 2004
 
-    @ñopyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+    @ï¿½opyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
 
@@ -10,8 +10,8 @@
 #ifndef INC_LIBQ_CORDIC_LOG_HPP_
 #define INC_LIBQ_CORDIC_LOG_HPP_
 
-#include <boost/integer/static_min_max.hpp>
-#include <boost/integer/static_log2.hpp>
+#include "boost/integer/static_min_max.hpp"
+#include "boost/integer/static_log2.hpp"
 
 #include <cassert>
 

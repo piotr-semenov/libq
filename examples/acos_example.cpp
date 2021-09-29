@@ -6,9 +6,10 @@
 #include <chrono>
 #include <iostream>
 
-#define N 100000000ul
+static constexpr auto const N = 100000000ul;
 
-int main(int argc, char** argv)
+int
+    main(int argc, char** argv)
 {
     using namespace std::chrono;
     using std::uintmax_t;
@@ -21,12 +22,12 @@ int main(int argc, char** argv)
     for (uintmax_t i = 0; i != N; ++i) {
         result = std::acos(value);
     }
+
     auto const end = system_clock::now();
+
     duration<double> const elapsed = end - start;
 
-    std::cout
-        << elapsed.count() / N
-        << std::endl;
+    std::cout << elapsed.count() / N << std::endl;
 
     return EXIT_SUCCESS;
 }

@@ -1,5 +1,0 @@
-syntax: regexp
-^Debug/
-^doc/
-syntax: glob
-*.sdf

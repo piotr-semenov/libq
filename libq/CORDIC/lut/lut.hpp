@@ -20,9 +20,8 @@ namespace cordic {
     @tparam n
     @tparam Q
 */
-template<std::size_t n, typename Q>
-class lut
-    : public std::array<Q, n>
+template <std::size_t n, typename Q>
+class lut : public std::array<Q, n>
 {
     using Base_class = std::array<Q, n>;
     using This_class = lut<n, Q>;
@@ -44,8 +43,8 @@ public:
     static This_class
         circular();
 
-    /** @brief Creates the LUT for angles in case of CORDIC rotations are performed
-        in hyperbolic coordinates.
+    /** @brief Creates the LUT for angles in case of CORDIC rotations are
+        performed in hyperbolic coordinates.
 
         @note This does not use the repeated iterations. All values are unique.
     */
@@ -58,7 +57,8 @@ public:
     static This_class
         pow2();
 
-    /** @brief Creates the LUT of @f$ \frac1{2 ^ \frac1{2^i}} @f$ for @f$ n @f$ positions.
+    /** @brief Creates the LUT of @f$ \frac1{2 ^ \frac1{2^i}} @f$ for @f$ n @f$
+        positions.
         @note This LUT is used for log2 function.
     */
     static This_class
@@ -68,14 +68,14 @@ public:
     static double
         circular_scale(std::size_t const _n);
 
-
-    /** @brief Creates the LUT for scales of n CORDIC-rotations in case of circular
-        coordinates.
+    /** @brief Creates the LUT for scales of n CORDIC-rotations in case of
+        circular coordinates.
     */
     static This_class
         circular_scales();
 
-    /** @brief Computes the scale of n CORDIC-rotations in hyperbolic coordinates.
+    /** @brief Computes the scale of n CORDIC-rotations in hyperbolic
+        coordinates.
         @note This uses repeated iterations for convergence.
     */
     static double
