@@ -79,10 +79,11 @@ public:
     }
 };
 
+using Error = std::function<double(double, double, double, double)>;
+
 template <typename Q_type1,
           typename Q_type2,
           typename Operation,
-          typename Error,
           std::size_t iterations = 1000u>
 void
     test_the_precision_of(Operation _op, Error _limit, logger &_log)
@@ -133,7 +134,6 @@ void
 
 template <typename Q_type1,
           typename Operation,
-          typename Error,
           std::size_t iterations = 100u>
 void
     test_the_precision_of(Operation _op, Error _limit, logger &_log)
@@ -154,10 +154,13 @@ public:
     }
 };
 
-#define error(_precision, _prescale)                                       \
-    [](double, double, double, double) {                                   \
-        double const factor = 1u << std::abs(_prescale);                   \
-        return 2 * _precision * ((_prescale > 0) ? 1.0 / factor : factor); \
+#define error(_precision, _prescale)                                   \
+    [](double, double, double, double) -> double {                     \
+        static constexpr double const precision = _precision;          \
+        static constexpr auto const   prescale = _prescale;            \
+        static double const           factor =                         \
+            static_cast<double>(uintmax_t(1) << std::abs(prescale));   \
+        return 2 * precision * (0 < prescale ? 1.0 / factor : factor); \
     }
 
 BOOST_AUTO_TEST_CASE(precision_of_plus)
@@ -228,9 +231,11 @@ public:
     }
 };
 
-#define error(_precision1, _precision2)                                       \
-    [](double _x, double _y, double _a, double _b) {                          \
-        return (std::fabs(_x) * _precision1) + (std::fabs(_y) * _precision2); \
+#define error(_precision1, _precision2)                                 \
+    [](double _x, double _y, double _a, double _b) -> double {          \
+        static constexpr double const precision1 = _precision1;         \
+        static constexpr double const precision2 = _precision2;         \
+        return std::fabs(_x) * precision1 + std::fabs(_y) * precision2; \
     }
 
 BOOST_AUTO_TEST_CASE(precision_of_multiplication)
@@ -285,10 +290,11 @@ public:
     }
 };
 
-#define error(_precision1, _precision2)                           \
-    [](double _x, double _y, double _a, double _b) {              \
-        return (_precision1 + std::fabs(_a / _b) * _precision2) / \
-               std::fabs(_y);                                     \
+#define error(_precision1, _precision2)                                        \
+    [](double _x, double _y, double _a, double _b) -> double {                 \
+        static constexpr double const precision1 = _precision1;                \
+        static constexpr double const precision2 = _precision2;                \
+        return (precision1 + std::fabs(_a / _b) * precision2) / std::fabs(_y); \
     }
 
 BOOST_AUTO_TEST_CASE(precision_of_division)
@@ -347,9 +353,10 @@ public:
     }
 };
 
-#define error(_precision)                \
-    [](double, double, double, double) { \
-        return _precision;               \
+#define error(_precision)                                     \
+    [](double, double, double, double) -> double {            \
+        static constexpr double const precision = _precision; \
+        return precision;                                     \
     }
 
 BOOST_AUTO_TEST_CASE(precision_of_log)
