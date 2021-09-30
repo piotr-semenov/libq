@@ -1,15 +1,12 @@
 #include "fixed_point.hpp"
 
-#include <cstdlib>
-#include <cstdint>
-
 #include <chrono>
 #include <iostream>
 
 static constexpr auto const N = 100000000ul;
 
 int
-    main(int argc, char** argv)
+    main(int argc, char **argv)
 {
     using namespace std::chrono;
     using std::uintmax_t;

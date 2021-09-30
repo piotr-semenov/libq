@@ -9,27 +9,35 @@
 #ifndef INC_LIBQ_CORDIC_SQRT_HPP_
 #define INC_LIBQ_CORDIC_SQRT_HPP_
 
+#include "libq/CORDIC/lut/lut.hpp"
+
+#include <cassert>
+
 namespace libq {
 namespace details {
 
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class sqrt_of
 {
-    static constexpr std::size_t const bits_for_integral = 0 != (n & 1u) ? n / 2u + 1u : n / 2u;
-    static constexpr std::size_t const bits_for_fractional = 0 != (f & 1u) ? f / 2u + 1u : f / 2u;
-    static constexpr std::size_t const number_of_significant_bits = bits_for_integral + bits_for_fractional;
-    static constexpr int const scaling_factor_exponent = 0 != (e & 1u) ? e / 2u + 1u : e / 2u;
+    static constexpr std::size_t const bits_for_integral =
+        0 != (n & 1u) ? n / 2u + 1u : n / 2u;
+    static constexpr std::size_t const bits_for_fractional =
+        0 != (f & 1u) ? f / 2u + 1u : f / 2u;
+    static constexpr std::size_t const number_of_significant_bits =
+        bits_for_integral + bits_for_fractional;
+    static constexpr int const scaling_factor_exponent =
+        0 != (e & 1u) ? e / 2u + 1u : e / 2u;
 
 public:
     using promoted_storage_type =
         typename boost::uint_t<number_of_significant_bits>::least;
 
     using promoted_type = libq::fixed_point<promoted_storage_type,
-        bits_for_integral,
-        bits_for_fractional,
-        scaling_factor_exponent,
-        op,
-        up>;
+                                            bits_for_integral,
+                                            bits_for_fractional,
+                                            scaling_factor_exponent,
+                                            op,
+                                            up>;
 };
 
 }  // namespace details
@@ -40,9 +48,10 @@ namespace std {
 /** @brief computes square root by CORDIC-algorithm
     @note page 11
 */
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::sqrt_of<T, n, f, e, op, up>::promoted_type
-sqrt(libq::fixed_point<T, n, f, e, op, up> const& _val)
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
+auto
+    sqrt(libq::fixed_point<T, n, f, e, op, up> const &_val) ->
+    typename libq::details::sqrt_of<T, n, f, e, op, up>::promoted_type
 {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using sqrt_type =
@@ -68,10 +77,10 @@ sqrt(libq::fixed_point<T, n, f, e, op, up> const& _val)
     using work_type = libq::Q<f + 2u, f, e, op, up>;
     using lut_type = libq::cordic::lut<f, work_type>;
 
-    using reduced_type =
-        typename std::conditional<Q::bits_for_integral >= 2, Q, work_type>::type;
+    using reduced_type = typename std::
+        conditional<Q::bits_for_integral >= 2, Q, work_type>::type;
 
-    int power(0);
+    int          power(0);
     reduced_type arg(_val);
 
     for (; arg >= reduced_type(2.0); --power) {
@@ -84,11 +93,11 @@ sqrt(libq::fixed_point<T, n, f, e, op, up> const& _val)
 
     // CORDIC vectoring mode:
     lut_type const angles = lut_type::hyperbolic_wo_repeated_iterations();
-    typename libq::UQ<f, f, e, op, up> const
-        norm{lut_type::hyperbolic_scale_with_repeated_iterations(f)};
+    typename libq::UQ<f, f, e, op, up> const norm{
+        lut_type::hyperbolic_scale_with_repeated_iterations(f)};
 
-    work_type x{work_type{arg} +0.25};
-    work_type y{work_type{arg} -0.25};
+    work_type x{work_type{arg} + 0.25};
+    work_type y{work_type{arg} - 0.25};
     work_type z{arg};
     {
         std::size_t repeated{4u};
@@ -99,8 +108,8 @@ sqrt(libq::fixed_point<T, n, f, e, op, up> const& _val)
 #else
         for (std::size_t i = 1u; i < f + 1u; ++i) {
 #endif
-            int const sign = ((x.value() < 0) ? -1 : +1) *
-                ((y.value() < 0) ? -1 : +1);
+            int const sign =
+                ((x.value() < 0) ? -1 : +1) * ((y.value() < 0) ? -1 : +1);
             typename work_type::storage_type const store(x.value());
             x = x - work_type::wrap(sign * (y.value() >> (num + 1u)));
             y = y - work_type::wrap(sign * (store >> (num + 1u)));
@@ -109,8 +118,7 @@ sqrt(libq::fixed_point<T, n, f, e, op, up> const& _val)
             // repeat until convergence is reached
             if (i == repeated && i != n - 1) {
                 int const sign =
-                    (x.value() < 0 ? -1 : +1) *
-                    (y.value() < 0 ? -1 : +1);
+                    (x.value() < 0 ? -1 : +1) * (y.value() < 0 ? -1 : +1);
 
                 typename work_type::storage_type const store{x.value()};
 

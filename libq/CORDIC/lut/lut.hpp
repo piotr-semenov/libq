@@ -16,7 +16,7 @@
 namespace libq {
 namespace cordic {
 
-/** @brief Look-up table for CORDIC algorithms.
+/** @brief Look-up table for CORDIC algorithms
     @tparam n
     @tparam Q
 */
@@ -26,7 +26,7 @@ class lut : public std::array<Q, n>
     using Base_class = std::array<Q, n>;
     using This_class = lut<n, Q>;
 
-    explicit lut(Base_class const& _dat)
+    explicit lut(Base_class const &_dat)
         : Base_class(_dat)
     {}
 
@@ -38,7 +38,7 @@ public:
     static constexpr std::size_t const dim = n;
 
     /** @brief Creates the LUT for angles in case of CORDIC rotations are
-     performed for circular coordinates.
+        performed for circular coordinates.
     */
     static This_class
         circular();
@@ -84,13 +84,5 @@ public:
 
 }  // namespace cordic
 }  // namespace libq
-
-/// @bug #include after code
-#include "libq/CORDIC/lut/arctan_lut.hpp"
-#include "libq/CORDIC/lut/arctanh_lut.hpp"
-#include "libq/CORDIC/lut/pow2_lut.hpp"
-#include "libq/CORDIC/lut/inv_pow2_lut.hpp"
-#include "libq/CORDIC/lut/circular_scales.hpp"
-#include "libq/CORDIC/lut/hyperbolic_scale.hpp"
 
 #endif  // INC_LIBQ_CORDIC_LUT_LUT_HPP_

@@ -8,11 +8,12 @@
 #ifndef INC_LIBQ_CORDIC_ASINH_HPP_
 #define INC_LIBQ_CORDIC_ASINH_HPP_
 
+#include "libq/details/fixed_point_common.hpp"
+
 namespace libq {
 namespace details {
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-class asinh_of
-    : public log_of<T, n, f, e, op, up>
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
+class asinh_of : public log_of<T, n, f, e, op, up>
 {};
 
 }  // namespace details
@@ -20,16 +21,16 @@ class asinh_of
 
 namespace std {
 
-/// @brief computes arcinh as logarithm
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::asinh_of<T, n, f, e, op, up>::promoted_type
-asinh(libq::fixed_point<T, n, f, e, op, up> _val)
+/// @brief computes arcsinh as logarithm
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
+auto
+    asinh(libq::fixed_point<T, n, f, e, op, up> _val) ->
+    typename libq::details::asinh_of<T, n, f, e, op, up>::promoted_type
 {
     using result_type =
         typename libq::details::asinh_of<T, n, f, e, op, up>::promoted_type;
 
-    return result_type(
-        std::log(std::sqrt(_val * _val + 1u) + _val));
+    return result_type(std::log(std::sqrt(_val * _val + 1u) + _val));
 }
 
 }  // namespace std

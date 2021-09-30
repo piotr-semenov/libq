@@ -9,34 +9,37 @@
 #ifndef INC_LIBQ_CORDIC_TAN_HPP_
 #define INC_LIBQ_CORDIC_TAN_HPP_
 
+#include "libq/details/fixed_point_common.hpp"
+
 namespace libq {
 namespace details {
 
-template<typename T>
+template <typename T>
 class tan_of
 {
 public:
     using promoted_type = T;
 };
 
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class tan_of<libq::fixed_point<T, n, f, e, op, up> >
     : public libq::details::div_of<
-        typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type,
-        typename libq::details::cos_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-    >
-{
-};
+          typename libq::details::sin_of<
+              libq::fixed_point<T, n, f, e, op, up> >::promoted_type,
+          typename libq::details::cos_of<
+              libq::fixed_point<T, n, f, e, op, up> >::promoted_type>
+{};
 
 }  // namespace details
 }  // namespace libq
 
-
 namespace std {
 
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::tan_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-tan(libq::fixed_point<T, n, f, e, op, up> _val)
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
+auto
+    tan(libq::fixed_point<T, n, f, e, op, up> _val) ->
+    typename libq::details::tan_of<
+        libq::fixed_point<T, n, f, e, op, up> >::promoted_type
 {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using tan_type = typename libq::details::tan_of<Q>::promoted_type;

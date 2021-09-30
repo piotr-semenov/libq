@@ -1,10 +1,8 @@
 #include "libq/fixed_point.hpp"
 
-#include <cstdlib>
 #include <vector>
 #include <numeric>
 #include <iostream>
-#include <cassert>
 
 namespace {
 
@@ -23,7 +21,7 @@ using value_type = double;
 
 template <typename Value_type>
 Value_type
-    mean(std::vector<Value_type> const& _samples)
+    mean(std::vector<Value_type> const &_samples)
 {
     Value_type const n = Value_type(_samples.size());
     Value_type const acc =
@@ -35,7 +33,7 @@ Value_type
 
 template <typename Value_type>
 Value_type
-    standard_deviation(std::vector<Value_type> const& _samples)
+    standard_deviation(std::vector<Value_type> const &_samples)
 {
     Value_type const tolerance = Value_type(1E-8);
     Value_type const m = mean<Value_type>(_samples);
@@ -50,9 +48,8 @@ Value_type
 
     assert(std::fabs(diff) > tolerance);
 
-    return std::fabs(diff) < tolerance
-               ? Value_type(0.0)
-               : Value_type{std::sqrt(diff)};
+    return std::fabs(diff) < tolerance ? Value_type(0.0)
+                                       : Value_type{std::sqrt(diff)};
 }
 
 template <typename value_type>
@@ -73,7 +70,7 @@ void
 }  // namespace
 
 int
-    main(int, char**)
+    main(int, char **)
 {
     std::cout << "Floating point:" << std::endl;
     test<floating_accuracy::value_type>();

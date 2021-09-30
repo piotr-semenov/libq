@@ -9,14 +9,16 @@
 
 #include "libq/details/fixed_point_common.hpp"
 
+#include <cassert>
+
 namespace libq {
 namespace details {
 
-template<typename T>
+template <typename T>
 class acosh_of
 {};
 
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class acosh_of<libq::fixed_point<T, n, f, e, op, up> >
 {
 public:
@@ -30,9 +32,11 @@ public:
 namespace std {
 
 /// @brief computes acosh as logarithm
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::acosh_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-acosh(libq::fixed_point<T, n, f, e, op, up> _val)
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
+auto
+    acosh(libq::fixed_point<T, n, f, e, op, up> _val) ->
+    typename libq::details::acosh_of<
+        libq::fixed_point<T, n, f, e, op, up> >::promoted_type
 {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using result_type = typename libq::details::acosh_of<Q>::promoted_type;

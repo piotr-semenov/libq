@@ -6,7 +6,7 @@
 #ifndef INC_LIBQ_DETAILS_MULT_OF_HPP_
 #define INC_LIBQ_DETAILS_MULT_OF_HPP_
 
-#include "libq/details/fixed_point_common.hpp"
+#include "libq/type_promotion.hpp"
 
 namespace libq {
 namespace details {
@@ -20,7 +20,7 @@ class mult_of
                   "unexpected use of multiplication_promoted_type_of template");
 };
 #else
-template<typename T, typename U>
+template <typename T, typename U>
 class mult_of;
 
 #endif
@@ -32,41 +32,56 @@ class mult_of;
  @note If n1 = max possible word size for unsigned integers and T2 is signed
  than you will get the error.
 */
-template<
-    typename T1,
-    std::size_t n1,
-    std::size_t f1,
-    int e1,
-    typename T2,
-    std::size_t n2,
-    std::size_t f2,
-    int e2,
-    class op,
-    class up
->
-class mult_of<libq::fixed_point<T1, n1, f1, e1, op, up>, libq::fixed_point<T2, n2, f2, e2, op, up> >
-    : public
-        std::conditional<
-            (n2 + f2 < n1 + f1),
-            type_promotion_base<
-                libq::fixed_point<
-                    typename std::conditional<
-                        (std::numeric_limits<T1>::is_signed || std::numeric_limits<T2>::is_signed) && n1 + f1 <= std::numeric_limits<typename std::make_signed<T1>::type>::digits,
-                        typename std::make_signed<T1>::type,
-                        T1
-                    >::type,
-                    n1, f1, e1, op, up>,
-                n2, f2, e2>,
-            type_promotion_base<
-                libq::fixed_point<
-                    typename std::conditional<
-                    (std::numeric_limits<T1>::is_signed || std::numeric_limits<T2>::is_signed) && n1 + f1 <= std::numeric_limits<typename std::make_signed<T1>::type>::digits,
-                    typename std::make_signed<T2>::type,
-                    T2
-                    >::type,
-                n2, f2, e2, op, up>,
-                n1,f1,e1>
-        >::type
+template <typename T1,
+          std::size_t n1,
+          std::size_t f1,
+          int         e1,
+          typename T2,
+          std::size_t n2,
+          std::size_t f2,
+          int         e2,
+          class op,
+          class up>
+class mult_of<libq::fixed_point<T1, n1, f1, e1, op, up>,
+              libq::fixed_point<T2, n2, f2, e2, op, up> >
+    : public std::conditional<
+          (n2 + f2 < n1 + f1),
+          type_promotion_base<
+              libq::fixed_point<
+                  typename std::conditional<
+                      (std::numeric_limits<T1>::is_signed ||
+                       std::numeric_limits<T2>::is_signed) &&
+                          n1 + f1 <=
+                              std::numeric_limits<
+                                  typename std::make_signed<T1>::type>::digits,
+                      typename std::make_signed<T1>::type,
+                      T1>::type,
+                  n1,
+                  f1,
+                  e1,
+                  op,
+                  up>,
+              n2,
+              f2,
+              e2>,
+          type_promotion_base<
+              libq::fixed_point<
+                  typename std::conditional<
+                      (std::numeric_limits<T1>::is_signed ||
+                       std::numeric_limits<T2>::is_signed) &&
+                          n1 + f1 <=
+                              std::numeric_limits<
+                                  typename std::make_signed<T1>::type>::digits,
+                      typename std::make_signed<T2>::type,
+                      T2>::type,
+                  n2,
+                  f2,
+                  e2,
+                  op,
+                  up>,
+              n1,
+              f1,
+              e1> >::type
 {};
 
 }  // namespace details

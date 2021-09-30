@@ -1,5 +1,6 @@
 /** @file numeric_limits.hpp
-    @brief Provides the partial specialization of numeric_limits template for fixed-point numbers.
+    @brief Provides the partial specialization of numeric_limits template for
+    fixed-point numbers.
     @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
@@ -10,24 +11,23 @@
 
 #include "libq/details/fixed_point_common.hpp"
 
-#include <limits>
-
 #define M_LOG10_2 0.301029995663981195214
 
 namespace std {
 
-template<typename T,
-         std::size_t n,
-         std::size_t f,
-         int e,
-         typename op,
-         typename up>
-class numeric_limits<libq::fixed_point<T, n, f, e, op, up> > {
+template <typename T,
+          std::size_t n,
+          std::size_t f,
+          int         e,
+          typename op,
+          typename up>
+class numeric_limits<libq::fixed_point<T, n, f, e, op, up> >
+{
     using Q = libq::fixed_point<T, n, f, e, op, up>;
 
- public:
+public:
     static std::float_denorm_style const has_denorm = std::denorm_absent;
-    static bool const has_denorm_loss = false;
+    static bool const                    has_denorm_loss = false;
 
     static bool const has_infinity = false;
     static bool const has_quiet_NaN = false;
@@ -61,36 +61,52 @@ class numeric_limits<libq::fixed_point<T, n, f, e, op, up> > {
     static int const radix = 2;
 
     /// @brief minimum value that can be achieved by fixed-point type
-    static Q min() throw() {
+    static Q
+        min() throw()
+    {
         return Q::least();
     }
 
     /// @brief maximum value that can be achieved by fixed-point type
-    static Q max() throw() {
+    static Q
+        max() throw()
+    {
         return Q::largest();
     }
 
     /// @brief returns the machine epsilon, that is, the difference between
     /// 1.0 and the next value representable by the fixed-point type
-    static Q epsilon() throw() {
+    static Q
+        epsilon() throw()
+    {
         return Q::wrap(1u);
     }
 
     /// @brief the maximum rounding error for fixed-point type
-    static Q round_error() throw() {
+    static Q
+        round_error() throw()
+    {
         return Q(0.5f);
     }
 
-    static Q denorm_min() throw() {
+    static Q
+        denorm_min() throw()
+    {
         return Q::wrap(0);
     }
-    static Q infinity() throw() {
+    static Q
+        infinity() throw()
+    {
         return Q::wrap(0);
     }
-    static Q quiet_NaN() throw() {
+    static Q
+        quiet_NaN() throw()
+    {
         return Q(0);
     }
-    static Q signaling_NaN() throw() {
+    static Q
+        signaling_NaN() throw()
+    {
         return Q(0);
     }
 };

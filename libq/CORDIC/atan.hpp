@@ -8,17 +8,19 @@
 #ifndef INC_LIBQ_CORDIC_ATAN_HPP_
 #define INC_LIBQ_CORDIC_ATAN_HPP_
 
+#include "libq/CORDIC/lut/lut.hpp"
+
 namespace libq {
 namespace details {
 
-template<typename T>
+template <typename T>
 class atan_of
 {
 public:
     using promoted_type = T;
 };
 
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class atan_of<libq::fixed_point<T, n, f, e, op, up> >
     : public asin_of<libq::fixed_point<T, n, f, e, op, up> >
 {};
@@ -26,16 +28,17 @@ class atan_of<libq::fixed_point<T, n, f, e, op, up> >
 }  // namespace details
 }  // namespace libq
 
-
 namespace std {
 
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-atan(libq::fixed_point<T, n, f, e, op, up> _val)
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
+auto
+    atan(libq::fixed_point<T, n, f, e, op, up> _val) ->
+    typename libq::details::atan_of<
+        libq::fixed_point<T, n, f, e, op, up> >::promoted_type
 {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
-    using result_type =
-        typename libq::details::atan_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type;
+    using result_type = typename libq::details::atan_of<
+        libq::fixed_point<T, n, f, e, op, up> >::promoted_type;
 
     using lut_type = libq::cordic::lut<f, Q>;
 
@@ -52,9 +55,7 @@ atan(libq::fixed_point<T, n, f, e, op, up> _val)
 #else
     for (std::size_t i = 0u; i != f; ++i) {
 #endif
-        int const sign =
-            (x.value() > 0 ? +1 : -1) *
-            (y.value() > 0 ? +1 : -1);
+        int const sign = (x.value() > 0 ? +1 : -1) * (y.value() > 0 ? +1 : -1);
 
         typename result_type::storage_type const store(x.value());
         /// @todo +=
@@ -64,7 +65,9 @@ atan(libq::fixed_point<T, n, f, e, op, up> _val)
         z = sign > 0 ? z + angles[i] : z - angles[i];
     };
 #ifdef LOOP_UNROLLING
-    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f - 1>());
+    libq::details::unroll(iteration_body,
+                          0u,
+                          libq::details::loop_size<f - 1>());
 #endif
 
     return z;

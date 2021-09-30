@@ -9,10 +9,13 @@
 #ifndef INC_LIBQ_CORDIC_SIN_HPP_
 #define INC_LIBQ_CORDIC_SIN_HPP_
 
+#include "libq/CORDIC/lut/lut.hpp"
+#include "libq/type_promotion.hpp"
+
 namespace libq {
 namespace details {
 
-template<typename T>
+template <typename T>
 class sin_of
 {
 public:
@@ -21,10 +24,13 @@ public:
 
 /// trick: an extra base class is required to make the compiler to
 /// instantiate the class representing the fixed-point number of a new format
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class sin_of<libq::fixed_point<T, n, f, e, op, up> >
     : private libq::fixed_point<T, 0, f, e, op, up>
-    , public type_promotion_base<libq::fixed_point<T, 0, f, e, op, up>, 1u, 0, 0>
+    , public type_promotion_base<libq::fixed_point<T, 0, f, e, op, up>,
+                                 1u,
+                                 0,
+                                 0>
 {};
 
 }  // namespace details
@@ -32,12 +38,14 @@ class sin_of<libq::fixed_point<T, n, f, e, op, up> >
 
 namespace std {
 
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-sin(libq::fixed_point<T, n, f, e, op, up> _val)
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
+auto
+    sin(libq::fixed_point<T, n, f, e, op, up> _val) ->
+    typename libq::details::sin_of<
+        libq::fixed_point<T, n, f, e, op, up> >::promoted_type
 {
-    using sin_type =
-        typename libq::details::sin_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type;
+    using sin_type = typename libq::details::sin_of<
+        libq::fixed_point<T, n, f, e, op, up> >::promoted_type;
 
     // gap in 3 bits is needed for CONST_PI existence
     using work_type = libq::Q<f + 3u, f, e, op, up>;
@@ -45,12 +53,12 @@ sin(libq::fixed_point<T, n, f, e, op, up> _val)
     // convergence interval for CORDIC rotations is [-pi/2, pi/2].
     // So anyone must map the input angle to that interval
     work_type arg(0);
-    int sign(1);
+    int       sign(1);
 
     {
         // reduce the argument to interval [-pi, +pi] and preserve its sign
-        work_type const x = work_type::CONST_PI -
-            std::fmod(_val, work_type::CONST_2PI);
+        work_type const x =
+            work_type::CONST_PI - std::fmod(_val, work_type::CONST_2PI);
 
         if (x < -work_type::CONST_PI_2) {
             arg = x + work_type::CONST_PI;
@@ -66,9 +74,10 @@ sin(libq::fixed_point<T, n, f, e, op, up> _val)
     using lut_type = libq::cordic::lut<f, work_type>;
     static auto const angles = lut_type::circular();
 
-    // normalization factor: see page 10, table 24.1 and pages 4-5, equations (5)-(6)
-    // factor converges to the limit 1.64676 very fast: it takes just 8 iterations.
-    // 8 iterations corresponds to precision of size 0.007812 for the angle approximation
+    // normalization factor: see page 10, table 24.1 and pages 4-5, equations
+    // (5)-(6) factor converges to the limit 1.64676 very fast: it takes just 8
+    // iterations. 8 iterations corresponds to precision of size 0.007812 for
+    // the angle approximation
     static work_type norm_factor(1.0 / lut_type::circular_scale(f));
 
     // rotation mode: see page 6
@@ -85,7 +94,7 @@ sin(libq::fixed_point<T, n, f, e, op, up> _val)
 #else
     for (std::size_t i = 0; i != f; ++i) {
 #endif
-        int const sign = z > work_type(0) ? 1 : -1;
+        int const       sign = z > work_type(0) ? 1 : -1;
         work_type const x_scaled = work_type::wrap(sign * (x.value() >> i));
         work_type const y_scaled = work_type::wrap(sign * (y.value() >> i));
 
@@ -98,7 +107,9 @@ sin(libq::fixed_point<T, n, f, e, op, up> _val)
         z = z1;
     };
 #ifdef LOOP_UNROLLING
-    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f - 1>());
+    libq::details::unroll(iteration_body,
+                          0u,
+                          libq::details::loop_size<f - 1>());
 #endif
 
     return sin_type(0 < sign ? y : -y);

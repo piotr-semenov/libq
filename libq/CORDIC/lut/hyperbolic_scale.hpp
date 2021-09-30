@@ -1,6 +1,6 @@
 /** @file hyperbolic_scale.hpp
-    @brief Computes the look-up table CORDIC-rotations performed in the hyperbolic
-    coordinates.
+    @brief Computes the look-up table CORDIC-rotations performed in the
+   hyperbolic coordinates.
 
     @copyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
@@ -14,11 +14,11 @@
 namespace libq {
 namespace cordic {
 
-template<std::size_t n, typename Q>
+template <std::size_t n, typename Q>
 double
-lut<n, Q>::hyperbolic_scale_with_repeated_iterations(std::size_t _n)
+    lut<n, Q>::hyperbolic_scale_with_repeated_iterations(std::size_t _n)
 {
-    double scale(1.0);
+    double      scale(1.0);
     std::size_t repeated(4u);
 
     for (std::size_t i = 1u; i != _n; ++i) {

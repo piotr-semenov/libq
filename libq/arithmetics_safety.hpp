@@ -24,7 +24,7 @@ public:
     static constexpr bool const does_throw = true;
 
     static void
-        raise_event(std::string const& _msg = std::string{})
+        raise_event(std::string const &_msg = std::string{})
     {
         throw std::overflow_error(_msg);
     }
@@ -38,7 +38,7 @@ public:
     static constexpr bool const does_throw = true;
 
     static void
-        raise_event(std::string const& _msg = std::string{})
+        raise_event(std::string const &_msg = std::string{})
     {
         throw std::underflow_error(_msg);
     }
@@ -52,7 +52,7 @@ public:
     static constexpr bool const does_throw = true;
 
     static void
-        raise_event(std::string const& = std::string{})
+        raise_event(std::string const & = std::string{})
     {}
 };
 
@@ -80,7 +80,7 @@ bool
     does_add_overflow(libq::fixed_point<T, n, f, e, Ps...> const _x,
                       libq::fixed_point<T, n, f, e, Ps...> const _y)
 {
-    using value_type = fixed_point<T, n, f, e, Ps...>;
+    using value_type = libq::fixed_point<T, n, f, e, Ps...>;
     using result_type = typename sum_traits<value_type>::promoted_type;
 
     auto const a = _x.value();
@@ -156,8 +156,9 @@ bool
     auto const a = _x.value();
     auto const b = _y.value();
 
-    return b == 0 || (result_type::is_signed &&
-                      a == result_type::least_stored_integer && intmax_t(b) == -1);
+    return b == 0 ||
+           (result_type::is_signed && a == result_type::least_stored_integer &&
+            intmax_t(b) == -1);
 }
 
 template <typename T, std::size_t n, std::size_t f, int e, typename... Ps>

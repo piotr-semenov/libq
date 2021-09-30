@@ -1,6 +1,7 @@
 /** @file pow2_lut.hpp
     @brief Implements the look-up table for log2 function.
-    @note See C. Baumann, "A simple and fast look-up table method to compute the exp(x) and ln(x) functions", 2004.
+    @note See C. Baumann, "A simple and fast look-up table method to compute the
+    exp(x) and ln(x) functions", 2004.
 
     @copyright (c) 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
@@ -15,9 +16,9 @@
 namespace libq {
 namespace cordic {
 
-template<std::size_t n, typename Q>
+template <std::size_t n, typename Q>
 auto
-lut<n, Q>::pow2()->This_class
+    lut<n, Q>::pow2() -> This_class
 {
     Base_class table;
 

@@ -1,6 +1,7 @@
 /** @file exp.hpp
     @brief Provides CORDIC for exp function
-    @note see C. Baumann, "A simple and fast look-up table method to compute the exp(x) and ln(x) functions", 2004
+    @note see C. Baumann, "A simple and fast look-up table method to compute the
+    exp(x) and ln(x) functions", 2004
 
     @copyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
@@ -9,31 +10,30 @@
 #ifndef INC_LIBQ_CORDIC_EXP_HPP_
 #define INC_LIBQ_CORDIC_EXP_HPP_
 
-#include <limits>
+#include "libq/CORDIC/lut/lut.hpp"
+#include "libq/type_promotion.hpp"
 
 namespace libq {
 namespace details {
 
-template<typename T>
+template <typename T>
 class exp_of
 {
 public:
     using promoted_type = T;
 };
 
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
 class exp_of<libq::fixed_point<T, n, f, e, op, up> >
 {
 public:
     using promoted_type =
-        libq::fixed_point<
-        std::uintmax_t,
-        std::numeric_limits<std::uintmax_t>::digits - f,
-        f,
-        e,
-        op,
-        up
-        >;
+        libq::fixed_point<std::uintmax_t,
+                          std::numeric_limits<std::uintmax_t>::digits - f,
+                          f,
+                          e,
+                          op,
+                          up>;
 };
 
 }  // namespace details
@@ -41,23 +41,26 @@ public:
 
 namespace std {
 
-template<typename T, std::size_t n, std::size_t f, int e, class op, class up>
-typename libq::details::exp_of<libq::fixed_point<T, n, f, e, op, up> >::promoted_type
-exp(libq::fixed_point<T, n, f, e, op, up> _val)
+template <typename T, std::size_t n, std::size_t f, int e, class op, class up>
+auto
+    exp(libq::fixed_point<T, n, f, e, op, up> _val) ->
+    typename libq::details::exp_of<
+        libq::fixed_point<T, n, f, e, op, up> >::promoted_type
 {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using exp_type = typename libq::details::exp_of<Q>::promoted_type;
 
     using Qw = libq::Q<f, f, e, op, up>;
-    using work_type =
-        typename libq::details::type_promotion_base<Qw, 1u, 0, 0>::promoted_type;
+    using work_type = typename libq::details::
+        type_promotion_base<Qw, 1u, 0, 0>::promoted_type;
 
     using lut_type = libq::cordic::lut<f, work_type>;
 
     // reduces argument to interval [0.0, 1.0]
     int power(0);
-    typename libq::details::mult_of<Q, work_type>::promoted_type
-        arg(_val * work_type::CONST_LOG2E);
+
+    typename libq::details::mult_of<Q, work_type>::promoted_type arg(
+        _val * work_type::CONST_LOG2E);
 
     for (; arg >= exp_type(1.0); ++power) {
         /// @todo Use -= ?
@@ -70,8 +73,8 @@ exp(libq::fixed_point<T, n, f, e, op, up> _val)
     }
 
     static lut_type const pow2_lut = lut_type::pow2();
-    exp_type result(1.0);
-    work_type x(arg);
+    exp_type              result(1.0);
+    work_type             x(arg);
 
 #ifdef LOOP_UNROLLING
     auto const iteration_body = [&](std::size_t i) {
@@ -88,7 +91,9 @@ exp(libq::fixed_point<T, n, f, e, op, up> _val)
         }
     };
 #ifdef LOOP_UNROLLING
-    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f - 1>());
+    libq::details::unroll(iteration_body,
+                          0u,
+                          libq::details::loop_size<f - 1>());
 #endif
 
     if (power >= 0) {

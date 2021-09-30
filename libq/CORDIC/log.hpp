@@ -1,14 +1,18 @@
 /** @file log.hpp
     @brief Provides CORDIC for ln function
-    @note see C. Baumann, "A simple and fast look-up table method to compute the exp(x) and ln(x) functions", 2004
+    @note see C. Baumann, "A simple and fast look-up table method to compute the
+    exp(x) and ln(x) functions", 2004
 
-    @�opyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
+    @copyright 2016 Piotr K. Semenov (piotr.k.semenov at gmail dot com)
 
     Distributed under the New BSD License. (See accompanying file LICENSE)
 
 */
 #ifndef INC_LIBQ_CORDIC_LOG_HPP_
 #define INC_LIBQ_CORDIC_LOG_HPP_
+
+#include "libq/CORDIC/lut/lut.hpp"
+#include "libq/type_promotion.hpp"
 
 #include "boost/integer/static_min_max.hpp"
 #include "boost/integer/static_log2.hpp"
@@ -18,27 +22,37 @@
 namespace libq {
 namespace details {
 
-template<typename T, std::size_t n, std::size_t f, int e, typename op, typename up>
+template <typename T,
+          std::size_t n,
+          std::size_t f,
+          int         e,
+          typename op,
+          typename up>
 class log_of
-    : public
-    type_promotion_base<
-        fixed_point<typename std::make_signed<T>::type, n, f, e, op, up>,
-        boost::static_unsigned_max<
-            (f > 0) ? (boost::static_log2<f>::value) : 0,
-            (n > 0) ? (boost::static_log2<n>::value) : 0
-            >::value + 1u,
-        0, 0>
+    : public type_promotion_base<
+          fixed_point<typename std::make_signed<T>::type, n, f, e, op, up>,
+          boost::static_unsigned_max<0 < f ? boost::static_log2<f>::value : 0,
+                                     0 < n ? boost::static_log2<n>::value
+                                           : 0>::value +
+              1u,
+          0,
+          0>
 {};
 
 }  // namespace details
 }  // namespace libq
 
-
 namespace std {
 
-template<typename T, std::size_t n, std::size_t f, int e, typename op, typename up>
-typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
-log(libq::fixed_point<T, n, f, e, op, up> _val)
+template <typename T,
+          std::size_t n,
+          std::size_t f,
+          int         e,
+          typename op,
+          typename up>
+auto
+    log(libq::fixed_point<T, n, f, e, op, up> _val) ->
+    typename libq::details::log_of<T, n, f, e, op, up>::promoted_type
 {
     using Q = libq::fixed_point<T, n, f, e, op, up>;
     using log_type =
@@ -46,7 +60,7 @@ log(libq::fixed_point<T, n, f, e, op, up> _val)
 
     using lut = libq::cordic::lut<f, Q>;
 
-    assert(("[std::log] argument is negaitve", _val >= Q(0)));
+    assert(("[std::log] argument is negative", _val >= Q(0)));
 
     if (_val <= Q(0)) {
         throw std::logic_error("[std::log]: argument is negative");
@@ -57,6 +71,7 @@ log(libq::fixed_point<T, n, f, e, op, up> _val)
 
     // reduces argument to interval [1.0, 2.0]
     int power(0);
+
     Q arg(_val);
 
     for (; arg >= Q(2.0); ++power) {
@@ -83,12 +98,14 @@ log(libq::fixed_point<T, n, f, e, op, up> _val)
         if (work_type(arg * inv_pow2_lut[i]) >= work_type(1.0)) {
             arg = work_type(arg * inv_pow2_lut[i]);
 
-            libq::lift(result) +=
-                typename work_type::storage_type(1u) << (f - i - 1u);
+            libq::lift(result) += typename work_type::storage_type(1u)
+                                  << (f - i - 1u);
         }
     };
 #ifdef LOOP_UNROLLING
-    libq::details::unroll(iteration_body, 0u, libq::details::loop_size<f - 1>());
+    libq::details::unroll(iteration_body,
+                          0u,
+                          libq::details::loop_size<f - 1>());
 #endif
 
     log_type const r0(log_type(result) + log_type(power));

@@ -17,9 +17,9 @@ namespace cordic {
 /**
     @note See page 5, equation 7, m = -1 (hyperbolic coordinate system).
 */
-template<size_t n, typename Q>
+template <size_t n, typename Q>
 auto
-lut<n, Q>::hyperbolic_wo_repeated_iterations()->This_class
+    lut<n, Q>::hyperbolic_wo_repeated_iterations() -> This_class
 {
     Base_class table;
 

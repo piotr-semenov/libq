@@ -7,13 +7,13 @@
 #define INC_LIBQ_DETAILS_DIV_OF_HPP_
 
 #include "libq/details/fixed_point_common.hpp"
+#include "libq/type_promotion.hpp"
 
 namespace libq {
 namespace details {
 
-template<typename T, typename U>
-class div_of
-    : public type_promotion_base<T, 0, 0, 0>
+template <typename T, typename U>
+class div_of : public type_promotion_base<T, 0, 0, 0>
 {
     static_assert(std::is_same<T, U>::value,
                   "unexpected use of division_promoted_type_of template");
@@ -43,18 +43,22 @@ class div_of
     So the quotient has the following fixed-point format
     @f$ (n_x+f_y, f_x+n_y, e_x-e_y) @f$.
 */
-template<typename T_x,
-    typename T_y,
-    std::size_t n_x,
-    std::size_t n_y,
-    std::size_t f_x,
-    std::size_t f_y,
-    int e_x,
-    int e_y,
-    class op,
-    class up>
-class div_of<libq::fixed_point<T_x, n_x, f_x, e_x, op, up>, libq::fixed_point<T_y, n_y, f_y, e_y, op, up> >
-    : public type_promotion_base<libq::fixed_point<T_x, n_x, f_x, e_x, op, up>, f_y, n_y, -e_y>
+template <typename T_x,
+          typename T_y,
+          std::size_t n_x,
+          std::size_t n_y,
+          std::size_t f_x,
+          std::size_t f_y,
+          int         e_x,
+          int         e_y,
+          class op,
+          class up>
+class div_of<libq::fixed_point<T_x, n_x, f_x, e_x, op, up>,
+             libq::fixed_point<T_y, n_y, f_y, e_y, op, up> >
+    : public type_promotion_base<libq::fixed_point<T_x, n_x, f_x, e_x, op, up>,
+                                 f_y,
+                                 n_y,
+                                 -e_y>
 {};
 
 }  // namespace details

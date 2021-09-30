@@ -2,7 +2,6 @@
 #define INC_LIBQ_DETAILS_FIXED_POINT_HPP_
 
 #include "libq/arithmetics_safety.hpp"
-#include "libq/type_promotion.hpp"
 
 #include "boost/integer/integer_mask.hpp"
 
@@ -28,18 +27,18 @@ inline double
 /// @brief Gets the reference to the stored integer behind the fixed-point
 /// number
 template <typename T, std::size_t n, std::size_t f, int e, class... Ps>
-T&
+T &
     /// @param[in] _x the fixed-point number
-    lift(fixed_point<T, n, f, e, Ps...>& _x)
+    lift(fixed_point<T, n, f, e, Ps...> &_x)
 {
     return _x.m_value;
 }
 
 /// @brief Gets the value of the stored integer behind the fixed-point number
 template <typename T, std::size_t n, std::size_t f, int e, class... Ps>
-T const&
+T const &
     /// @param[in] _x the fixed - point number
-    lift(fixed_point<T, n, f, e, Ps...> const& _x)
+    lift(fixed_point<T, n, f, e, Ps...> const &_x)
 {
     return _x.m_value;
 }
@@ -257,7 +256,7 @@ public:
     */
     template <typename T>
     static This_class
-        wrap(T const& _val)
+        wrap(T const &_val)
     {
         static_assert(std::is_integral<T>::value,
                       "input param must be of the built-in integral type");
@@ -276,13 +275,13 @@ public:
     }
 
     static This_class
-        wrap(float const&) = delete;
+        wrap(float const &) = delete;
 
     static This_class
-        wrap(double const&) = delete;
+        wrap(double const &) = delete;
 
     fixed_point() = default;
-    fixed_point(This_class const& _x) = default;
+    fixed_point(This_class const &_x) = default;
 
     /// @brief Normalizes the input fixed-point number to be accepted by current
     /// format.
@@ -293,7 +292,7 @@ public:
               typename op1,
               typename up1>
     COPY_CTR_EXPLICIT_SPECIFIER
-        fixed_point(fixed_point<T1, n1, f1, e1, op1, up1> const& _x)
+        fixed_point(fixed_point<T1, n1, f1, e1, op1, up1> const &_x)
         : m_value(This_class::normalize(
               _x,
               std::integral_constant<bool,
@@ -306,7 +305,7 @@ public:
     /// @brief Creates the fixed-point number from any arithmetic object.
     template <typename T>
     COPY_CTR_EXPLICIT_SPECIFIER
-        fixed_point(T const& _value)
+        fixed_point(T const &_value)
         : m_value(This_class::calc_stored_integer_from(
               _value,
               std::integral_constant<bool, std::is_floating_point<T>::value>{}))
@@ -319,8 +318,8 @@ public:
               int         e1,
               typename op1,
               typename up1>
-    This_class&
-        operator=(fixed_point<T1, n1, f1, e1, op1, up1> const& _x)
+    This_class &
+        operator=(fixed_point<T1, n1, f1, e1, op1, up1> const &_x)
     {
         using status_type =
             std::integral_constant<bool,
@@ -331,13 +330,13 @@ public:
         return this->set_value_to(This_class::normalize(_x, status_type()));
     }
 
-    This_class&
-        operator=(This_class const& _x) = default;
+    This_class &
+        operator=(This_class const &_x) = default;
 
     /// @brief Assigns any arithmetic type.
     template <typename T>
-    This_class&
-        operator=(T const& _x)
+    This_class &
+        operator=(T const &_x)
     {
         static_assert(std::is_arithmetic<T>::value,
                       "T must be of the arithmetic type");
@@ -375,7 +374,7 @@ public:
     // handle the template operators
 #define COMPARISON_OPERATOR(op)                         \
     template <typename T>                               \
-    bool operator op(T const& _x) const                 \
+    bool operator op(T const &_x) const                 \
     {                                                   \
         return this->value() op This_class(_x).value(); \
     }
@@ -430,13 +429,14 @@ public:
     */
     template <typename T>
     typename libq::details::sum_traits<This_class>::promoted_type
-        operator+(T const& _x) const
+        operator+(T const &_x) const
     {
         using sum_type =
             typename libq::details::sum_traits<This_class>::promoted_type;
         using word_type = typename sum_type::storage_type;
 
         This_class const converted(_x);
+
         if (details::does_add_overflow(*this, converted)) {
             overflow_policy::raise_event();
         }
@@ -447,8 +447,8 @@ public:
     }
 
     template <typename T>
-    inline This_class&
-        operator+=(T const& _x)
+    inline This_class &
+        operator+=(T const &_x)
     {
         This_class const result(*this + _x);
 
@@ -462,7 +462,7 @@ public:
     */
     template <typename T>
     typename libq::details::sum_traits<This_class>::promoted_type
-        operator-(T const& _x) const
+        operator-(T const &_x) const
     {
         using diff_type =
             typename libq::details::sum_traits<This_class>::promoted_type;
@@ -480,7 +480,7 @@ public:
 
     template <typename T>
     This_class
-        operator-=(T const& _x)
+        operator-=(T const &_x)
     {
         This_class const result(*this - _x);
 
@@ -499,7 +499,7 @@ public:
               class op1,
               class up1>
     auto
-        operator*(libq::fixed_point<T1, n1, f1, e1, op1, up1> const& _x) const
+        operator*(libq::fixed_point<T1, n1, f1, e1, op1, up1> const &_x) const
         -> typename libq::details::mult_of<
             This_class,
             libq::fixed_point<T1, n1, f1, e1, op1, up1> >::promoted_type
@@ -530,7 +530,7 @@ public:
               class op1,
               class up1>
     This_class
-        operator*=(libq::fixed_point<T1, n1, f1, e1, op1, up1> const& _x)
+        operator*=(libq::fixed_point<T1, n1, f1, e1, op1, up1> const &_x)
     {
         This_class const result(*this * _x);
 
@@ -544,7 +544,7 @@ public:
     */
     template <typename T1, std::size_t n1, std::size_t f1, int e1, class... Ps>
     auto
-        operator/(libq::fixed_point<T1, n1, f1, e1, Ps...> const& _x) const ->
+        operator/(libq::fixed_point<T1, n1, f1, e1, Ps...> const &_x) const ->
         typename libq::details::div_of<
             This_class,
             libq::fixed_point<T1, n1, f1, e1, Ps...> >::promoted_type
@@ -561,7 +561,8 @@ public:
                                   << operand_type::number_of_significant_bits;
 
         auto const un_shifted =
-            static_cast<typename operand_type::storage_type>(shifted >> operand_type::number_of_significant_bits);
+            static_cast<typename operand_type::storage_type>(
+                shifted >> operand_type::number_of_significant_bits);
 
         if (!promotion_traits::is_expandable && _x.value() != un_shifted) {
             overflow_policy::raise_event();
@@ -573,7 +574,7 @@ public:
 
     template <typename T1, std::size_t n1, std::size_t f1, int e1, class... Ps>
     This_class
-        operator/=(libq::fixed_point<T1, n1, f1, e1, Ps...> const& _x)
+        operator/=(libq::fixed_point<T1, n1, f1, e1, Ps...> const &_x)
     {
         This_class const result(*this / _x);
 
@@ -598,7 +599,7 @@ private:
     */
     template <typename T>
     static storage_type
-        calc_stored_integer_from(T const& _x, std::true_type)
+        calc_stored_integer_from(T const &_x, std::true_type)
     {
         static double const scale =
             static_cast<double>(This_class::scaling_factor_exponent);
@@ -623,7 +624,7 @@ private:
     /// @brief Represents some integral number as a fixed-point number.
     template <typename T>
     static storage_type
-        calc_stored_integer_from(T const& _x, std::false_type)
+        calc_stored_integer_from(T const &_x, std::false_type)
     {
         double const scale =
             static_cast<double>(This_class::scaling_factor_exponent);
@@ -636,7 +637,7 @@ private:
     */
     template <typename T1, std::size_t n1, std::size_t f1, int e1, class... Ps>
     static storage_type
-        normalize(fixed_point<T1, n1, f1, e1, Ps...> const& _x, std::false_type)
+        normalize(fixed_point<T1, n1, f1, e1, Ps...> const &_x, std::false_type)
     {
         static std::size_t const shifts =
             (static_cast<int>(This_class::bits_for_fractional) +
@@ -644,8 +645,12 @@ private:
             (e1 + f1);
         static_assert(shifts <= CHAR_BIT * sizeof(uintmax_t), "Invalid shift");
         storage_type const normalized = storage_type(_x.value()) << shifts;
+
         typedef fixed_point<T1, n1, f1, e1, Ps...> operand_type;
-        auto const un_shifted = static_cast<typename operand_type::storage_type>(normalized >> shifts);
+
+        auto const un_shifted =
+            static_cast<typename operand_type::storage_type>(normalized >>
+                                                             shifts);
 
         if (_x.value() != un_shifted) {
             overflow_policy::raise_event();
@@ -660,7 +665,7 @@ private:
     */
     template <typename T1, std::size_t n1, std::size_t f1, int e1, class... Ps>
     static storage_type
-        normalize(fixed_point<T1, n1, f1, e1, Ps...> const& _x, std::true_type)
+        normalize(fixed_point<T1, n1, f1, e1, Ps...> const &_x, std::true_type)
     {
         static std::size_t const shifts =
             (static_cast<int>(e1) + f1) -
@@ -679,16 +684,16 @@ private:
     double
         to_floating_point() const
     {
-        return this->scaling_factor() * static_cast<double>(value()) /
-               This_class::scale;
+        return This_class::scaling_factor() *
+               static_cast<double>(this->value()) / This_class::scale;
     }
 
     storage_type m_value;
-    /**
-    @brief This also checks if the stored integer is within the range of
-    current fixed-point number.
+
+    /** @brief This also checks if the stored integer is within the range of
+        current fixed-point number.
     */
-    This_class&
+    This_class &
         set_value_to(storage_type const _x)
     {
         if (_x < This_class::least_stored_integer ||
@@ -700,9 +705,9 @@ private:
         return *this;
     }
 
-    friend storage_type&
+    friend storage_type &
         lift<value_type, n, f, e, overflow_policy, underflow_policy>(
-            This_class&);
+            This_class &);
 };
 
 /// @brief Short-cut for the signed fixed-point with just 2 template parameters

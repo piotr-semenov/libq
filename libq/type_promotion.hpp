@@ -8,6 +8,8 @@
 #ifndef INC_LIBQ_TYPE_PROMOTION_HPP_
 #define INC_LIBQ_TYPE_PROMOTION_HPP_
 
+#include "libq/details/fixed_point_common.hpp"
+
 #include "boost/integer.hpp"
 #include "boost/mpl/eval_if.hpp"
 

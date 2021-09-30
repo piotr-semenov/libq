@@ -59,17 +59,18 @@ BOOST_AUTO_TEST_CASE(out_of_range_policies)
         Q const x(std::numeric_limits<Q>::max() + 1);
 
         BOOST_FAIL(msg);
-    } catch (std::overflow_error&) {
+    } catch (std::overflow_error &) {
     }
 
     try {
         Q const x(std::numeric_limits<Q>::min() - 1);
         BOOST_FAIL(msg);
-    } catch (std::overflow_error const&) {
+    } catch (std::overflow_error const &) {
     }
 }
 
-BOOST_AUTO_TEST_SUITE_END()
+BOOST_AUTO_TEST_SUITE_END
+()
 
 }  // unit_tests
 }  // libq

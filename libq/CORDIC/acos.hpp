@@ -8,7 +8,10 @@
 #ifndef INC_LIBQ_CORDIC_ACOS_HPP_
 #define INC_LIBQ_CORDIC_ACOS_HPP_
 
-#include "libq/details/fixed_point_common.hpp"
+#include "libq/CORDIC/lut/lut.hpp"
+#include "libq/type_promotion.hpp"
+
+#include <cassert>
 
 namespace libq {
 namespace details {
@@ -105,7 +108,7 @@ auto
 #ifdef LOOP_UNROLLING
     auto const iteration_body = [&](std::size_t i) {
 #else
-// #pragma unroll
+    // #pragma unroll
     for (std::size_t i = 0u; i != f; ++i) {
 #endif
         int sign(0);
