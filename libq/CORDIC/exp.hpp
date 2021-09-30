@@ -63,7 +63,7 @@ auto
         _val * work_type::CONST_LOG2E);
 
     for (; arg >= exp_type(1.0); ++power) {
-        /// @todo Use -= ?
+        /// @todo Use '-=' ?
         arg = arg - 1u;
     }
 

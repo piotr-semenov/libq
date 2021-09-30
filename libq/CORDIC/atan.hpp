@@ -58,9 +58,9 @@ auto
         int const sign = (x.value() > 0 ? +1 : -1) * (y.value() > 0 ? +1 : -1);
 
         typename result_type::storage_type const store(x.value());
-        /// @todo +=
+        /// @todo Use '+='
         x = x + result_type::wrap(sign * (y.value() >> i));
-        /// @todo -=
+        /// @todo Use '-='
         y = y - result_type::wrap(sign * (store >> i));
         z = sign > 0 ? z + angles[i] : z - angles[i];
     };

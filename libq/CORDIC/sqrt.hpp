@@ -144,7 +144,7 @@ auto
         libq::lift(result) >>= (power >> 1u);
 
         if (power & 1u) {
-            /// @todo /= ?
+            /// @todo Use '/=' ?
             result = result / reduced_type::CONST_SQRT2;
         }
     } else {
@@ -152,7 +152,7 @@ auto
         libq::lift(result) <<= (p >> 1u);
 
         if (p & 1u) {
-            /// @todo *= ?
+            /// @todo Use '*=' ?
             result = result * work_type::CONST_SQRT2;
         }
     }

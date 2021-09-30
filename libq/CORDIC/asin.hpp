@@ -81,13 +81,13 @@ auto
 
         typename result_type::storage_type const store{x.value()};
 
-        /// @todo -=
+        /// @todo Use '-='
         x = x - result_type::wrap(sign * (y.value() >> i));
-        /// @todo +=
+        /// @todo Use '+='
         y = y + result_type::wrap(sign * (store >> i));
-        /// @todo +=
+        /// @todo Use '+='
         z = sign > 0 ? z + angles[i] : z - angles[i];
-        /// @todo *=
+        /// @todo Use '*='
         _val = _val * scales[i];
     };
 #ifdef LOOP_UNROLLING

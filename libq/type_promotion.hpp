@@ -61,7 +61,7 @@ class type_promotion_base<libq::fixed_point<T, _n, _f, _e, op, up>,
     /// simple "type" wrapper for lazy instantiation of its "internal" type
     struct storage_type_promotion_traits
     {
-        // Note, boost::int_t takes a sign bit into account
+        /// @note boost::int_t takes a sign bit into account
         using type = typename std::conditional<
             Q::is_signed,
             typename boost::int_t<total_data_bits + This_class::sign_bit>,
