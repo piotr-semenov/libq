@@ -8,7 +8,7 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 
 if(MSVC)
   add_definitions(-D_SCL_SECURE_NO_WARNINGS -D_USE_MATH_DEFINES -DNOMINMAX)
-  add_compile_options(/bigobj)
+  add_compile_options(/bigobj /MP)
 endif(MSVC)
 
 # set(Boost_USE_STATIC_LIBS OFF)
