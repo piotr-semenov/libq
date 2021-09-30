@@ -89,7 +89,6 @@ void
     test_the_precision_of(Operation _op, Error _limit, logger &_log)
 {
     for (std::size_t it = 0; it != iterations; ++it) {
-        double const u1 = uniform_distribution_sample<Q_type1>();
         double const u2 = uniform_distribution_sample<Q_type2>();
 
         if (Q_type2(u2).value() == 0) {
@@ -97,18 +96,23 @@ void
             continue;
         }
 
+        double const  u1 = uniform_distribution_sample<Q_type1>();
         Q_type1 const a(u1);
         Q_type2 const b(u2);
 
         std::stringstream stream;
-        stream << Q_stringifier<Q_type1>::name() << "\t"
-               << Q_stringifier<Q_type2>::name() << "\t"
-               << std::setprecision(20) << u1 << "\t" << u2 << "\t";
+        stream << std::setprecision(20)  //
+               << " " << Q_stringifier<Q_type1>::name() << "=" << u1  //
+               << " " << Q_stringifier<Q_type2>::name() << "=" << u2;
 
         try {
-            double const abs_diff = std::fabs(_op(a, b) - _op(u1, u2));
+            auto const ref = _op(u1, u2);
+            auto const res = _op(a, b);
+            double const abs_diff = std::fabs(res - ref);
 
-            stream << abs_diff;
+            stream << " ref=" << ref;
+            stream << " res=" << res;
+            stream << " abs_diff=" << abs_diff;
             std::string const message = stream.str();
 
             if (abs_diff > _limit(u1,
@@ -116,25 +120,23 @@ void
                                   static_cast<double>(a),
                                   static_cast<double>(b))) {
                 BOOST_LOG_SEV(_log, logging::trivial::error)
-                    << "[Error]\t" << message;
+                    << "[Error]" << message;
                 BOOST_CHECK_MESSAGE(false, message);
             } else {
                 BOOST_LOG_SEV(_log, logging::trivial::info)
-                    << "[Info]\t" << message;
+                    << "[Info]" << message;
             }
         } catch (std::exception const &_e) {
-            stream << _e.what();
+            stream << "\t" << _e.what();
             std::string const message = stream.str();
             BOOST_LOG_SEV(_log, logging::trivial::error)
-                << "[Error]\t" << message;
+                << "[Error]" << message;
             BOOST_CHECK_MESSAGE(false, message);
         }
     }
 }
 
-template <typename Q_type1,
-          typename Operation,
-          std::size_t iterations = 100u>
+template <typename Q_type1, typename Operation, std::size_t iterations = 100u>
 void
     test_the_precision_of(Operation _op, Error _limit, logger &_log)
 {
