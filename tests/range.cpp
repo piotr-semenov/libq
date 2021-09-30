@@ -52,12 +52,14 @@ BOOST_AUTO_TEST_CASE(check_the_division_result_range)
 ///     of range
 BOOST_AUTO_TEST_CASE(out_of_range_policies)
 {
-    using Q = libq::UQ<8, 5>;
+    using namespace libq;
+    using Q =
+        UQ<8, 5, 0, overflow_exception_policy, underflow_exception_policy>;
 
     std::string const msg("positive overflow was detected");
+
     try {
         Q const x(std::numeric_limits<Q>::max() + 1);
-
         BOOST_FAIL(msg);
     } catch (std::overflow_error &) {
     }
