@@ -626,7 +626,7 @@ private:
     static storage_type
         calc_stored_integer_from(T const &_x, std::false_type)
     {
-        double const scale =
+        static constexpr double const scale =
             static_cast<double>(This_class::scaling_factor_exponent);
         double const value = static_cast<double>(_x) / details::exp2(scale);
         return storage_type(value) << This_class::bits_for_fractional;
@@ -639,18 +639,17 @@ private:
     static storage_type
         normalize(fixed_point<T1, n1, f1, e1, Ps...> const &_x, std::false_type)
     {
-        static std::size_t const shifts =
+        static constexpr std::size_t const shifts =
             (static_cast<int>(This_class::bits_for_fractional) +
              This_class::scaling_factor_exponent) -
             (e1 + f1);
         static_assert(shifts <= CHAR_BIT * sizeof(uintmax_t), "Invalid shift");
         storage_type const normalized = storage_type(_x.value()) << shifts;
 
-        typedef fixed_point<T1, n1, f1, e1, Ps...> operand_type;
+        typedef
+            typename fixed_point<T1, n1, f1, e1, Ps...>::storage_type st_type;
 
-        auto const un_shifted =
-            static_cast<typename operand_type::storage_type>(normalized >>
-                                                             shifts);
+        auto const un_shifted = static_cast<st_type>(normalized >> shifts);
 
         if (_x.value() != un_shifted) {
             overflow_policy::raise_event();
@@ -667,7 +666,7 @@ private:
     static storage_type
         normalize(fixed_point<T1, n1, f1, e1, Ps...> const &_x, std::true_type)
     {
-        static std::size_t const shifts =
+        static constexpr std::size_t const shifts =
             (static_cast<int>(e1) + f1) -
             (static_cast<int>(This_class::bits_for_fractional) +
              This_class::scaling_factor_exponent);
@@ -677,6 +676,7 @@ private:
         if (_x.value() && !normalized) {
             underflow_policy::raise_event();
         }
+
         return normalized;
     }
 
