@@ -21,8 +21,8 @@ auto
 {
     Base_class table;
 
-    for (std::size_t i = 1; i != n + 1; ++i) {
-        table[i - 1] = Q(1.0 / std::pow(2.0, 1.0 / std::pow(2.0, i)));
+    for (std::size_t i = 0; i < n; ++i) {
+        table[i] = Q(1.0 / std::pow(2.0, 1.0 / std::pow(2.0, i + 1)));
     }
 
     return This_class(table);
