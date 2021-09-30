@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.6)
+cmake_minimum_required(VERSION 3.20)
 
 project(libq VERSION 1.0.0.0)
 
