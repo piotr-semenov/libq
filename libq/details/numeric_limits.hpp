@@ -34,11 +34,14 @@ public:
     static bool const has_signaling_NaN = false;
 
     static bool const is_bounded = true;
+
+    /// @todo This is right?
     static bool const is_exact = false;
 
     static const bool is_iec599 = false;
     static const bool is_integer = false;
 
+    /// @todo This is right?
     static bool const is_modulo = true;
     static bool const is_signed = Q::is_signed;
     static bool const is_specialized = true;
@@ -46,6 +49,7 @@ public:
     static bool const tinyless_before = up::does_throw;
     static bool const traps = true;
 
+    /// @todo Maybe this is a choice
     static std::float_round_style const round_style = std::round_to_nearest;
 
     static int const digits = Q::number_of_significant_bits;
