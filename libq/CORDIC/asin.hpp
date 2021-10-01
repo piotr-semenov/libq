@@ -49,6 +49,7 @@ auto
 
     assert(("[std::asin] argument is not from [-1.0, 1.0]",
             std::fabs(_val) <= Q(1.0f)));
+
     if (std::fabs(_val) > Q(1.0f)) {
         throw std::logic_error("[std::asin] argument is out of range");
     }

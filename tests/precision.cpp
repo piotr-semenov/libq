@@ -62,6 +62,7 @@ public:
         name()
     {
         static std::string type_label;
+
         if (type_label.empty()) {
             std::stringstream stream;
             stream << (Q_type::is_signed ? "Q" : "UQ")
@@ -106,8 +107,8 @@ void
                << " " << Q_stringifier<Q_type2>::name() << "=" << u2;
 
         try {
-            auto const ref = _op(u1, u2);
-            auto const res = _op(a, b);
+            auto const   ref = _op(u1, u2);
+            auto const   res = _op(a, b);
             double const abs_diff = std::fabs(res - ref);
 
             stream << " ref=" << ref;

@@ -16,6 +16,7 @@ int
     Q1 volatile result;
 
     auto const start = system_clock::now();
+
     for (uintmax_t i = 0; i != N; ++i) {
         result = std::acos(value);
     }

@@ -469,6 +469,7 @@ public:
         using word_type = typename diff_type::storage_type;
 
         This_class const converted(_x);
+
         if (details::does_sub_overflow(*this, converted)) {
             overflow_policy::raise_event();
         }

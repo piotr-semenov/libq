@@ -94,16 +94,19 @@ public:
     {
         return Q::wrap(0);
     }
+
     static Q
         infinity() throw()
     {
         return Q::wrap(0);
     }
+
     static Q
         quiet_NaN() throw()
     {
         return Q(0);
     }
+
     static Q
         signaling_NaN() throw()
     {

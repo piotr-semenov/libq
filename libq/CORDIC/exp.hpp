@@ -101,6 +101,7 @@ auto
     } else {
         libq::lift(result) >>= -power;
     }
+
     return result;
 }
 

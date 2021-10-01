@@ -24,6 +24,7 @@ auto
     using Q = libq::fixed_point<T, n, f, e, op, up>;
 
     typename Q::storage_type val = _x.value();
+
     if (val & Q::fractional_bits_mask) {
         val += Q::storage_type(1u) << Q::bits_for_fractional;
     }

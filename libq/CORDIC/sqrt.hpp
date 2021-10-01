@@ -140,6 +140,7 @@ auto
     }
 
     reduced_type result(x / norm);
+
     if (power > 0) {
         libq::lift(result) >>= (power >> 1u);
 
@@ -151,7 +152,7 @@ auto
         std::size_t const p(-power);
         libq::lift(result) <<= (p >> 1u);
 
-        if (p & 1u) {
+        if (0 != (p & 1u)) {
             /// @todo Use '*=' ?
             result = result * work_type::CONST_SQRT2;
         }
