@@ -157,10 +157,10 @@ public:
     /// @brief Binary mask to extract the integral bits only from the stored
     /// integer. This is tricky to process if n + f = max. possible word size.
     static constexpr std::uintmax_t const integer_bits_mask =
-        This_class::bits_for_integral > 0u
+        0u < This_class::bits_for_integral
             ? 2u * (EXP2N(This_class::bits_for_fractional +
                           This_class::bits_for_integral - 1u) -
-                    ((This_class::bits_for_fractional > 0u)
+                    (0 < This_class::bits_for_fractional
                          ? EXP2N(This_class::bits_for_fractional - 1u)
                          : 0u))
             : 0u;
@@ -168,7 +168,7 @@ public:
     /// @brief Binary mask to extract the fractional bits from the stored
     /// integer.
     static constexpr std::uintmax_t const fractional_bits_mask =
-        This_class::bits_for_fractional > 0u
+        0u < This_class::bits_for_fractional
             ? 2u * (EXP2N(This_class::bits_for_fractional - 1u) - 1u) + 1u
             : 0u;
 #undef EXP2N
