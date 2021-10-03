@@ -174,12 +174,10 @@ public:
 #undef EXP2N
 
     /// @brief The maximum value of stored integer for this fixed-point format.
-    static typename This_class::largest_type const largest_stored_integer =
-        boost::low_bits_mask_t<
-            This_class::number_of_significant_bits>::sig_bits;
+    static typename This_class::largest_type const largest_stored_integer;
 
     /// @brief Gets the maximum available fixed-point number.
-    static This_class
+    static constexpr This_class
         largest()
     {
         return This_class::wrap<typename This_class::largest_type>(
@@ -187,12 +185,10 @@ public:
     }
 
     /// @brief The minimum value of stored integer for this fixed-point format.
-    static std::intmax_t const least_stored_integer =
-        !!This_class::is_signed *
-        (-static_cast<std::intmax_t>(This_class::largest_stored_integer) - 1);
+    static std::intmax_t const least_stored_integer;
 
     /// @brief Gets the minimum available fixed-point number.
-    static This_class
+    static constexpr This_class
         least()
     {
         return This_class::wrap(This_class::least_stored_integer);
@@ -710,6 +706,30 @@ private:
         lift<value_type, n, f, e, overflow_policy, underflow_policy>(
             This_class &);
 };
+
+template <typename value_type,
+          std::size_t n,
+          std::size_t f,
+          int         e,
+          class op,
+          class up>
+constexpr typename fixed_point<value_type, n, f, e, op, up>::largest_type const
+    fixed_point<value_type, n, f, e, op, up>::largest_stored_integer =
+        boost::low_bits_mask_t<fixed_point<value_type, n, f, e, op, up>::
+                                   number_of_significant_bits>::sig_bits;
+
+template <typename value_type,
+          std::size_t n,
+          std::size_t f,
+          int         e,
+          class op,
+          class up>
+constexpr std::intmax_t const
+    fixed_point<value_type, n, f, e, op, up>::least_stored_integer =
+        !!fixed_point<value_type, n, f, e, op, up>::is_signed *
+        (-static_cast<std::intmax_t>(
+             fixed_point<value_type, n, f, e, op, up>::largest_stored_integer) -
+         1);
 
 /// @brief Short-cut for the signed fixed-point with just 2 template parameters
 /// n and f.
