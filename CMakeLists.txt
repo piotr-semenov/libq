@@ -13,7 +13,7 @@ endif(MSVC)
 
 # set(Boost_USE_STATIC_LIBS OFF)
 set(Boost_USE_MULTITHREADED ON)
-find_package(Boost 1.66 COMPONENTS log unit_test_framework)
+find_package(Boost 1.66 COMPONENTS log log_setup unit_test_framework)
 
 add_library(libq INTERFACE)
 target_link_directories(libq INTERFACE ${Boost_LIBRARY_DIRS})
