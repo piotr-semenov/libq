@@ -50,20 +50,22 @@ T const &
     @tparam value_type Built-in integral type to represent a fixed-point number.
     @tparam n Number of integral bits.
     @tparam f Number of fractional bits.
+    @tparam e Exponent of the pre-scaling factor \f$2^e\f$.
+    @tparam op Policy class specifying the actions to do if overflow occurred.
+    @tparam up Policy class specifying the actions to do if underflow occurred.
+
     @remark Note, \f$n\f$ and \f$f\f$ exclude the sign bit.
     So if storage_type is signed then total number of bits is \f$(n + f + 1)\f$.
     @remark Note, the supremum of \f$(n + f)\f$ is
     std::numeric_limits<std::uintmax_t>::digits in case of the unsigned numbers
     and std::numeric_limits<std::intmax_t>::digits in case of the signed
     numbers.
-    @tparam e Exponent of the pre-scaling factor \f$2^e\f$.
-    @tparam op Policy class specifying the actions to do if overflow occurred.
-    @tparam up Policy class specifying the actions to do if underflow occurred.
 
     <B>Usage</B>
 
     <I>Example 1</I>: Flexible switch between the floating-point calculations
     and fixed precision calculations while algorithm staying the same.
+
     @code{.cpp}
         #include "libq/fixed_point.hpp"
         #include <iostream>
@@ -113,24 +115,26 @@ class fixed_point
                                   std::uintmax_t>::type;
 
 public:
-    using type = This_class;
-    using overflow_policy = op;
-    using underflow_policy = up;
-
     /// @brief Used type for the stored integer.
     using storage_type = value_type;
 
-    static constexpr int scaling_factor_exponent = e;
-
-    /// @brief Total number of significant bits.
-    static constexpr std::size_t const number_of_significant_bits = n + f;
+    /// @brief Number of bits to represent the integral part.
+    static constexpr std::size_t const bits_for_integral = n;
 
     /// @brief Queried number of bits to represent the fractional part of
     /// fixed-point number.
     static constexpr std::size_t const bits_for_fractional = f;
 
-    /// @brief Number of bits to represent the integral part.
-    static constexpr std::size_t const bits_for_integral = n;
+    static constexpr int scaling_factor_exponent = e;
+
+    using overflow_policy = op;
+    using underflow_policy = up;
+
+    using type = This_class;
+
+    /// @brief Total number of significant bits.
+    static constexpr std::size_t const number_of_significant_bits =
+        bits_for_integral + bits_for_fractional;
 
     /// @brief This checks if this fixed-point number is signed.
     static constexpr bool const is_signed =
@@ -155,7 +159,8 @@ public:
         EXP2N(This_class::bits_for_fractional);
 
     /// @brief Binary mask to extract the integral bits only from the stored
-    /// integer. This is tricky to process if n + f = max. possible word size.
+    /// integer. This is tricky to process if bits_for_integral +
+    /// bits_for_fractional = max. possible word size.
     static constexpr std::uintmax_t const integer_bits_mask =
         0u < This_class::bits_for_integral
             ? 2u * (EXP2N(This_class::bits_for_fractional +

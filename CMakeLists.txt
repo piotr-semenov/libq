@@ -19,47 +19,48 @@ add_library(libq INTERFACE)
 target_link_directories(libq INTERFACE ${Boost_LIBRARY_DIRS})
 target_sources(
   libq
-  INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/libq/arithmetics_safety.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/acos.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/acosh.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/asin.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/asinh.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/atan.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/atanh.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/cos.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/cosh.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/exp.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/log.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/arctan_lut.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/arctanh_lut.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/circular_scales.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/hyperbolic_scale.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/inv_pow2_lut.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/lut.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/lut/pow2_lut.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sin.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sinh.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/sqrt.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/tan.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/CORDIC/tanh.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/ceil.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/div_of.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fabs.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fixed_point_common.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/floor.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/fmod.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/loop_unroller.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/mult_of.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/numeric_limits.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/remainder.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/round.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sign.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/sum_traits.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/details/type_traits.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/fixed_point.hpp
-            ${CMAKE_CURRENT_SOURCE_DIR}/libq/type_promotion.hpp)
+  INTERFACE
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/arithmetics_safety.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/acos.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/acosh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/asin.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/asinh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/atan.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/atanh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/cos.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/cosh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/exp.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/log.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/lut/arctan_lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/lut/arctanh_lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/lut/circular_scales.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/lut/hyperbolic_scale.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/lut/inv_pow2_lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/lut/lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/lut/pow2_lut.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/sin.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/sinh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/sqrt.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/tan.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/CORDIC/tanh.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/ceil.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/div_of.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/fabs.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/fixed_point_common.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/floor.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/fmod.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/loop_unroller.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/mult_of.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/numeric_limits.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/remainder.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/round.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/sign.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/sum_traits.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/details/type_traits.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/fixed_point.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/type_promotion.hpp)
 
-target_include_directories(libq INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}
+target_include_directories(libq INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include
                                           ${Boost_INCLUDE_DIR})
 target_link_libraries(libq INTERFACE Boost::boost)
 target_compile_features(
@@ -121,8 +122,8 @@ target_compile_features(
             cxx_variadic_macros
             cxx_variadic_templates
             cxx_template_template_parameters)
-target_precompile_headers(libq INTERFACE
-                          ${CMAKE_CURRENT_SOURCE_DIR}/libq/fixed_point.hpp)
+target_precompile_headers(
+  libq INTERFACE ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/fixed_point.hpp)
 
 set(LIBQ_TEST
     ON
@@ -205,9 +206,12 @@ if(DOXYGEN_FOUND)
   endif(EXISTS dot/targets.dot)
 
   doxygen_add_docs(
-    doxygen-${PROJECT_NAME} ${TARGETS_PAGE}
-    ${CMAKE_CURRENT_SOURCE_DIR}/README.md ${CMAKE_CURRENT_SOURCE_DIR}/examples/
-    ${CMAKE_CURRENT_SOURCE_DIR}/libq/ ${CMAKE_CURRENT_SOURCE_DIR}/tests/)
+    doxygen-${PROJECT_NAME}
+    ${TARGETS_PAGE}
+    ${CMAKE_CURRENT_SOURCE_DIR}/README.md
+    ${CMAKE_CURRENT_SOURCE_DIR}/examples/
+    ${CMAKE_CURRENT_SOURCE_DIR}/include/libq/
+    ${CMAKE_CURRENT_SOURCE_DIR}/tests/)
   set(FILES_TO_CLEAN_
       ${FILES_TO_CLEAN_} ${CMAKE_CURRENT_BINARY_DIR}/doxygen.log
       ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}.tag
