@@ -157,14 +157,40 @@ public:
     }
 };
 
-#define error(_precision, _prescale)                                   \
-    [](double, double, double, double) -> double {                     \
-        static constexpr double const precision = _precision;          \
-        static constexpr auto const   prescale = _prescale;            \
-        static double const           factor =                         \
-            static_cast<double>(uintmax_t(1) << std::abs(prescale));   \
-        return 2 * precision * (0 < prescale ? 1.0 / factor : factor); \
-    }
+static Error
+    error_4(double precision)
+{
+    return [precision](double, double, double, double) -> double {
+        return precision;
+    };
+}
+
+static Error
+    error_1(double precision, int prescale)
+{
+    auto const factor = static_cast<double>(uintmax_t(1) << std::abs(prescale));
+    auto const factor_1 = 0 < prescale ? 1.0 / factor : factor;
+    auto const factor_2 = 2 * precision * factor_1;
+    return error_4(factor_2);
+}
+
+static Error
+    error_2(double precision1, double precision2)
+{
+    return [precision1,
+            precision2](double _x, double _y, double, double) -> double {
+        return std::fabs(_x) * precision1 + std::fabs(_y) * precision2;
+    };
+}
+
+static Error
+    error_3(double precision1, double precision2)
+{
+    return [precision1,
+            precision2](double, double _y, double _a, double _b) -> double {
+        return (precision1 + std::fabs(_a / _b) * precision2) / std::fabs(_y);
+    };
+}
 
 BOOST_AUTO_TEST_CASE(precision_of_plus)
 {
@@ -186,11 +212,11 @@ BOOST_AUTO_TEST_CASE(precision_of_plus)
 
     test_the_precision_of<UQ<23, 13, 3> >(
         op,
-        error(1E-3, 3),
+        error_1(1E-3, 3),
         custom_log);  // floor(log(10,2^13-1))=3
-    test_the_precision_of<Q<56, 34, -5> >(op, error(1E-10, -5), custom_log);
-    test_the_precision_of<Q<61, 52, 3> >(op, error(1E-15, 3), custom_log);
-    test_the_precision_of<UQ<53, 23, 7> >(op, error(1E-6, 7), custom_log);
+    test_the_precision_of<Q<56, 34, -5> >(op, error_1(1E-10, -5), custom_log);
+    test_the_precision_of<Q<61, 52, 3> >(op, error_1(1E-15, 3), custom_log);
+    test_the_precision_of<UQ<53, 23, 7> >(op, error_1(1E-6, 7), custom_log);
 }
 
 /**
@@ -215,13 +241,11 @@ BOOST_AUTO_TEST_CASE(precision_of_minus)
     using libq::Q;
     using libq::UQ;
 
-    test_the_precision_of<Q<28, 13, 5> >(op, error(1E-3, 5), custom_log);
-    test_the_precision_of<Q<56, 34, -6> >(op, error(1E-10, -6), custom_log);
-    test_the_precision_of<Q<61, 52, 23> >(op, error(1E-15, 23), custom_log);
-    test_the_precision_of<Q<53, 23, 1> >(op, error(1E-6, 1), custom_log);
+    test_the_precision_of<Q<28, 13, 5> >(op, error_1(1E-3, 5), custom_log);
+    test_the_precision_of<Q<56, 34, -6> >(op, error_1(1E-10, -6), custom_log);
+    test_the_precision_of<Q<61, 52, 23> >(op, error_1(1E-15, 23), custom_log);
+    test_the_precision_of<Q<53, 23, 1> >(op, error_1(1E-6, 1), custom_log);
 }
-
-#undef error
 
 class multiply_op
 {
@@ -233,13 +257,6 @@ public:
         return static_cast<double>(_x * _y);
     }
 };
-
-#define error(_precision1, _precision2)                                 \
-    [](double _x, double _y, double _a, double _b) -> double {          \
-        static constexpr double const precision1 = _precision1;         \
-        static constexpr double const precision2 = _precision2;         \
-        return std::fabs(_x) * precision1 + std::fabs(_y) * precision2; \
-    }
 
 BOOST_AUTO_TEST_CASE(precision_of_multiplication)
 {
@@ -254,33 +271,31 @@ BOOST_AUTO_TEST_CASE(precision_of_multiplication)
     using libq::UQ;
 
     test_the_precision_of<UQ<18, 13>, UQ<20, 15> >(op,
-                                                   error(1E-3, 1E-4),
+                                                   error_2(1E-3, 1E-4),
                                                    custom_log);
     test_the_precision_of<Q<24, 23>, Q<30, 22> >(op,
-                                                 error(1E-6, 1E-6),
+                                                 error_2(1E-6, 1E-6),
                                                  custom_log);
     test_the_precision_of<Q<30, 29>, Q<33, 33> >(op,
-                                                 error(1E-8, 1E-9),
+                                                 error_2(1E-8, 1E-9),
                                                  custom_log);
 
     test_the_precision_of<UQ<18, 13>, UQ<18, 13> >(op,
-                                                   error(1E-3, 1E-3),
+                                                   error_2(1E-3, 1E-3),
                                                    custom_log);
     test_the_precision_of<UQ<20, 15>, UQ<20, 15> >(op,
-                                                   error(1E-4, 1E-4),
+                                                   error_2(1E-4, 1E-4),
                                                    custom_log);
     test_the_precision_of<Q<24, 23>, Q<24, 23> >(op,
-                                                 error(1E-6, 1E-6),
+                                                 error_2(1E-6, 1E-6),
                                                  custom_log);
     test_the_precision_of<Q<30, 22>, Q<30, 22> >(op,
-                                                 error(1E-6, 1E-6),
+                                                 error_2(1E-6, 1E-6),
                                                  custom_log);
     test_the_precision_of<Q<30, 29>, Q<30, 29> >(op,
-                                                 error(1E-8, 1E-8),
+                                                 error_2(1E-8, 1E-8),
                                                  custom_log);
 }
-
-#undef error
 
 class division_op
 {
@@ -292,13 +307,6 @@ public:
         return static_cast<double>(_x / _y);
     }
 };
-
-#define error(_precision1, _precision2)                                        \
-    [](double _x, double _y, double _a, double _b) -> double {                 \
-        static constexpr double const precision1 = _precision1;                \
-        static constexpr double const precision2 = _precision2;                \
-        return (precision1 + std::fabs(_a / _b) * precision2) / std::fabs(_y); \
-    }
 
 BOOST_AUTO_TEST_CASE(precision_of_division)
 {
@@ -314,36 +322,34 @@ BOOST_AUTO_TEST_CASE(precision_of_division)
     using libq::UQ;
 
     test_the_precision_of<UQ<18, 13, 1>, UQ<20, 15, -3> >(op,
-                                                          error(1E-3, 1E-4),
+                                                          error_3(1E-3, 1E-4),
                                                           custom_log);
     test_the_precision_of<Q<24, 23, -20>, Q<30, 22, 4> >(op,
-                                                         error(1E-6, 1E-6),
+                                                         error_3(1E-6, 1E-6),
                                                          custom_log);
     test_the_precision_of<Q<29, 29>, Q<33, 33> >(op,
-                                                 error(1E-8, 1E-9),
+                                                 error_3(1E-8, 1E-9),
                                                  custom_log);
     test_the_precision_of<Q<52, 52, -2>, Q<5, 4, 4> >(op,
-                                                      error(1E-15, 1E-1),
+                                                      error_3(1E-15, 1E-1),
                                                       custom_log);
 
     test_the_precision_of<UQ<18, 13>, UQ<18, 13> >(op,
-                                                   error(1E-3, 1E-3),
+                                                   error_3(1E-3, 1E-3),
                                                    custom_log);
     test_the_precision_of<UQ<20, 15, 1>, UQ<20, 15> >(op,
-                                                      error(1E-4, 1E-4),
+                                                      error_3(1E-4, 1E-4),
                                                       custom_log);
     test_the_precision_of<Q<24, 23>, Q<24, 23, 2> >(op,
-                                                    error(1E-6, 1E-6),
+                                                    error_3(1E-6, 1E-6),
                                                     custom_log);
     test_the_precision_of<Q<30, 22>, Q<30, 22> >(op,
-                                                 error(1E-6, 1E-6),
+                                                 error_3(1E-6, 1E-6),
                                                  custom_log);
     test_the_precision_of<Q<30, 29, 5>, Q<30, 29> >(op,
-                                                    error(1E-8, 1E-8),
+                                                    error_3(1E-8, 1E-8),
                                                     custom_log);
 }
-
-#undef error
 
 class log_op
 {
@@ -356,12 +362,6 @@ public:
     }
 };
 
-#define error(_precision)                                     \
-    [](double, double, double, double) -> double {            \
-        static constexpr double const precision = _precision; \
-        return precision;                                     \
-    }
-
 BOOST_AUTO_TEST_CASE(precision_of_log)
 {
     log_op const op;
@@ -371,11 +371,11 @@ BOOST_AUTO_TEST_CASE(precision_of_log)
     using libq::UQ;
 
     test_the_precision_of<UQ<23, 17> >(op,
-                                       error(1E-4),
+                                       error_4(1E-4),
                                        custom_log);  // floor(log(10, 2^f))-1
-    test_the_precision_of<UQ<32, 16> >(op, error(1E-3), custom_log);
-    test_the_precision_of<UQ<43, 20> >(op, error(1E-4), custom_log);
-    test_the_precision_of<UQ<50, 13> >(op, error(1E-2), custom_log);
+    test_the_precision_of<UQ<32, 16> >(op, error_4(1E-3), custom_log);
+    test_the_precision_of<UQ<43, 20> >(op, error_4(1E-4), custom_log);
+    test_the_precision_of<UQ<50, 13> >(op, error_4(1E-2), custom_log);
 }
 
 #if 0
