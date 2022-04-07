@@ -1,0 +1,5 @@
+/** @mainpage libq targets
+    
+    # CMake targets structure
+    @dotfile targets.dot width=50%
+*/
